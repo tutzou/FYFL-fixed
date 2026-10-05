@@ -226,6 +226,10 @@ html,body{max-width:100%;overflow-x:hidden}.nav{gap:12px}.auth-actions{display:f
 .fyfl-live-sync{position:fixed;right:14px;bottom:14px;z-index:9998;background:rgba(12,17,24,.92);border:1px solid #2b3442;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:900;color:#7ee787;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none}
 .fyfl-live-sync.show{opacity:1;transform:none}
 </style>
+<style id="fyfl-credit-fix">
+.fyfl-credit-card{display:flex;align-items:center;justify-content:center;text-align:center;min-height:150px}
+.fyfl-credit-card h3{margin:0;font-size:22px}
+</style>
 <style id="fyfl-mobile-nav-fix">
 @media(max-width:700px){
   header .nav{width:100%;box-sizing:border-box;overflow:visible}
@@ -272,7 +276,7 @@ html,body{max-width:100%;overflow-x:hidden}.nav{gap:12px}.auth-actions{display:f
    Colle ici ton URL Supabase et ta clé PUBLISHABLE/anon.
    Ne mets JAMAIS la clé service_role/secret dans ce fichier. */
 const FYFL_SUPABASE_URL="https://dxbaicqbpccruebmlorb.supabase.co";
-const FYFL_DATA_RESET_AT='2026-10-05T15:27:00.000Z';
+const FYFL_DATA_RESET_AT='2026-10-05T15:40:00.000Z';
 const FYFL_SUPABASE_KEY="sb_publishable_pglwhtDgDHi6DV931NsfTQ_tUGo4-Jk";
 let fyflSupabase=null;
 let fyflRealtimeChannel=null;
@@ -316,8 +320,8 @@ function normalizeSeasonResults(rows){
   });
 }
 function cleanStandingsOverrides(value){
-  if(!value||typeof value!=='object')return {};
-  return Object.fromEntries(Object.entries(value).filter(([,v])=>v&&typeof v==='object'&&v.manual===true));
+  // Reset all manual ranking overrides so standings come only from the two official results.
+  return {};
 }
 function setRemoteResults(rows){
   results=normalizeSeasonResults(rows);
@@ -585,7 +589,7 @@ function broadcastLive(){try{new BroadcastChannel('fyfl-live').postMessage({type
 function startLiveTicker(){if(window.__liveTimer)return;window.__liveTimer=setInterval(()=>{const pg=getCurrentPage();if(['matches','home','ranking','admin'].includes(pg))render(pg,false)},1000)}
 function pageHome(){return `<section class="hero"><div><div class="eyebrow">SAISON 1 · COMPÉTITION OFFICIELLE</div><h1>FRENCH YOUTH<br><span>FUT LEAGUE</span></h1><p>Bienvenue sur la plateforme officielle de la <b>FYFL</b>. Suivez les poules, les classements et tous les résultats.</p><div class="hero-actions"><button onclick="render('ranking')">Voir le classement</button><button class="secondary" onclick="render('matches')">Voir les résultats</button></div></div><img class="hero-logo" src="fyfl-logo.png"></section>
 <section class="section"><div class="section-head"><h2>⚡ Infos rapides</h2><small>FYFL Saison 1</small></div><div class="feature-grid">
-<div class="feature-card"><div class="mini-label">⏳ PROCHAIN MATCH</div><h3>Website created by tutzou !</h3><div class="countdown" id="countdown">--:--:--</div><p>Le prochain match de poule</p></div>
+<div class="feature-card fyfl-credit-card"><h3>Website Created By Tutzou</h3></div>
 <div class="feature-card"><div class="mini-label">🏅 JOUEUR DU MOIS</div><div class="player-month"><div class="player-avatar">🏆</div><div><h3 style="margin:8px 0 0">${escapeHtml(getAdminPrefs().player||"À déterminer")}</h3><p style="margin:6px 0 0">Le meilleur joueur sera bientôt annoncé.</p></div></div></div>
 <div class="feature-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="mini-label">⚽ STATUT DES MATCHS</div><button class="results-head-actions" style="font-size:11px;padding:7px 9px;background:#151b25;color:#fff;border:1px solid #303846;border-radius:9px;font-weight:800;cursor:pointer" onclick="render('matches')">Voir tous les matchs à venir →</button></div><div style="margin-top:12px;max-height:220px;overflow:auto;padding-right:4px">${getUpcomingMatches().map(x=>`<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:7px;padding:9px 5px;border-bottom:1px solid #202834"><div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800">${crest(x.h,"mini-logo")}${x.h}</div><div style="text-align:center;font-size:11px;font-weight:900;color:#ff8a22">VS</div><div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:11px;font-weight:800">${x.a}${crest(x.a,"mini-logo")}</div></div>`).join("")}</div><p style="margin:10px 0 0;text-align:center">Journée 1 · Tous les matchs à venir</p></div>
 </div></section>
@@ -611,7 +615,7 @@ function toggleHalloween(){document.body.classList.toggle('halloween-theme');con
 function spawnPumpkin(){const p=document.createElement('div');p.className='halloween-fall';p.textContent=['🎃','🦇','🍬','🕸️'][Math.floor(Math.random()*4)];p.style.left=(Math.random()*96)+'vw';p.style.fontSize=(18+Math.random()*18)+'px';p.style.animationDuration=(5+Math.random()*6)+'s';document.body.appendChild(p);setTimeout(()=>p.remove(),12000)}
 setInterval(()=>{if(document.body.classList.contains('halloween-theme'))spawnPumpkin()},1800);setTimeout(()=>{if(document.body.classList.contains('halloween-theme'))spawnPumpkin()},200);
 function nextWednesday(){const d=new Date();const day=d.getDay();let add=(3-day+7)%7;if(add===0 && d.getHours()>=18)add=7;const n=new Date(d);n.setDate(d.getDate()+add);n.setHours(18,0,0,0);return n}
-function updateCountdown(){const el=document.getElementById('countdown');if(!el)return;const diff=Math.max(0,nextWednesday()-new Date());const h=Math.floor(diff/36e5),m=Math.floor(diff/6e4)%60,sec=Math.floor(diff/1000)%60;el.textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')}
+function updateCountdown(){}
 setInterval(updateCountdown,1000);updateCountdown();
 window.openAdmin=openAdmin;window.openAdminLogin=openAdminLogin;window.toggleSpookySound=toggleSpookySound;
 
