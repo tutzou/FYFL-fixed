@@ -266,7 +266,7 @@ html,body{max-width:100%;overflow-x:hidden}.nav{gap:12px}.auth-actions{display:f
 
 <div class="breaking-news"><b>BREAKING</b><span id="breakingNewsText">REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !</span><a href="https://discord.gg/fyfl" target="_blank" rel="noopener">↗</a></div><div id="fyflLiveSync" class="fyfl-live-sync">● EN DIRECT</div>
 <header><div class="nav"><div class="brand"><img src="fyfl-logo.png"><span>FYFL</span></div>
-<nav><button class="active" data-page="home">Accueil</button><button data-page="matches">Matchs / Résultats</button><button data-page="teams">Équipes</button><button data-page="competitions">Compétitions</button><button data-page="news">FYFL - NEWS</button><button data-page="comments">💬 Commentaires</button></nav><div class="auth-actions" id="authActions"></div></div></header>
+<nav><button class="active" data-page="home">Accueil</button><button data-page="matches">Matchs / Résultats</button><button data-page="ranking">Classement</button><button data-page="teams">Équipes</button><button data-page="competitions">Compétitions</button><button data-page="news">FYFL - NEWS</button><button data-page="comments">💬 Commentaires</button></nav><div class="auth-actions" id="authActions"></div></div></header>
 <main id="app"></main><footer>FYFL — French Youth Fut League · Saison 1<br><small>Les écussons appartiennent à leurs clubs respectifs.</small></footer>
 <div id="newsAlert" class="news-alert"><button onclick="document.getElementById('newsAlert').remove()" aria-label="Fermer">×</button><div style="font-size:11px;letter-spacing:.12em;color:#ff8a22;font-weight:900">📢 FYFL NEWS</div><strong>Les matchs sont les mercredis et les week-ends !</strong><div style="color:#aaa;margin-top:5px;font-size:13px">Pense à rester actif sur le Discord.</div></div>
 <button id="halloweenToggle" class="halloween-toggle" onclick="toggleHalloween()">🎃 Halloween ON</button>
@@ -284,7 +284,7 @@ let fyflRemoteReady=false;
 let fyflInitPromise=null;
 
 const groups={"A": ["ASTON VILLA", "OM", "BAYER LEVERKUSEN", "NEWCASTLE"], "B": ["BARCELONE", "BESIKTAS", "LIVERPOOL", "REAL MADRID"], "C": ["CRYSTAL PALACE", "PSG", "ATLETICO MADRID", "JUVENTUS"], "D": ["AS MONACO", "LAZIO FC", "D2T", "FIORENTINA"], "E": ["INTER MILAN", "RED STAR", "ARSENAL", "AC MILAN"], "F": ["RENNES", "CHELSEA", "MANCHESTER CITY", "BAYERN MUNICH"]};
-const defaultResults=[{"group": "F", "home": "RENNES", "away": "CHELSEA", "hs": 9, "as": 2, "status": "Terminé", "minute": 90, "goals": []}, {"group": "F", "home": "MANCHESTER CITY", "away": "BAYERN MUNICH", "hs": 7, "as": 0, "status": "Terminé", "minute": 90, "goals": []}];
+const defaultResults=[];
 let results=defaultResults.map(x=>({...x}));
 let fyflSettings={breaking:'REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !',player:'À déterminer',news:'Les matchs FYFL se joueront les mercredis et les week-ends !',standings:{}};
 let fyflComments=[];
@@ -311,30 +311,30 @@ function isCurrentPlayedMatch(m){
       ||(m.group==='F'&&m.home==='MANCHESTER CITY'&&m.away==='BAYERN MUNICH'&&Number(m.hs)===7&&Number(m.as)===0&&m.status==='Terminé');
 }
 function normalizeSeasonResults(rows){
-  // Nouveau classement : tout repart à zéro, sauf les deux matchs déjà joués.
-  // On garde exactement les 6 poules et les 18 affiches prévues (3 journées x 6 poules).
-  // Les deux résultats officiels sont conservés même si Supabase est vide au premier chargement.
-  const remote=(Array.isArray(rows)?rows:[]).map(fyflFromRow);
-  const officialSeed=[
-    {group:'F',day:1,home:'RENNES',away:'CHELSEA',hs:9,as:2,status:'Terminé',minute:90,goals:[]},
-    {group:'F',day:1,home:'MANCHESTER CITY',away:'BAYERN MUNICH',hs:7,as:0,status:'Terminé',minute:90,goals:[]}
-  ];
-  const official=new Map();
-  officialSeed.forEach(m=>official.set(`${m.group}|${m.home}|${m.away}`,m));
-  remote.filter(isCurrentPlayedMatch).forEach(m=>official.set(`${m.group}|${m.home}|${m.away}`,m));
+  // La base Supabase est la source de vérité : on conserve les matchs distants
+  // (à venir, en direct ou terminés) et on complète uniquement les affiches manquantes.
+  const remote=new Map();
+  (Array.isArray(rows)?rows:[]).forEach(r=>{
+    const m=fyflFromRow(r);
+    const day=Number(m.day||findMatchDay(m));
+    const key=fyflMatchKey({...m,day});
+    remote.set(key,{...m,day});
+  });
   const out=[];
   Object.entries(groups).forEach(([g,arr])=>{
     const pairs={1:[[arr[0],arr[1]],[arr[2],arr[3]]],2:[[arr[0],arr[2]],[arr[1],arr[3]]],3:[[arr[0],arr[3]],[arr[1],arr[2]]]};
     Object.entries(pairs).forEach(([day,ps])=>ps.forEach(([home,away])=>{
-      const played=official.get(`${g}|${home}|${away}`)||official.get(`${g}|${away}|${home}`);
-      out.push(played?{...played,group:g,day:Number(day)}:{group:g,day:Number(day),home,away,hs:null,as:null,status:'À venir',minute:0,goals:[]});
+      const d=Number(day);
+      const key=fyflMatchKey({group:g,day:d,home,away});
+      const reverseKey=fyflMatchKey({group:g,day:d,home:away,away:home});
+      const found=remote.get(key)||remote.get(reverseKey);
+      out.push(found?{...found,group:g,day:d}:{group:g,day:d,home,away,hs:0,as:0,status:'À venir',minute:0,goals:[]});
     }));
   });
   return out;
 }
 function cleanStandingsOverrides(value){
-  // Reset all manual ranking overrides so standings come only from the two official results.
-  return {};
+  return (value && typeof value==='object') ? value : {};
 }
 function setRemoteResults(rows){
   results=normalizeSeasonResults(rows);
@@ -395,11 +395,11 @@ async function initFYFLSupabase(){
           if(payload.eventType==='DELETE'){const key=payload.old?.match_key;const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===key);if(i>=0)results.splice(i,1);}
           else if(payload.new){const incoming=fyflFromRow(payload.new);const allowedIncoming=isCurrentPlayedMatch(incoming)||incoming.status==='À venir'||incoming.status==='En direct';if(allowedIncoming){const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===payload.new.match_key);if(i>=0)results[i]=incoming;else results.push(incoming);}}
           flashLive();
-          const pg=getCurrentPage();if(['home','matches','admin'].includes(pg))render(pg,false);
+          const pg=getCurrentPage();if(['home','matches','ranking','admin'].includes(pg))render(pg,false);
           if(payload.eventType==='UPDATE'&&payload.new?.status==='En direct'){const newGoals=Array.isArray(payload.new.goals)?payload.new.goals:[];const g=newGoals[newGoals.length-1];const sig=g?JSON.stringify(g):'';if(g&&sig!==window.__lastGoalSignature){window.__lastGoalSignature=sig;showGoalAnimation(g.team,g.scorer,g.minute)}}
         })
         .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_settings'},payload=>{
-          if(payload.new){fyflSettings={...fyflSettings,breaking:payload.new.breaking||fyflSettings.breaking,player:payload.new.player||fyflSettings.player,news:payload.new.news||fyflSettings.news,standings:(payload.new.standings&&typeof payload.new.standings==='object')?payload.new.standings:(fyflSettings.standings||{})};fyflSettingsReady=true;applyAdminPrefs();flashLive();const pg=getCurrentPage();if(['home','news','admin'].includes(pg))render(pg,false);}
+          if(payload.new){fyflSettings={...fyflSettings,breaking:payload.new.breaking||fyflSettings.breaking,player:payload.new.player||fyflSettings.player,news:payload.new.news||fyflSettings.news,standings:(payload.new.standings&&typeof payload.new.standings==='object')?payload.new.standings:(fyflSettings.standings||{})};fyflSettingsReady=true;applyAdminPrefs();flashLive();const pg=getCurrentPage();if(['home','news','ranking','admin'].includes(pg))render(pg,false);}
         })
         .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_comments'},payload=>{
           if(payload.eventType==='DELETE'){fyflComments=fyflComments.filter(c=>c.id!==payload.old?.id);}
@@ -493,29 +493,16 @@ async function ensureRemoteFixtureSeed(){
   if(!fyflSupabase||!fyflRemoteReady||!isCurrentAccountAdminVerified())return false;
   const {data,error}=await fyflSupabase.from('fyfl_matches').select('*');
   if(error){console.warn('FYFL seed read:',error.message);return false;}
-  const currentPlayed=[
-    {group:'F',day:1,home:'RENNES',away:'CHELSEA',hs:9,as:2,status:'Terminé',minute:90,goals:[]},
-    {group:'F',day:1,home:'MANCHESTER CITY',away:'BAYERN MUNICH',hs:7,as:0,status:'Terminé',minute:90,goals:[]}
-  ];
-  const allowedPlayedKeys=new Set(currentPlayed.map(m=>fyflMatchKey(m)));
-  const stale=(data||[]).filter(r=>r.status==='Terminé'&&!allowedPlayedKeys.has(r.match_key));
-  for(const r of stale){
-    const {error:delError}=await fyflSupabase.from('fyfl_matches').delete().eq('match_key',r.match_key);
-    if(delError)console.warn('FYFL cleanup:',delError.message);
-  }
-  const remaining=(data||[]).filter(r=>!(r.status==='Terminé'&&!allowedPlayedKeys.has(r.match_key)));
-  const days=buildAllMatchDays();
+  const existingKeys=new Set((data||[]).map(r=>r.match_key));
   const seed=[];
-  const existingKeys=new Set(remaining.map(r=>r.match_key));
+  const days=buildAllMatchDays();
   [1,2,3].forEach(day=>(days[day]||[]).forEach(m=>{
     const row=fyflToRow({...m,day});
     if(!existingKeys.has(row.match_key))seed.push(row);
   }));
-  const canonicalRows=currentPlayed.map(m=>fyflToRow(m));
-  const allUpserts=[...canonicalRows,...seed];
-  if(allUpserts.length){
-    const {error:upError}=await fyflSupabase.from('fyfl_matches').upsert(allUpserts,{onConflict:'match_key'});
-    if(upError){console.warn('FYFL seed upsert:',upError.message);return false;}
+  if(seed.length){
+    const {error:upError}=await fyflSupabase.from('fyfl_matches').upsert(seed,{onConflict:'match_key'});
+    if(upError){window.__fyflLastMatchSyncError=upError.message||String(upError);console.warn('FYFL seed upsert:',upError.message);return false;}
   }
   const {data:all}=await fyflSupabase.from('fyfl_matches').select('*');
   if(Array.isArray(all))setRemoteResults(all);

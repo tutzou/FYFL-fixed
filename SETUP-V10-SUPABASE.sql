@@ -92,12 +92,12 @@ do $$ begin alter publication supabase_realtime add table public.fyfl_comments; 
 
 
 -- ============================================================
--- FYFL V14 - REMISE À ZÉRO DU CLASSEMENT ET DES MATCHS
--- À exécuter UNE FOIS après la mise à jour du site.
--- Résultats conservés :
---   Rennes 9-2 Chelsea
---   Manchester City 7-0 Bayern Munich
--- Tous les autres matchs sont remis "À venir".
+-- FYFL V17 - REMISE À ZÉRO COMPLÈTE
+-- À exécuter UNE FOIS dans Supabase SQL Editor.
+-- Tous les matchs sont À VENIR sauf les deux matchs déjà joués de la poule F.
+-- Rennes et Manchester City ont chacun 3 points et 1 match joué.
+-- Les commandes admin modifient ensuite ces lignes dans Supabase
+-- et les changements sont diffusés à tous les visiteurs via Realtime.
 -- ============================================================
 
 delete from public.fyfl_matches;
@@ -105,43 +105,45 @@ delete from public.fyfl_matches;
 insert into public.fyfl_matches
   (match_key, group_name, day, home, away, home_score, away_score, status, minute, goals, started_at, updated_at)
 values
-  ('A|1|ASTON VILLA|OM', 'A', 1, 'ASTON VILLA', 'OM', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('A|1|BAYER LEVERKUSEN|NEWCASTLE', 'A', 1, 'BAYER LEVERKUSEN', 'NEWCASTLE', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('A|2|ASTON VILLA|BAYER LEVERKUSEN', 'A', 2, 'ASTON VILLA', 'BAYER LEVERKUSEN', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('A|2|OM|NEWCASTLE', 'A', 2, 'OM', 'NEWCASTLE', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('A|3|ASTON VILLA|NEWCASTLE', 'A', 3, 'ASTON VILLA', 'NEWCASTLE', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('A|3|OM|BAYER LEVERKUSEN', 'A', 3, 'OM', 'BAYER LEVERKUSEN', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('B|1|BARCELONE|BESIKTAS', 'B', 1, 'BARCELONE', 'BESIKTAS', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('B|1|LIVERPOOL|REAL MADRID', 'B', 1, 'LIVERPOOL', 'REAL MADRID', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('B|2|BARCELONE|LIVERPOOL', 'B', 2, 'BARCELONE', 'LIVERPOOL', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('B|2|BESIKTAS|REAL MADRID', 'B', 2, 'BESIKTAS', 'REAL MADRID', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('B|3|BARCELONE|REAL MADRID', 'B', 3, 'BARCELONE', 'REAL MADRID', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('B|3|BESIKTAS|LIVERPOOL', 'B', 3, 'BESIKTAS', 'LIVERPOOL', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('C|1|CRYSTAL PALACE|PSG', 'C', 1, 'CRYSTAL PALACE', 'PSG', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('C|1|ATLETICO MADRID|JUVENTUS', 'C', 1, 'ATLETICO MADRID', 'JUVENTUS', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('C|2|CRYSTAL PALACE|ATLETICO MADRID', 'C', 2, 'CRYSTAL PALACE', 'ATLETICO MADRID', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('C|2|PSG|JUVENTUS', 'C', 2, 'PSG', 'JUVENTUS', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('C|3|CRYSTAL PALACE|JUVENTUS', 'C', 3, 'CRYSTAL PALACE', 'JUVENTUS', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('C|3|PSG|ATLETICO MADRID', 'C', 3, 'PSG', 'ATLETICO MADRID', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('D|1|AS MONACO|LAZIO FC', 'D', 1, 'AS MONACO', 'LAZIO FC', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('D|1|D2T|FIORENTINA', 'D', 1, 'D2T', 'FIORENTINA', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('D|2|AS MONACO|D2T', 'D', 2, 'AS MONACO', 'D2T', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('D|2|LAZIO FC|FIORENTINA', 'D', 2, 'LAZIO FC', 'FIORENTINA', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('D|3|AS MONACO|FIORENTINA', 'D', 3, 'AS MONACO', 'FIORENTINA', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('D|3|LAZIO FC|D2T', 'D', 3, 'LAZIO FC', 'D2T', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('E|1|INTER MILAN|RED STAR', 'E', 1, 'INTER MILAN', 'RED STAR', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('E|1|ARSENAL|AC MILAN', 'E', 1, 'ARSENAL', 'AC MILAN', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('E|2|INTER MILAN|ARSENAL', 'E', 2, 'INTER MILAN', 'ARSENAL', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('E|2|RED STAR|AC MILAN', 'E', 2, 'RED STAR', 'AC MILAN', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('E|3|INTER MILAN|AC MILAN', 'E', 3, 'INTER MILAN', 'AC MILAN', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('E|3|RED STAR|ARSENAL', 'E', 3, 'RED STAR', 'ARSENAL', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
+  ('A|1|ASTON VILLA|OM', 'A', 1, 'ASTON VILLA', 'OM', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('A|1|BAYER LEVERKUSEN|NEWCASTLE', 'A', 1, 'BAYER LEVERKUSEN', 'NEWCASTLE', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('A|2|ASTON VILLA|BAYER LEVERKUSEN', 'A', 2, 'ASTON VILLA', 'BAYER LEVERKUSEN', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('A|2|OM|NEWCASTLE', 'A', 2, 'OM', 'NEWCASTLE', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('A|3|ASTON VILLA|NEWCASTLE', 'A', 3, 'ASTON VILLA', 'NEWCASTLE', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('A|3|OM|BAYER LEVERKUSEN', 'A', 3, 'OM', 'BAYER LEVERKUSEN', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('B|1|BARCELONE|BESIKTAS', 'B', 1, 'BARCELONE', 'BESIKTAS', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('B|1|LIVERPOOL|REAL MADRID', 'B', 1, 'LIVERPOOL', 'REAL MADRID', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('B|2|BARCELONE|LIVERPOOL', 'B', 2, 'BARCELONE', 'LIVERPOOL', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('B|2|BESIKTAS|REAL MADRID', 'B', 2, 'BESIKTAS', 'REAL MADRID', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('B|3|BARCELONE|REAL MADRID', 'B', 3, 'BARCELONE', 'REAL MADRID', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('B|3|BESIKTAS|LIVERPOOL', 'B', 3, 'BESIKTAS', 'LIVERPOOL', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('C|1|CRYSTAL PALACE|PSG', 'C', 1, 'CRYSTAL PALACE', 'PSG', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('C|1|ATLETICO MADRID|JUVENTUS', 'C', 1, 'ATLETICO MADRID', 'JUVENTUS', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('C|2|CRYSTAL PALACE|ATLETICO MADRID', 'C', 2, 'CRYSTAL PALACE', 'ATLETICO MADRID', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('C|2|PSG|JUVENTUS', 'C', 2, 'PSG', 'JUVENTUS', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('C|3|CRYSTAL PALACE|JUVENTUS', 'C', 3, 'CRYSTAL PALACE', 'JUVENTUS', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('C|3|PSG|ATLETICO MADRID', 'C', 3, 'PSG', 'ATLETICO MADRID', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('D|1|AS MONACO|LAZIO FC', 'D', 1, 'AS MONACO', 'LAZIO FC', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('D|1|D2T|FIORENTINA', 'D', 1, 'D2T', 'FIORENTINA', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('D|2|AS MONACO|D2T', 'D', 2, 'AS MONACO', 'D2T', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('D|2|LAZIO FC|FIORENTINA', 'D', 2, 'LAZIO FC', 'FIORENTINA', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('D|3|AS MONACO|FIORENTINA', 'D', 3, 'AS MONACO', 'FIORENTINA', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('D|3|LAZIO FC|D2T', 'D', 3, 'LAZIO FC', 'D2T', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('E|1|INTER MILAN|RED STAR', 'E', 1, 'INTER MILAN', 'RED STAR', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('E|1|ARSENAL|AC MILAN', 'E', 1, 'ARSENAL', 'AC MILAN', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('E|2|INTER MILAN|ARSENAL', 'E', 2, 'INTER MILAN', 'ARSENAL', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('E|2|RED STAR|AC MILAN', 'E', 2, 'RED STAR', 'AC MILAN', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('E|3|INTER MILAN|AC MILAN', 'E', 3, 'INTER MILAN', 'AC MILAN', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('E|3|RED STAR|ARSENAL', 'E', 3, 'RED STAR', 'ARSENAL', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
   ('F|1|RENNES|CHELSEA', 'F', 1, 'RENNES', 'CHELSEA', 9, 2, 'Terminé', 90, '[]'::jsonb, NULL, now()),
   ('F|1|MANCHESTER CITY|BAYERN MUNICH', 'F', 1, 'MANCHESTER CITY', 'BAYERN MUNICH', 7, 0, 'Terminé', 90, '[]'::jsonb, NULL, now()),
-  ('F|2|RENNES|MANCHESTER CITY', 'F', 2, 'RENNES', 'MANCHESTER CITY', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('F|2|CHELSEA|BAYERN MUNICH', 'F', 2, 'CHELSEA', 'BAYERN MUNICH', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('F|3|RENNES|BAYERN MUNICH', 'F', 3, 'RENNES', 'BAYERN MUNICH', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now()),
-  ('F|3|CHELSEA|MANCHESTER CITY', 'F', 3, 'CHELSEA', 'MANCHESTER CITY', 0, 0, 'À venir', 90, '[]'::jsonb, NULL, now());
+  ('F|2|RENNES|MANCHESTER CITY', 'F', 2, 'RENNES', 'MANCHESTER CITY', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('F|2|CHELSEA|BAYERN MUNICH', 'F', 2, 'CHELSEA', 'BAYERN MUNICH', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('F|3|RENNES|BAYERN MUNICH', 'F', 3, 'RENNES', 'BAYERN MUNICH', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now()),
+  ('F|3|CHELSEA|MANCHESTER CITY', 'F', 3, 'CHELSEA', 'MANCHESTER CITY', 0, 0, 'À venir', 0, '[]'::jsonb, NULL, now());
 
-update public.fyfl_settings
-set standings='{}'::jsonb, updated_at=now()
-where id='main';
+update public.fyfl_settings set standings='{}'::jsonb, updated_at=now() where id='main';
+
+-- Vérification rapide : 36 matchs, dont 2 terminés et 34 À venir. Rennes et Manchester City : 3 pts / 1 MJ.
+select status, count(*) from public.fyfl_matches group by status order by status;
+select count(*) as total_matchs from public.fyfl_matches;
