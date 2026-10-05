@@ -17,3 +17,8 @@ Après cette remise à zéro, ne relance pas cette section SQL lors de futures j
 
 
 CORRECTION V14 : si Supabase affiche « syntax error at or near as », utilise cette version du SQL. La colonne existante nommée as est maintenant correctement citée comme "as".
+
+## V16 — classement et statut des matchs
+- Le classement ignore définitivement les anciens résultats Supabase sauf Rennes–Chelsea (9–2) et Manchester City–Bayern Munich (7–0).
+- Les autres rencontres des 6 poules sont affichées comme « À venir ».
+- La carte « STATUT DES MATCHS » de l'accueil liste les matchs à venir de toutes les poules et des 3 journées.

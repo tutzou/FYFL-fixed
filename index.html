@@ -311,13 +311,26 @@ function isCurrentPlayedMatch(m){
       ||(m.group==='F'&&m.home==='MANCHESTER CITY'&&m.away==='BAYERN MUNICH'&&Number(m.hs)===7&&Number(m.as)===0&&m.status==='Terminé');
 }
 function normalizeSeasonResults(rows){
-  if(!Array.isArray(rows))return [];
-  const resetAt=new Date(FYFL_DATA_RESET_AT).getTime();
-  return rows.map(fyflFromRow).filter(m=>{
-    if(isCurrentPlayedMatch(m))return true;
-    if(m.status==='À venir')return true;
-    return Number(m.updatedAt||0)>=resetAt;
+  // Nouveau classement : tout repart à zéro, sauf les deux matchs déjà joués.
+  // On garde exactement les 6 poules et les 18 affiches prévues (3 journées x 6 poules).
+  // Les deux résultats officiels sont conservés même si Supabase est vide au premier chargement.
+  const remote=(Array.isArray(rows)?rows:[]).map(fyflFromRow);
+  const officialSeed=[
+    {group:'F',day:1,home:'RENNES',away:'CHELSEA',hs:9,as:2,status:'Terminé',minute:90,goals:[]},
+    {group:'F',day:1,home:'MANCHESTER CITY',away:'BAYERN MUNICH',hs:7,as:0,status:'Terminé',minute:90,goals:[]}
+  ];
+  const official=new Map();
+  officialSeed.forEach(m=>official.set(`${m.group}|${m.home}|${m.away}`,m));
+  remote.filter(isCurrentPlayedMatch).forEach(m=>official.set(`${m.group}|${m.home}|${m.away}`,m));
+  const out=[];
+  Object.entries(groups).forEach(([g,arr])=>{
+    const pairs={1:[[arr[0],arr[1]],[arr[2],arr[3]]],2:[[arr[0],arr[2]],[arr[1],arr[3]]],3:[[arr[0],arr[3]],[arr[1],arr[2]]]};
+    Object.entries(pairs).forEach(([day,ps])=>ps.forEach(([home,away])=>{
+      const played=official.get(`${g}|${home}|${away}`)||official.get(`${g}|${away}|${home}`);
+      out.push(played?{...played,group:g,day:Number(day)}:{group:g,day:Number(day),home,away,hs:null,as:null,status:'À venir',minute:0,goals:[]});
+    }));
   });
+  return out;
 }
 function cleanStandingsOverrides(value){
   // Reset all manual ranking overrides so standings come only from the two official results.
@@ -380,7 +393,7 @@ async function initFYFLSupabase(){
       fyflRealtimeChannel=fyflSupabase.channel('fyfl-live-all')
         .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_matches'},payload=>{
           if(payload.eventType==='DELETE'){const key=payload.old?.match_key;const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===key);if(i>=0)results.splice(i,1);}
-          else if(payload.new){const incoming=fyflFromRow(payload.new);const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===payload.new.match_key);if(i>=0)results[i]=incoming;else results.push(incoming);}
+          else if(payload.new){const incoming=fyflFromRow(payload.new);const allowedIncoming=isCurrentPlayedMatch(incoming)||incoming.status==='À venir'||incoming.status==='En direct';if(allowedIncoming){const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===payload.new.match_key);if(i>=0)results[i]=incoming;else results.push(incoming);}}
           flashLive();
           const pg=getCurrentPage();if(['home','matches','ranking','admin'].includes(pg))render(pg,false);
           if(payload.eventType==='UPDATE'&&payload.new?.status==='En direct'){const newGoals=Array.isArray(payload.new.goals)?payload.new.goals:[];const g=newGoals[newGoals.length-1];const sig=g?JSON.stringify(g):'';if(g&&sig!==window.__lastGoalSignature){window.__lastGoalSignature=sig;showGoalAnimation(g.team,g.scorer,g.minute)}}
@@ -591,12 +604,17 @@ function pageHome(){return `<section class="hero"><div><div class="eyebrow">SAIS
 <section class="section"><div class="section-head"><h2>⚡ Infos rapides</h2><small>FYFL Saison 1</small></div><div class="feature-grid">
 <div class="feature-card fyfl-credit-card"><h3>Website Created By Tutzou</h3></div>
 <div class="feature-card"><div class="mini-label">🏅 JOUEUR DU MOIS</div><div class="player-month"><div class="player-avatar">🏆</div><div><h3 style="margin:8px 0 0">${escapeHtml(getAdminPrefs().player||"À déterminer")}</h3><p style="margin:6px 0 0">Le meilleur joueur sera bientôt annoncé.</p></div></div></div>
-<div class="feature-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="mini-label">⚽ STATUT DES MATCHS</div><button class="results-head-actions" style="font-size:11px;padding:7px 9px;background:#151b25;color:#fff;border:1px solid #303846;border-radius:9px;font-weight:800;cursor:pointer" onclick="render('matches')">Voir tous les matchs à venir →</button></div><div style="margin-top:12px;max-height:220px;overflow:auto;padding-right:4px">${getUpcomingMatches().map(x=>`<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:7px;padding:9px 5px;border-bottom:1px solid #202834"><div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800">${crest(x.h,"mini-logo")}${x.h}</div><div style="text-align:center;font-size:11px;font-weight:900;color:#ff8a22">VS</div><div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:11px;font-weight:800">${x.a}${crest(x.a,"mini-logo")}</div></div>`).join("")}</div><p style="margin:10px 0 0;text-align:center">Journée 1 · Tous les matchs à venir</p></div>
+<div class="feature-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="mini-label">⚽ STATUT DES MATCHS</div><button class="results-head-actions" style="font-size:11px;padding:7px 9px;background:#151b25;color:#fff;border:1px solid #303846;border-radius:9px;font-weight:800;cursor:pointer" onclick="render('matches')">Voir tous les matchs →</button></div><div style="margin-top:12px;max-height:320px;overflow:auto;padding-right:4px">${getUpcomingMatches().map(x=>`<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:7px;padding:9px 5px;border-bottom:1px solid #202834"><div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800">${crest(x.h,"mini-logo")}${x.h}</div><div style="text-align:center;font-size:11px;font-weight:900;color:#ff8a22">VS<br><small style="color:#7e8a9d">J${x.day} · P. ${x.g}</small></div><div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:11px;font-weight:800">${x.a}${crest(x.a,"mini-logo")}</div></div>`).join("")}</div><p style="margin:10px 0 0;text-align:center">${getUpcomingMatches().length} matchs à venir · Toutes les poules</p></div>
 </div></section>
 <section class="section"><div class="section-head"><h2>Derniers résultats</h2><div class="results-head-actions"><small>${results.length} matchs joués</small><button onclick="render('matches')">Voir tous les résultats →</button></div></div><div class="grid">${results.map(matchCard).join("")}</div></section><section class="section"><div class="section-head"><h2>Les poules</h2><small>24 équipes · 6 poules</small></div><div class="group-links">${Object.keys(groups).map(g=>`<button onclick="render('ranking');setTimeout(()=>showGroup('${g}'),0)">Poule ${g}</button>`).join("")}</div></section>`}
 function pageRanking(){return `<section class="section"><div class="section-head"><h2>Classement FYFL</h2><small>Victoire = 3 pts · Nul = 1 pt</small></div><div class="tabs" id="tabs">${Object.keys(groups).map((g,i)=>`<button class="${i===0?"active":""}" onclick="showGroup('${g}')">Poule ${g}</button>`).join("")}</div><div id="group-content">${groupBlock("A")}</div></section>`}
 function showGroup(g){document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active",b.textContent==="Poule "+g));document.getElementById("group-content").innerHTML=groupBlock(g)}
-function getUpcomingMatches(){let upcoming=[];Object.keys(groups).forEach(g=>{[[groups[g][0],groups[g][1]],[groups[g][2],groups[g][3]]].forEach(([h,a])=>{if(!results.some(m=>(m.home===h&&m.away===a)||(m.home===a&&m.away===h)))upcoming.push({g,h,a})})});return upcoming} 
+function getUpcomingMatches(){
+  const upcoming=[];
+  const days=buildAllMatchDays();
+  [1,2,3].forEach(day=>(days[day]||[]).forEach(m=>{if(m.status==='À venir')upcoming.push({g:m.group,h:m.home,a:m.away,day})}));
+  return upcoming;
+} 
 function buildAllMatchDays(){const days={1:[],2:[],3:[]};Object.entries(groups).forEach(([g,arr])=>{const pairs={1:[[arr[0],arr[1]],[arr[2],arr[3]]],2:[[arr[0],arr[2]],[arr[1],arr[3]]],3:[[arr[0],arr[3]],[arr[1],arr[2]]]};Object.entries(pairs).forEach(([day,ps])=>ps.forEach(([home,away])=>{const found=results.find(r=>(r.home===home&&r.away===away)||(r.home===away&&r.away===home));days[day].push(found?{...found,group:g,day:Number(day)}:{group:g,day:Number(day),home,away,hs:null,as:null,status:"À venir"});}));});return days}
 function pageMatches(){const days=buildAllMatchDays();const card=m=>matchCard(m);return `<section class="section"><div class="section-head"><h2>Matchs / Résultats</h2><small>3 journées · 6 poules</small></div><div class="tabs" id="matchTabs"><button class="active" onclick="showMatchDay('day1')">Journée 1</button><button onclick="showMatchDay('day2')">Journée 2</button><button onclick="showMatchDay('day3')">Journée 3</button><button onclick="showMatchDay('allDays')">Toutes les journées</button></div><div id="match-content"><h3 class="subheading">Journée 1 · Tous les matchs</h3><div class="grid">${days[1].map(card).join("")}</div></div></section>`}
 function showMatchDay(mode){const modes=['day1','day2','day3','allDays'];document.querySelectorAll("#matchTabs button").forEach((b,i)=>b.classList.toggle("active",modes[i]===mode));const days=buildAllMatchDays();const el=document.getElementById("match-content");if(!el)return;if(mode==='allDays'){el.innerHTML=[1,2,3].map(day=>`<h3 class="subheading">Journée ${day} · Tous les matchs</h3><div class="grid">${days[day].map(matchCard).join("")}</div>`).join("");return}const day=Number(mode.replace('day',''));el.innerHTML=`<h3 class="subheading">Journée ${day} · Tous les matchs</h3><div class="grid">${days[day].map(matchCard).join("")}</div>`}
