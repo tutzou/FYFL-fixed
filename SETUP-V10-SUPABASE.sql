@@ -1,4 +1,4 @@
--- FYFL V14 - correction schéma fyfl_matches
+-- FYFL V12 - correction schéma fyfl_matches
 -- Le site utilise maintenant home_score / away_score, conformément à la table créée au départ.
 -- Si ta table avait été créée avec hs / as, ces colonnes sont renommées automatiquement.
 DO $$
@@ -9,11 +9,11 @@ BEGIN
   END IF;
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='fyfl_matches' AND column_name='as')
      AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='fyfl_matches' AND column_name='away_score') THEN
-    ALTER TABLE public.fyfl_matches RENAME COLUMN "as" TO away_score;
+    ALTER TABLE public.fyfl_matches RENAME COLUMN as TO away_score;
   END IF;
 END $$;
 
--- FYFL V14 - synchronisation temps réel complète
+-- FYFL V12 - synchronisation temps réel complète
 -- À exécuter une seule fois dans Supabase > SQL Editor.
 
 -- MATCHS
@@ -92,7 +92,7 @@ do $$ begin alter publication supabase_realtime add table public.fyfl_comments; 
 
 
 -- ============================================================
--- FYFL V14 - REMISE À ZÉRO DU CLASSEMENT ET DES MATCHS
+-- FYFL V12 - REMISE À ZÉRO DU CLASSEMENT ET DES MATCHS
 -- À exécuter UNE FOIS après la mise à jour du site.
 -- Résultats conservés :
 --   Rennes 9-2 Chelsea

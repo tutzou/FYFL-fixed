@@ -14,6 +14,3 @@ La fin de `SETUP-V10-SUPABASE.sql` contient maintenant une section de reset à e
 - anciens overrides de classement supprimés
 
 Après cette remise à zéro, ne relance pas cette section SQL lors de futures journées, sinon elle remettrait les matchs à venir à leur état initial.
-
-
-CORRECTION V14 : si Supabase affiche « syntax error at or near as », utilise cette version du SQL. La colonne existante nommée as est maintenant correctement citée comme "as".
