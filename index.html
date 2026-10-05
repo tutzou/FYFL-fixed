@@ -284,13 +284,13 @@ async function saveSingleRemoteMatch(m){
   const day=Number(m.day||findMatchDay(m));
   const row=fyflToRow({...m,day});
   const {error}=await fyflSupabase.from('fyfl_matches').upsert(row,{onConflict:'match_key'});
-  if(error){console.warn('FYFL Supabase match upsert:',error.message);return false;}
+  if(error){window.__fyflLastMatchSyncError=error.message||String(error);console.warn('FYFL Supabase match upsert:',error);return false;} window.__fyflLastMatchSyncError='';
   return true;
 }
 
 function fyflMatchKey(m){return `${m.group||''}|${m.day||''}|${m.home||''}|${m.away||''}`}
-function fyflToRow(m){return {match_key:fyflMatchKey(m),group_name:m.group,day:Number(m.day||1),home:m.home,away:m.away,hs:Number(m.hs||0),as:Number(m.as||0),status:m.status||'À venir',minute:Number(m.minute||0),goals:Array.isArray(m.goals)?m.goals:[],started_at:m.startedAt?new Date(m.startedAt).toISOString():null,updated_at:new Date().toISOString()}}
-function fyflFromRow(r){return {group:r.group_name,day:Number(r.day),home:r.home,away:r.away,hs:Number(r.hs||0),as:Number(r.as||0),status:r.status||'À venir',minute:Number(r.minute||0),goals:Array.isArray(r.goals)?r.goals:[],...(r.started_at?{startedAt:new Date(r.started_at).getTime()}: {})}}
+function fyflToRow(m){return {match_key:fyflMatchKey(m),group_name:m.group,day:Number(m.day||1),home:m.home,away:m.away,home_score:Number(m.hs||0),away_score:Number(m.as||0),status:m.status||'À venir',minute:Number(m.minute||0),goals:Array.isArray(m.goals)?m.goals:[],started_at:m.startedAt?new Date(m.startedAt).toISOString():null,updated_at:new Date().toISOString()}}
+function fyflFromRow(r){return {group:r.group_name,day:Number(r.day),home:r.home,away:r.away,hs:Number(r.home_score??r.hs??0),as:Number(r.away_score??r.as??0),status:r.status||'À venir',minute:Number(r.minute||0),goals:Array.isArray(r.goals)?r.goals:[],...(r.started_at?{startedAt:new Date(r.started_at).getTime()}: {})}}
 function setRemoteResults(rows){
   results=Array.isArray(rows)?rows.map(fyflFromRow):[];
 }
@@ -303,7 +303,7 @@ async function syncAllRemoteMatches(){
   const rows=results.map(m=>{const day=m.day||findMatchDay(m);return fyflToRow({...m,day})});
   if(!rows.length)return true;
   const {error}=await fyflSupabase.from('fyfl_matches').upsert(rows,{onConflict:'match_key'});
-  if(error){console.warn('FYFL Supabase upsert:',error.message);return false}
+  if(error){window.__fyflLastMatchSyncError=error.message||String(error);console.warn('FYFL Supabase upsert:',error);return false} window.__fyflLastMatchSyncError='';
   return true;
 }
 function findMatchDay(m){for(const [g,arr] of Object.entries(groups)){const pairs={1:[[arr[0],arr[1]],[arr[2],arr[3]]],2:[[arr[0],arr[2]],[arr[1],arr[3]]],3:[[arr[0],arr[3]],[arr[1],arr[2]]]};for(const [d,ps] of Object.entries(pairs))for(const [h,a] of ps)if((m.home===h&&m.away===a)||(m.home===a&&m.away===h))return Number(d)}return 1}
@@ -490,7 +490,7 @@ async function persistMatchFromAdmin(status){
   if(status==='En direct') existing.startedAt=Date.now()-existing.minute*60000;
   else if(status==='Terminé'){existing.minute=90;delete existing.startedAt;}
   const ok=await saveSingleRemoteMatch(existing);
-  if(!ok){alert('Impossible de synchroniser ce match avec Supabase. Vérifie les règles UPDATE/INSERT de fyfl_matches.');return;}
+  if(!ok){alert('Impossible de synchroniser ce match avec Supabase : '+(window.__fyflLastMatchSyncError||'erreur inconnue')+'\n\nVérifie les règles UPDATE/INSERT de fyfl_matches.');return;}
   flashLive(); render('admin'); if(status==='En direct')startLiveTicker();
 }
 async function adminSetStatus(status){await persistMatchFromAdmin(status)}
@@ -507,7 +507,7 @@ async function adminAddGoal(){
   if(team===existing.home)existing.hs=(Number(existing.hs)||0)+1;else existing.as=(Number(existing.as)||0)+1;
   existing.status='En direct'; existing.minute=Math.max(Number(existing.minute)||0,minute); existing.startedAt=Date.now()-existing.minute*60000;
   const ok=await saveSingleRemoteMatch(existing);
-  if(!ok){existing.goals.pop();if(team===existing.home)existing.hs=Math.max(0,(Number(existing.hs)||0)-1);else existing.as=Math.max(0,(Number(existing.as)||0)-1);alert("Le but n'a pas pu être synchronisé avec Supabase.");return;}
+  if(!ok){existing.goals.pop();if(team===existing.home)existing.hs=Math.max(0,(Number(existing.hs)||0)-1);else existing.as=Math.max(0,(Number(existing.as)||0)-1);alert("Le but n'a pas pu être synchronisé avec Supabase : "+(window.__fyflLastMatchSyncError||'erreur inconnue')+"\n\nVérifie les règles UPDATE de fyfl_matches.");return;}
   render('admin');showGoalAnimation(team,scorer,minute);flashLive();
 }
 async function adminDeleteGoal(i){

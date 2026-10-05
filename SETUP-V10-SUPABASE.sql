@@ -1,4 +1,19 @@
--- FYFL V10 - synchronisation temps réel complète
+-- FYFL V12 - correction schéma fyfl_matches
+-- Le site utilise maintenant home_score / away_score, conformément à la table créée au départ.
+-- Si ta table avait été créée avec hs / as, ces colonnes sont renommées automatiquement.
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='fyfl_matches' AND column_name='hs')
+     AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='fyfl_matches' AND column_name='home_score') THEN
+    ALTER TABLE public.fyfl_matches RENAME COLUMN hs TO home_score;
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='fyfl_matches' AND column_name='as')
+     AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='fyfl_matches' AND column_name='away_score') THEN
+    ALTER TABLE public.fyfl_matches RENAME COLUMN as TO away_score;
+  END IF;
+END $$;
+
+-- FYFL V12 - synchronisation temps réel complète
 -- À exécuter une seule fois dans Supabase > SQL Editor.
 
 -- MATCHS
