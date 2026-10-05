@@ -226,6 +226,16 @@ html,body{max-width:100%;overflow-x:hidden}.nav{gap:12px}.auth-actions{display:f
 .fyfl-live-sync{position:fixed;right:14px;bottom:14px;z-index:9998;background:rgba(12,17,24,.92);border:1px solid #2b3442;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:900;color:#7ee787;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none}
 .fyfl-live-sync.show{opacity:1;transform:none}
 </style>
+<style id="fyfl-mobile-nav-fix">
+@media(max-width:700px){
+  header .nav{width:100%;box-sizing:border-box;overflow:visible}
+  header .nav nav{width:100%;max-width:100%;min-width:0;box-sizing:border-box;display:flex;justify-content:flex-start;align-items:center;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px 2px 8px;margin:0}
+  header .nav nav::-webkit-scrollbar{display:none}
+  header .nav nav button{flex:0 0 auto;display:block;visibility:visible;opacity:1;padding:9px 11px!important;font-size:11px!important}
+  header .nav nav button:first-child{margin-left:0}
+  header .nav nav button:nth-child(2){margin-left:0}
+}
+</style>
 </head><body>
 
 <div id="halloweenOverlay" role="dialog" aria-modal="true" aria-label="Annonce Halloween FYFL">
@@ -262,6 +272,7 @@ html,body{max-width:100%;overflow-x:hidden}.nav{gap:12px}.auth-actions{display:f
    Colle ici ton URL Supabase et ta clé PUBLISHABLE/anon.
    Ne mets JAMAIS la clé service_role/secret dans ce fichier. */
 const FYFL_SUPABASE_URL="https://dxbaicqbpccruebmlorb.supabase.co";
+const FYFL_DATA_RESET_AT='2026-10-05T15:27:00.000Z';
 const FYFL_SUPABASE_KEY="sb_publishable_pglwhtDgDHi6DV931NsfTQ_tUGo4-Jk";
 let fyflSupabase=null;
 let fyflRealtimeChannel=null;
@@ -290,9 +301,26 @@ async function saveSingleRemoteMatch(m){
 
 function fyflMatchKey(m){return `${m.group||''}|${m.day||''}|${m.home||''}|${m.away||''}`}
 function fyflToRow(m){return {match_key:fyflMatchKey(m),group_name:m.group,day:Number(m.day||1),home:m.home,away:m.away,home_score:Number(m.hs||0),away_score:Number(m.as||0),status:m.status||'À venir',minute:Number(m.minute||0),goals:Array.isArray(m.goals)?m.goals:[],started_at:m.startedAt?new Date(m.startedAt).toISOString():null,updated_at:new Date().toISOString()}}
-function fyflFromRow(r){return {group:r.group_name,day:Number(r.day),home:r.home,away:r.away,hs:Number(r.home_score??r.hs??0),as:Number(r.away_score??r.as??0),status:r.status||'À venir',minute:Number(r.minute||0),goals:Array.isArray(r.goals)?r.goals:[],...(r.started_at?{startedAt:new Date(r.started_at).getTime()}: {})}}
+function fyflFromRow(r){return {group:r.group_name,day:Number(r.day),home:r.home,away:r.away,hs:Number(r.home_score??r.hs??0),as:Number(r.away_score??r.as??0),status:r.status||'À venir',minute:Number(r.minute||0),goals:Array.isArray(r.goals)?r.goals:[],...(r.started_at?{startedAt:new Date(r.started_at).getTime()}: {}),...(r.updated_at?{updatedAt:new Date(r.updated_at).getTime()}: {})}}
+function isCurrentPlayedMatch(m){
+  return (m.group==='F'&&m.home==='RENNES'&&m.away==='CHELSEA'&&Number(m.hs)===9&&Number(m.as)===2&&m.status==='Terminé')
+      ||(m.group==='F'&&m.home==='MANCHESTER CITY'&&m.away==='BAYERN MUNICH'&&Number(m.hs)===7&&Number(m.as)===0&&m.status==='Terminé');
+}
+function normalizeSeasonResults(rows){
+  if(!Array.isArray(rows))return [];
+  const resetAt=new Date(FYFL_DATA_RESET_AT).getTime();
+  return rows.map(fyflFromRow).filter(m=>{
+    if(isCurrentPlayedMatch(m))return true;
+    if(m.status==='À venir')return true;
+    return Number(m.updatedAt||0)>=resetAt;
+  });
+}
+function cleanStandingsOverrides(value){
+  if(!value||typeof value!=='object')return {};
+  return Object.fromEntries(Object.entries(value).filter(([,v])=>v&&typeof v==='object'&&v.manual===true));
+}
 function setRemoteResults(rows){
-  results=Array.isArray(rows)?rows.map(fyflFromRow):[];
+  results=normalizeSeasonResults(rows);
 }
 function mergeRemoteRows(rows){
   if(!Array.isArray(rows))return;
@@ -312,7 +340,7 @@ function flashLive(){const el=document.getElementById('fyflLiveSync');if(!el)ret
 async function loadOnlineSettings(){
   if(!fyflSupabase)return;
   const {data,error}=await fyflSupabase.from('fyfl_settings').select('*').eq('id','main').maybeSingle();
-  if(!error&&data){fyflSettings={...fyflSettings,breaking:data.breaking||fyflSettings.breaking,player:data.player||fyflSettings.player,news:data.news||fyflSettings.news,standings:(data.standings&&typeof data.standings==='object')?data.standings:(fyflSettings.standings||{})};fyflSettingsReady=true;applyAdminPrefs();}
+  if(!error&&data){fyflSettings={...fyflSettings,breaking:data.breaking||fyflSettings.breaking,player:data.player||fyflSettings.player,news:data.news||fyflSettings.news,standings:cleanStandingsOverrides(data.standings)};fyflSettingsReady=true;applyAdminPrefs();}
 }
 async function saveOnlineSettings(p){
   if(!fyflSupabase||!isCurrentAccountAdminVerified())return false;
@@ -375,7 +403,9 @@ function getRanking(){return allTeams.map(name=>{const r={name,p:0,w:0,d:0,l:0,g
  results.forEach(m=>{
   if(m.home===name){r.p++;r.gf+=Number(m.hs)||0;r.ga+=Number(m.as)||0;if((Number(m.hs)||0)>(Number(m.as)||0)){r.w++;r.pts+=3}else if((Number(m.hs)||0)===(Number(m.as)||0)){r.d++;r.pts++}else r.l++}
   if(m.away===name){r.p++;r.gf+=Number(m.as)||0;r.ga+=Number(m.hs)||0;if((Number(m.as)||0)>(Number(m.hs)||0)){r.w++;r.pts+=3}else if((Number(m.as)||0)===(Number(m.hs)||0)){r.d++;r.pts++}else r.l++}
- });r.diff=r.gf-r.ga;const ov=(fyflSettings.standings&&fyflSettings.standings[name])||null;if(ov){['p','w','d','l','gf','ga','pts'].forEach(k=>{if(ov[k]!==undefined&&ov[k]!==''&&Number.isFinite(Number(ov[k])))r[k]=Number(ov[k])});r.diff=ov.diff!==undefined&&ov.diff!==''?Number(ov.diff):r.gf-r.ga;}return r;
+ });r.diff=r.gf-r.ga;const ov=(fyflSettings.standings&&fyflSettings.standings[name])||null;
+  if(ov&&ov.manual===true){['p','w','d','l','gf','ga','pts'].forEach(k=>{if(ov[k]!==undefined&&ov[k]!==''&&Number.isFinite(Number(ov[k])))r[k]=Number(ov[k])});r.diff=ov.diff!==undefined&&ov.diff!==''?Number(ov.diff):r.gf-r.ga;}
+  return r;
 });}
 
 function initials(n){let a=n.split(" ");return (a.length>1?a[0][0]+a[1][0]:n.slice(0,3)).toUpperCase()}
@@ -444,14 +474,32 @@ async function openAdminLogin(){
 }
 async function ensureRemoteFixtureSeed(){
   if(!fyflSupabase||!fyflRemoteReady||!isCurrentAccountAdminVerified())return false;
-  const {data,error}=await fyflSupabase.from('fyfl_matches').select('match_key');
+  const {data,error}=await fyflSupabase.from('fyfl_matches').select('*');
   if(error){console.warn('FYFL seed read:',error.message);return false;}
-  const keys=new Set((data||[]).map(r=>r.match_key));
-  const days=buildAllMatchDays(); const seed=[];
-  [1,2,3].forEach(day=>(days[day]||[]).forEach(m=>{const row=fyflToRow({...m,day});if(!keys.has(row.match_key))seed.push(row);}));
-  if(!seed.length)return true;
-  const {error:upError}=await fyflSupabase.from('fyfl_matches').upsert(seed,{onConflict:'match_key'});
-  if(upError){console.warn('FYFL seed upsert:',upError.message);return false;}
+  const currentPlayed=[
+    {group:'F',day:1,home:'RENNES',away:'CHELSEA',hs:9,as:2,status:'Terminé',minute:90,goals:[]},
+    {group:'F',day:1,home:'MANCHESTER CITY',away:'BAYERN MUNICH',hs:7,as:0,status:'Terminé',minute:90,goals:[]}
+  ];
+  const allowedPlayedKeys=new Set(currentPlayed.map(m=>fyflMatchKey(m)));
+  const stale=(data||[]).filter(r=>r.status==='Terminé'&&!allowedPlayedKeys.has(r.match_key));
+  for(const r of stale){
+    const {error:delError}=await fyflSupabase.from('fyfl_matches').delete().eq('match_key',r.match_key);
+    if(delError)console.warn('FYFL cleanup:',delError.message);
+  }
+  const remaining=(data||[]).filter(r=>!(r.status==='Terminé'&&!allowedPlayedKeys.has(r.match_key)));
+  const days=buildAllMatchDays();
+  const seed=[];
+  const existingKeys=new Set(remaining.map(r=>r.match_key));
+  [1,2,3].forEach(day=>(days[day]||[]).forEach(m=>{
+    const row=fyflToRow({...m,day});
+    if(!existingKeys.has(row.match_key))seed.push(row);
+  }));
+  const canonicalRows=currentPlayed.map(m=>fyflToRow(m));
+  const allUpserts=[...canonicalRows,...seed];
+  if(allUpserts.length){
+    const {error:upError}=await fyflSupabase.from('fyfl_matches').upsert(allUpserts,{onConflict:'match_key'});
+    if(upError){console.warn('FYFL seed upsert:',upError.message);return false;}
+  }
   const {data:all}=await fyflSupabase.from('fyfl_matches').select('*');
   if(Array.isArray(all))setRemoteResults(all);
   return true;
@@ -527,7 +575,7 @@ async function adminResetMatch(){const m=selectedAdminMatch();if(!m)return;const
 function adminStandingTeamOptions(group){const arr=groups[group]||[];return arr.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('')}
 function adminLoadStanding(){const group=document.getElementById('adminStandingGroup')?.value||Object.keys(groups)[0];const teamSel=document.getElementById('adminStandingTeam');if(!teamSel)return;const current=teamSel.value;teamSel.innerHTML=adminStandingTeamOptions(group);if((groups[group]||[]).includes(current))teamSel.value=current;adminLoadStandingFields();}
 function adminLoadStandingFields(){const team=document.getElementById('adminStandingTeam')?.value;if(!team)return;const r=getRanking().find(x=>x.name===team)||{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0,diff:0};['p','w','d','l','gf','ga','pts','diff'].forEach(k=>{const el=document.getElementById('adminStand_'+k);if(el)el.value=r[k]??0;});}
-async function adminSaveStanding(){if(!fyflSupabase||!fyflRemoteReady||!isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée.');return}const team=document.getElementById('adminStandingTeam')?.value;if(!team)return;const standings={...(fyflSettings.standings||{})};const row={};['p','w','d','l','gf','ga','pts','diff'].forEach(k=>{const v=Number(document.getElementById('adminStand_'+k)?.value||0);row[k]=Number.isFinite(v)?Math.max(0,v):0;});standings[team]=row;const ok=await saveOnlineSettings({...fyflSettings,standings});if(!ok){alert('Impossible de synchroniser le classement avec Supabase.');return}render('admin',false);flashLive();alert('Classement de la poule modifié et synchronisé en direct pour tout le monde !');}
+async function adminSaveStanding(){if(!fyflSupabase||!fyflRemoteReady||!isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée.');return}const team=document.getElementById('adminStandingTeam')?.value;if(!team)return;const standings={...(fyflSettings.standings||{})};const row={manual:true};['p','w','d','l','gf','ga','pts','diff'].forEach(k=>{const v=Number(document.getElementById('adminStand_'+k)?.value||0);row[k]=Number.isFinite(v)?Math.max(0,v):0;});standings[team]=row;const ok=await saveOnlineSettings({...fyflSettings,standings});if(!ok){alert('Impossible de synchroniser le classement avec Supabase.');return}render('admin',false);flashLive();alert('Classement de la poule modifié et synchronisé en direct pour tout le monde !');}
 async function adminResetStanding(){if(!fyflSupabase||!isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée.');return}const team=document.getElementById('adminStandingTeam')?.value;if(!team)return;const standings={...(fyflSettings.standings||{})};delete standings[team];const ok=await saveOnlineSettings({...fyflSettings,standings});if(!ok){alert('Impossible de réinitialiser le classement.');return}render('admin',false);flashLive();alert('Classement de cette équipe remis au calcul automatique des matchs.');}
 async function adminSaveText(){const p=getAdminPrefs();p.breaking=(document.getElementById('adminBreaking').value||'').trim()||'REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !';p.player=(document.getElementById('adminPlayer').value||'').trim()||'À déterminer';p.news=(document.getElementById('adminNews').value||'').trim()||'Les matchs FYFL se joueront les mercredis et les week-ends !';const ok=await saveOnlineSettings(p);if(!ok){alert('Impossible de synchroniser les modifications avec Supabase.');return}alert('Modifications enregistrées et visibles en direct pour tout le monde !')}
 function pageAdmin(){if(!isCurrentAccountAdminVerified())return `<section class="section"><div class="card"><h2>🔐 Accès administrateur</h2><p>Connecte-toi avec ton compte administrateur Supabase.</p><button class="admin-btn" onclick="openAdminLogin()">Ouvrir l’administration</button></div></section>`;const p=getAdminPrefs();return `<section class="section admin-panel"><div class="section-head"><h2>⚙️ Panneau administrateur FYFL</h2><small>Contrôle en direct</small></div><div class="admin-grid"><div class="admin-box"><h3>⚽ Match en direct</h3><select id="adminMatchSelect" onchange="adminLoadMatch()">${adminMatchOptions()}</select><div class="admin-stat"><span>Score</span><input id="adminHomeScore" type="number" min="0" style="width:80px"><b>—</b><input id="adminAwayScore" type="number" min="0" style="width:80px"></div><label>Minute du match</label><input id="adminMinute" type="number" min="0" max="130" placeholder="0"><div class="admin-actions"><button class="live" onclick="adminSetStatus('En direct')">🔴 Lancer / mettre à jour en direct</button><button class="done" onclick="adminFinish()">✅ Terminer le match</button><button class="reset" onclick="adminResetMatch()">🧹 Match jamais commencé</button></div><h4>⚽ Ajouter un but</h4><select id="adminGoalTeam"><option></option></select><input id="adminScorer" maxlength="40" placeholder="Nom du buteur"><input id="adminGoalMinute" type="number" min="0" max="130" placeholder="Minute du but"><button onclick="adminAddGoal()">⚽ Ajouter le but + animation</button><div id="adminGoals"></div><p class="admin-help">Les scores, minutes et buteurs sont sauvegardés ${fyflRemoteReady?"dans Supabase et diffusés en direct à tous les visiteurs":"dans ce navigateur"}. « Match jamais commencé » efface complètement le match et ses buts.</p></div><div class="admin-box"><h3>📢 Site & annonces</h3><label>Breaking News</label><input id="adminBreaking" value="${escapeHtml(p.breaking||'REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !')}"><label>Joueur du mois</label><input id="adminPlayer" value="${escapeHtml(p.player||'À déterminer')}"><label>Message FYFL</label><textarea id="adminNews" rows="5">${escapeHtml(p.news||'Les matchs FYFL se joueront les mercredis et les week-ends !')}</textarea><button onclick="adminSaveText()">💾 Enregistrer les modifications</button><p class="admin-help">Tu peux changer les infos affichées sans modifier le code du site.</p></div><div class="admin-box"><h3>🏆 Modifier le classement des poules</h3><label>Poule</label><select id="adminStandingGroup" onchange="adminLoadStanding()">${Object.keys(groups).map(g=>`<option value="${g}">Poule ${g}</option>`).join('')}</select><label>Équipe</label><select id="adminStandingTeam" onchange="adminLoadStandingFields()"></select><div class="admin-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"><label>MJ<input id="adminStand_p" type="number" min="0"></label><label>V<input id="adminStand_w" type="number" min="0"></label><label>N<input id="adminStand_d" type="number" min="0"></label><label>D<input id="adminStand_l" type="number" min="0"></label><label>BP<input id="adminStand_gf" type="number" min="0"></label><label>BC<input id="adminStand_ga" type="number" min="0"></label><label>Diff<input id="adminStand_diff" type="number"></label><label>Pts<input id="adminStand_pts" type="number" min="0"></label></div><div class="admin-actions"><button class="live" onclick="adminSaveStanding()">💾 Enregistrer le classement</button><button class="reset" onclick="adminResetStanding()">↩️ Revenir au calcul automatique</button></div><p class="admin-help">Les valeurs enregistrées sont stockées dans Supabase et envoyées en direct à tous les visiteurs. Tu peux modifier chaque équipe de chaque poule.</p></div></div></section>`}
@@ -537,7 +585,7 @@ function broadcastLive(){try{new BroadcastChannel('fyfl-live').postMessage({type
 function startLiveTicker(){if(window.__liveTimer)return;window.__liveTimer=setInterval(()=>{const pg=getCurrentPage();if(['matches','home','ranking','admin'].includes(pg))render(pg,false)},1000)}
 function pageHome(){return `<section class="hero"><div><div class="eyebrow">SAISON 1 · COMPÉTITION OFFICIELLE</div><h1>FRENCH YOUTH<br><span>FUT LEAGUE</span></h1><p>Bienvenue sur la plateforme officielle de la <b>FYFL</b>. Suivez les poules, les classements et tous les résultats.</p><div class="hero-actions"><button onclick="render('ranking')">Voir le classement</button><button class="secondary" onclick="render('matches')">Voir les résultats</button></div></div><img class="hero-logo" src="fyfl-logo.png"></section>
 <section class="section"><div class="section-head"><h2>⚡ Infos rapides</h2><small>FYFL Saison 1</small></div><div class="feature-grid">
-<div class="feature-card"><div class="mini-label">⏳ PROCHAIN MATCH</div><h3>Mercredi prochain</h3><div class="countdown" id="countdown">--:--:--</div><p>Le prochain match de poule</p></div>
+<div class="feature-card"><div class="mini-label">⏳ PROCHAIN MATCH</div><h3>Website created by tutzou !</h3><div class="countdown" id="countdown">--:--:--</div><p>Le prochain match de poule</p></div>
 <div class="feature-card"><div class="mini-label">🏅 JOUEUR DU MOIS</div><div class="player-month"><div class="player-avatar">🏆</div><div><h3 style="margin:8px 0 0">${escapeHtml(getAdminPrefs().player||"À déterminer")}</h3><p style="margin:6px 0 0">Le meilleur joueur sera bientôt annoncé.</p></div></div></div>
 <div class="feature-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="mini-label">⚽ STATUT DES MATCHS</div><button class="results-head-actions" style="font-size:11px;padding:7px 9px;background:#151b25;color:#fff;border:1px solid #303846;border-radius:9px;font-weight:800;cursor:pointer" onclick="render('matches')">Voir tous les matchs à venir →</button></div><div style="margin-top:12px;max-height:220px;overflow:auto;padding-right:4px">${getUpcomingMatches().map(x=>`<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:7px;padding:9px 5px;border-bottom:1px solid #202834"><div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800">${crest(x.h,"mini-logo")}${x.h}</div><div style="text-align:center;font-size:11px;font-weight:900;color:#ff8a22">VS</div><div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:11px;font-weight:800">${x.a}${crest(x.a,"mini-logo")}</div></div>`).join("")}</div><p style="margin:10px 0 0;text-align:center">Journée 1 · Tous les matchs à venir</p></div>
 </div></section>
