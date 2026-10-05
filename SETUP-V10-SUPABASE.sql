@@ -92,6 +92,13 @@ do $$ begin alter publication supabase_realtime add table public.fyfl_comments; 
 
 
 -- ============================================================
+-- FYFL V18 - CORRECTION CLASSEMENT
+-- Supprime les anciens overrides du classement qui pouvaient
+-- afficher 3 MJ / 3 nuls / 3 pts pour toutes les équipes.
+-- Le classement est calculé uniquement à partir des matchs TERMINÉS.
+update public.fyfl_settings set standings='{}'::jsonb, updated_at=now() where id='main';
+
+-- ============================================================
 -- FYFL V17 - REMISE À ZÉRO COMPLÈTE
 -- À exécuter UNE FOIS dans Supabase SQL Editor.
 -- Tous les matchs sont À VENIR sauf les deux matchs déjà joués de la poule F.
@@ -147,3 +154,12 @@ update public.fyfl_settings set standings='{}'::jsonb, updated_at=now() where id
 -- Vérification rapide : 36 matchs, dont 2 terminés et 34 À venir. Rennes et Manchester City : 3 pts / 1 MJ.
 select status, count(*) from public.fyfl_matches group by status order by status;
 select count(*) as total_matchs from public.fyfl_matches;
+select name, 0 as attendu_mj, 0 as attendu_pts
+from (values
+  ('ASTON VILLA'),('OM'),('BAYER LEVERKUSEN'),('NEWCASTLE'),
+  ('BARCELONE'),('BESIKTAS'),('LIVERPOOL'),('REAL MADRID'),
+  ('CRYSTAL PALACE'),('PSG'),('ATLETICO MADRID'),('JUVENTUS'),
+  ('AS MONACO'),('LAZIO FC'),('D2T'),('FIORENTINA'),
+  ('INTER MILAN'),('RED STAR'),('ARSENAL'),('AC MILAN'),
+  ('RENNES'),('CHELSEA'),('MANCHESTER CITY'),('BAYERN MUNICH')
+) as t(name);

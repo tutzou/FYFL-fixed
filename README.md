@@ -13,3 +13,7 @@ Exécute `SETUP-V10-SUPABASE.sql` une seule fois dans Supabase SQL Editor après
 Il remet les 36 matchs à `À venir`, avec 0-0, et le classement à zéro pour toutes les équipes.
 
 Après cette remise à zéro, ne relance pas la section de reset lors des futures journées.
+
+
+## V18 — correction du classement
+Le site ignore automatiquement un ancien override manuel qui couvrait toutes les équipes. Le classement est alors recalculé uniquement depuis les matchs `Terminé`. Le SQL remet aussi `fyfl_settings.standings` à `{}`.

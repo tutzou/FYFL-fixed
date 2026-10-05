@@ -357,7 +357,24 @@ function flashLive(){const el=document.getElementById('fyflLiveSync');if(!el)ret
 async function loadOnlineSettings(){
   if(!fyflSupabase)return;
   const {data,error}=await fyflSupabase.from('fyfl_settings').select('*').eq('id','main').maybeSingle();
-  if(!error&&data){fyflSettings={...fyflSettings,breaking:data.breaking||fyflSettings.breaking,player:data.player||fyflSettings.player,news:data.news||fyflSettings.news,standings:cleanStandingsOverrides(data.standings)};fyflSettingsReady=true;applyAdminPrefs();}
+  if(!error&&data){
+    let standings=cleanStandingsOverrides(data.standings);
+    // Migration de sécurité : une ancienne version pouvait enregistrer un override
+    // pour toutes les équipes (ex. 3 MJ / 3 nuls / 3 pts partout). Dans ce cas,
+    // le classement calculé à partir des matchs ne doit plus être écrasé.
+    const overrideKeys=Object.keys(standings).filter(k=>allTeams.includes(k));
+    // Purge l’ancien classement manuel global qui pouvait afficher 3 MJ / 3 nuls / 3 pts partout.
+    const blanketOverride=allTeams && overrideKeys.length>=Math.max(12,Math.ceil(allTeams.length*0.75));
+    if(blanketOverride){
+      standings={};
+      if(isCurrentAccountAdminVerified()){
+        const {error:clearError}=await fyflSupabase.from('fyfl_settings').update({standings:{},updated_at:new Date().toISOString()}).eq('id','main');
+        if(clearError)console.warn('FYFL nettoyage classement:',clearError.message);
+      }
+    }
+    fyflSettings={...fyflSettings,breaking:data.breaking||fyflSettings.breaking,player:data.player||fyflSettings.player,news:data.news||fyflSettings.news,standings};
+    fyflSettingsReady=true;applyAdminPrefs();
+  }
 }
 async function saveOnlineSettings(p){
   if(!fyflSupabase||!isCurrentAccountAdminVerified())return false;
@@ -418,10 +435,12 @@ const logoUrls={"ASTON VILLA":"https://assets.football-logos.cc/logos/england/15
 
 function getRanking(){return allTeams.map(name=>{const r={name,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
  results.forEach(m=>{
+  // Seuls les matchs réellement terminés comptent dans le classement.
+  if(m.status!=="Terminé") return;
   if(m.home===name){r.p++;r.gf+=Number(m.hs)||0;r.ga+=Number(m.as)||0;if((Number(m.hs)||0)>(Number(m.as)||0)){r.w++;r.pts+=3}else if((Number(m.hs)||0)===(Number(m.as)||0)){r.d++;r.pts++}else r.l++}
   if(m.away===name){r.p++;r.gf+=Number(m.as)||0;r.ga+=Number(m.hs)||0;if((Number(m.as)||0)>(Number(m.hs)||0)){r.w++;r.pts+=3}else if((Number(m.as)||0)===(Number(m.hs)||0)){r.d++;r.pts++}else r.l++}
- });r.diff=r.gf-r.ga;const ov=(fyflSettings.standings&&fyflSettings.standings[name])||null;
-  if(ov&&ov.manual===true){['p','w','d','l','gf','ga','pts'].forEach(k=>{if(ov[k]!==undefined&&ov[k]!==''&&Number.isFinite(Number(ov[k])))r[k]=Number(ov[k])});r.diff=ov.diff!==undefined&&ov.diff!==''?Number(ov.diff):r.gf-r.ga;}
+ });r.diff=r.gf-r.ga;
+  // Classement public calculé exclusivement depuis les matchs terminés.
   return r;
 });}
 
@@ -431,7 +450,7 @@ function sortedGroup(g){return getRanking().filter(t=>groups[g].includes(t.name)
 function table(data){return `<div class="card table-wrap"><table><thead><tr><th>#</th><th>Équipe</th><th>MJ</th><th>V</th><th>N</th><th>D</th><th>BP</th><th>BC</th><th>Diff</th><th>Pts</th></tr></thead><tbody>${data.map((t,i)=>`<tr><td class="pos">${i+1}</td><td class="team-cell">${crest(t.name,"table-logo")}${!logoUrls[t.name]?`<span class="mini-badge">${initials(t.name)}</span>`:""}${t.name}</td><td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gf}</td><td>${t.ga}</td><td>${t.diff>0?"+":""}${t.diff}</td><td class="pts">${t.pts}</td></tr>`).join("")}</tbody></table></div>`}
 function getMatchMinute(m){if(m.status!=="En direct")return Math.max(0,Number(m.minute)||0);if(m.startedAt){return Math.min(130,Math.max(0,Math.floor((Date.now()-m.startedAt)/60000)));}return Math.max(0,Number(m.minute)||0)}
 function matchCard(m){const live=m.status==="En direct";const upcoming=m.status==="À venir";const goals=m.goals||[];const statusHtml=live?`<span class="live-pill"><span class="live-dot"></span> En direct</span>`:(upcoming?`<span style="color:#ffb16f;font-weight:900">À venir</span>`:`<span style="color:#7ee787;font-weight:900">Terminé</span>`);const score=upcoming?`VS`:`${m.hs} — ${m.as}`;const minute=live?`<span class="live-minute">🔴 ${getMatchMinute(m)}'</span>`:(m.status==="Terminé"?`<span style="opacity:.65">${m.minute||90}'</span>`:'');const goalHtml=goals.length?`<div class="goal-feed">${goals.map(g=>`<div class="goal-line"><span class="goal-icon">⚽</span><strong>${escapeHtml(g.team)}</strong> · ${escapeHtml(g.scorer||'Buteur')} · ${escapeHtml(g.minute)}'</div>`).join('')}</div>`:'';return `<div class="card match-card ${live?'live-match':''}"><div class="date">${statusHtml} · Journée ${m.day} · Poule ${m.group} ${minute}</div><div class="match"><div class="team">${crest(m.home,"team-logo")}<div>${m.home}</div></div><div class="score">${score}</div><div class="team">${crest(m.away,"team-logo")}<div>${m.away}</div></div></div>${live?`<div class="live-ticker">⏱️ MATCH EN DIRECT · ${getMatchMinute(m)} minutes</div>`:''}${goalHtml}</div>`}
-function groupBlock(g){const arr=groups[g];const pairs=[[[arr[0],arr[1]],1],[[arr[2],arr[3]],1],[[arr[0],arr[2]],2],[[arr[1],arr[3]],2],[[arr[0],arr[3]],3],[[arr[1],arr[2]],3]];const upcoming=pairs.filter(([[h,a]])=>!results.some(x=>(x.home===h&&x.away===a)||(x.home===a&&x.away===h)));return `<div class="group-title"><span>POULE ${g}</span><span class="group-count">4 équipes</span></div>${table(sortedGroup(g))}<div class="group-fixtures-title">⚽ Matchs à venir · Poule ${g}</div><div class="fixtures">${upcoming.length?upcoming.map(([[h,a],day])=>`<div class="fixture"><span><small style="opacity:.65">J${day}</small> ${crest(h,"mini-logo")}${h}</span><b>VS</b><span>${crest(a,"mini-logo")}${a}</span><em>À venir</em></div>`).join(""):`<div class="fixture"><span>Tous les matchs de la poule sont joués</span></div>`}</div>`}
+function groupBlock(g){const arr=groups[g];const pairs=[[[arr[0],arr[1]],1],[[arr[2],arr[3]],1],[[arr[0],arr[2]],2],[[arr[1],arr[3]],2],[[arr[0],arr[3]],3],[[arr[1],arr[2]],3]];const upcoming=pairs.filter(([[h,a]])=>!results.some(x=>x.status==="Terminé"&&((x.home===h&&x.away===a)||(x.home===a&&x.away===h))));return `<div class="group-title"><span>POULE ${g}</span><span class="group-count">4 équipes</span></div>${table(sortedGroup(g))}<div class="group-fixtures-title">⚽ Matchs à venir · Poule ${g}</div><div class="fixtures">${upcoming.length?upcoming.map(([[h,a],day])=>`<div class="fixture"><span><small style="opacity:.65">J${day}</small> ${crest(h,"mini-logo")}${h}</span><b>VS</b><span>${crest(a,"mini-logo")}${a}</span><em>À venir</em></div>`).join(""):`<div class="fixture"><span>Tous les matchs de la poule sont joués</span></div>`}</div>`}
 function getUsers(){try{return JSON.parse(localStorage.getItem("fyfl_users")||"[]")}catch(e){return []}}
 function getSession(){return localStorage.getItem("fyfl_session")||""}
 function setSession(name){if(name)localStorage.setItem("fyfl_session",name);else localStorage.removeItem("fyfl_session");updateAuthUI()}
@@ -587,7 +606,7 @@ function syncAdminGoalTeam(){const m=selectedAdminMatch();const sel=document.get
 function showGoalAnimation(team,scorer,minute){const pop=document.createElement('div');pop.className='goal-pop';pop.innerHTML=`<div class="goal-box"><div class="big">⚽</div><h2>BUUUUUT !</h2><p>${escapeHtml(team)} · ${escapeHtml(scorer)} · ${minute}'</p></div>`;document.body.appendChild(pop);for(let i=0;i<45;i++){const c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.animationDelay=Math.random()*.25+'s';c.style.transform=`rotate(${Math.random()*360}deg)`;document.body.appendChild(c);setTimeout(()=>c.remove(),1800)}setTimeout(()=>pop.remove(),950)}
 function broadcastLive(){try{new BroadcastChannel('fyfl-live').postMessage({type:'update',at:Date.now()})}catch(e){} flashLive()}
 function startLiveTicker(){if(window.__liveTimer)return;window.__liveTimer=setInterval(()=>{const pg=getCurrentPage();if(['matches','home','admin'].includes(pg))render(pg,false)},1000)}
-function pageHome(){return `<section class="hero"><div><div class="eyebrow">SAISON 1 · COMPÉTITION OFFICIELLE</div><h1>FRENCH YOUTH<br><span>FUT LEAGUE</span></h1><p>Bienvenue sur la plateforme officielle de la <b>FYFL</b>. Suivez les poules et tous les résultats.</p><div class="hero-actions"><button class="secondary" onclick="render('matches')">Voir les résultats</button></div></div><img class="hero-logo" src="fyfl-logo.png"></section>
+function pageHome(){return `<section class="hero"><div><div class="eyebrow">SAISON 1 · COMPÉTITION OFFICIELLE</div><h1>FRENCH YOUTH<br><span>FUT LEAGUE</span></h1><p>Bienvenue sur la plateforme officielle de la <b>FYFL</b>. Suivez les poules et tous les résultats.</p><div class="hero-actions"><button class="secondary" onclick="render('matches')">Voir les résultats</button><button class="secondary" onclick="render('ranking')">Voir le classement</button></div></div><img class="hero-logo" src="fyfl-logo.png"></section>
 <section class="section"><div class="section-head"><h2>⚡ Infos rapides</h2><small>FYFL Saison 1</small></div><div class="feature-grid">
 <div class="feature-card fyfl-credit-card"><h3>Website Created By Tutzou</h3><p style="margin:6px 0 0">Tutzou is the FYFL owner with Bs Pomier</p></div>
 <div class="feature-card"><div class="mini-label">🏅 JOUEUR DU MOIS</div><div class="player-month"><div class="player-avatar">🏆</div><div><h3 style="margin:8px 0 0">${escapeHtml(getAdminPrefs().player||"À déterminer")}</h3><p style="margin:6px 0 0">Le joueur du mois sera defini en fonction des performmence en match</p></div></div></div>
