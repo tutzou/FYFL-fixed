@@ -412,11 +412,11 @@ async function initFYFLSupabase(){
           if(payload.eventType==='DELETE'){const key=payload.old?.match_key;const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===key);if(i>=0)results.splice(i,1);}
           else if(payload.new){const incoming=fyflFromRow(payload.new);const allowedIncoming=isCurrentPlayedMatch(incoming)||incoming.status==='À venir'||incoming.status==='En direct';if(allowedIncoming){const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===payload.new.match_key);if(i>=0)results[i]=incoming;else results.push(incoming);}}
           flashLive();
-          const pg=getCurrentPage();if(['home','matches','ranking','admin'].includes(pg))render(pg,false);
+          const pg=getCurrentPage();if(['home','matches','ranking'].includes(pg))render(pg,false);
           if(payload.eventType==='UPDATE'&&payload.new?.status==='En direct'){const newGoals=Array.isArray(payload.new.goals)?payload.new.goals:[];const g=newGoals[newGoals.length-1];const sig=g?JSON.stringify(g):'';if(g&&sig!==window.__lastGoalSignature){window.__lastGoalSignature=sig;showGoalAnimation(g.team,g.scorer,g.minute)}}
         })
         .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_settings'},payload=>{
-          if(payload.new){fyflSettings={...fyflSettings,breaking:payload.new.breaking||fyflSettings.breaking,player:payload.new.player||fyflSettings.player,news:payload.new.news||fyflSettings.news,standings:(payload.new.standings&&typeof payload.new.standings==='object')?payload.new.standings:(fyflSettings.standings||{})};fyflSettingsReady=true;applyAdminPrefs();flashLive();const pg=getCurrentPage();if(['home','news','ranking','admin'].includes(pg))render(pg,false);}
+          if(payload.new){fyflSettings={...fyflSettings,breaking:payload.new.breaking||fyflSettings.breaking,player:payload.new.player||fyflSettings.player,news:payload.new.news||fyflSettings.news,standings:(payload.new.standings&&typeof payload.new.standings==='object')?payload.new.standings:(fyflSettings.standings||{})};fyflSettingsReady=true;applyAdminPrefs();flashLive();const pg=getCurrentPage();if(['home','news','ranking'].includes(pg))render(pg,false);}
         })
         .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_comments'},payload=>{
           if(payload.eventType==='DELETE'){fyflComments=fyflComments.filter(c=>c.id!==payload.old?.id);}
