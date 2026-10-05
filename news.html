@@ -19,9 +19,13 @@ display:flex;align-items:center;justify-content:center;z-index:9999;background:#
 box-shadow:0 8px 24px rgba(0,0,0,.35);transition:.18s}
 .fyfl-discord-button:hover{transform:scale(1.08)}.fyfl-discord-button svg{width:29px;height:29px;fill:#fff}
 @media(max-width:700px){.wrap{padding:20px 14px}.news-card{padding:20px}.news-card h1{font-size:24px}.message{font-size:16px}.fyfl-discord-button{left:14px;bottom:14px;width:48px;height:48px}}
+
+/* FYFL V9 page transition */
+body.fyfl-page-v9{animation:fyflFade .45s ease both}
+@keyframes fyflFade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 </style>
 </head>
-<body>
+<body class="fyfl-page-v9">
 <main class="wrap">
 <a class="back" href="index.html">← Retour à l'accueil</a>
 <article class="news-card">
