@@ -233,7 +233,7 @@ html,body{max-width:100%;overflow-x:hidden}.nav{gap:12px}.auth-actions{display:f
 .stats-card-head span{font-size:11px;font-weight:900;color:#8e9bb0;letter-spacing:.12em}
 .stats-table{min-width:0}
 .stats-table th:first-child,.stats-table td:first-child{width:45px}
-.stats-table td:nth-child(3),.stats-table th:nth-child(3){text-align:right}
+.stats-table td:nth-child(3),.stats-table th:nth-child(3){text-align:right}.stats-player{display:flex;align-items:center;gap:10px;min-width:0}.stats-player-logo{width:28px;height:28px;object-fit:contain;flex:0 0 28px}.stats-player-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stats-club{display:block;font-size:10px;color:var(--muted);font-weight:700;margin-top:2px}.stats-admin-player{display:flex;align-items:center;gap:8px;min-width:0}.stats-admin-player img{width:24px;height:24px;object-fit:contain;flex:0 0 24px}.stats-admin-player-info{min-width:0}.stats-admin-player-info b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stats-admin-player-info small{color:var(--muted)}
 .stats-live-note{margin-top:14px;text-align:center;color:#7ee787;font-size:12px;font-weight:800}
 .stats-admin-box{min-height:100%}
 .stats-admin-list{margin-top:12px;display:grid;gap:7px}
@@ -624,14 +624,19 @@ async function adminSaveText(){const p=getAdminPrefs();p.breaking=(document.getE
 
 function cleanStats(value){
   const raw=value&&typeof value==='object'?value:{};
-  const normalize=list=>Array.isArray(list)?list.map(x=>({name:String(x?.name||'').trim(),value:Math.max(0,Number(x?.value)||0)})).filter(x=>x.name).sort((a,b)=>b.value-a.value||a.name.localeCompare(b.name,'fr')).slice(0,15):[];
+  const normalize=list=>Array.isArray(list)?list.map(x=>({name:String(x?.name||'').trim(),club:String(x?.club||'').trim(),value:Math.max(0,Number(x?.value)||0)})).filter(x=>x.name).sort((a,b)=>b.value-a.value||a.name.localeCompare(b.name,'fr')).slice(0,15):[];
   return {scorers:normalize(raw.scorers),assists:normalize(raw.assists)};
 }
 function getStats(){
   return cleanStats(fyflSettings?.standings?.__stats);
 }
+function statsClubLogo(club){
+  const c=String(club||'').trim();
+  const u=logoUrls[c];
+  return u?`<img class="stats-player-logo" src="${u}" alt="${escapeHtml(c)}" loading="lazy">`:`<span class="mini-badge" title="${escapeHtml(c||'Club')}" style="width:28px;height:28px;font-size:9px">${initials(c||'Club')}</span>`;
+}
 function statsRows(list,unit){
-  return list.length?list.map((p,i)=>`<tr><td class="pos">${i+1}</td><td><strong>${escapeHtml(p.name)}</strong></td><td class="pts">${p.value} ${unit}</td></tr>`).join(""):`<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:22px">Aucun joueur enregistré.</td></tr>`;
+  return list.length?list.map((p,i)=>`<tr><td class="pos">${i+1}</td><td><div class="stats-player">${statsClubLogo(p.club)}<div class="stats-player-name"><strong>${escapeHtml(p.name)}</strong>${p.club?`<span class="stats-club">${escapeHtml(p.club)}</span>`:''}</div></div></td><td class="pts">${p.value} ${unit}</td></tr>`).join(""):`<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:22px">Aucun joueur enregistré.</td></tr>`;
 }
 function statsCard(title,icon,list,unit){
   return `<div class="card stats-card"><div class="stats-card-head"><h3>${icon} ${title}</h3><span>TOP 15</span></div><div class="table-wrap"><table class="stats-table"><thead><tr><th>#</th><th>Joueur</th><th>${unit}</th></tr></thead><tbody>${statsRows(list,unit)}</tbody></table></div></div>`;
@@ -643,11 +648,15 @@ function pageStats(){
 function statsAdminList(type){
   const list=getStats()[type];
   const label=type==='scorers'?'buts':'passes';
-  return list.length?list.map((p,i)=>`<div class="stats-admin-row"><span><b>${i+1}.</b> ${escapeHtml(p.name)} <strong>${p.value} ${label}</strong></span><button class="reset" onclick="adminRemoveStat('${type}',${i})">×</button></div>`).join(""):'<div class="admin-help">Aucun joueur enregistré.</div>';
+  return list.length?list.map((p,i)=>`<div class="stats-admin-row"><span class="stats-admin-player">${statsClubLogo(p.club)}<span class="stats-admin-player-info"><b>${i+1}. ${escapeHtml(p.name)}</b><small>${escapeHtml(p.club||'Club non renseigné')} · ${p.value} ${label}</small></span></span><button class="reset" onclick="adminRemoveStat('${type}',${i})">×</button></div>`).join(""):'<div class="admin-help">Aucun joueur enregistré.</div>';
+}
+function statsClubOptions(selected=''){
+  const clubs=Object.keys(logoUrls).sort((a,b)=>a.localeCompare(b,'fr'));
+  return `<option value="">Sélectionner un club</option>${clubs.map(c=>`<option value="${escapeHtml(c)}" ${c===selected?'selected':''}>${escapeHtml(c)}</option>`).join('')}`;
 }
 function pageStatsAdminBox(type,title,icon){
   const label=type==='scorers'?'Buts':'Passes';
-  return `<div class="admin-box stats-admin-box"><h3>${icon} ${title}</h3><label>Nom du joueur</label><input id="adminStatName_${type}" maxlength="40" placeholder="Ex. Kylian"><label>Nombre de ${label.toLowerCase()}</label><input id="adminStatValue_${type}" type="number" min="0" max="9999" step="1" placeholder="0"><button class="live" onclick="adminAddStat('${type}')">➕ Ajouter au classement</button><div class="stats-admin-list">${statsAdminList(type)}</div><p class="admin-help">Le classement garde automatiquement les 15 meilleurs ${label.toLowerCase()}. Si le joueur existe déjà, sa valeur est mise à jour.</p></div>`;
+  return `<div class="admin-box stats-admin-box"><h3>${icon} ${title}</h3><label>Nom du joueur</label><input id="adminStatName_${type}" maxlength="40" placeholder="Ex. Kylian"><label>Club</label><select id="adminStatClub_${type}">${statsClubOptions()}</select><label>Nombre de ${label.toLowerCase()}</label><input id="adminStatValue_${type}" type="number" min="0" max="9999" step="1" placeholder="0"><button class="live" onclick="adminAddStat('${type}')">➕ Ajouter au classement</button><div class="stats-admin-list">${statsAdminList(type)}</div><p class="admin-help">Choisis le club avant l'ajout. Le logo du club apparaîtra automatiquement dans le classement. Le classement garde les 15 meilleurs ${label.toLowerCase()}.</p></div>`;
 }
 async function saveStats(stats){
   const standings={...(fyflSettings.standings||{}),__stats:cleanStats(stats)};
@@ -655,14 +664,16 @@ async function saveStats(stats){
 }
 async function adminAddStat(type){
   const name=(document.getElementById('adminStatName_'+type)?.value||'').trim();
+  const club=(document.getElementById('adminStatClub_'+type)?.value||'').trim();
   const value=Math.max(0,Math.floor(Number(document.getElementById('adminStatValue_'+type)?.value||0)));
   if(!name){alert('Entre le nom du joueur.');return}
+  if(!club){alert('Sélectionne le club du joueur.');return}
   if(!Number.isFinite(value)){alert('Entre un nombre valide.');return}
   if(!isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée.');return}
   const stats=getStats();
   const list=[...stats[type]];
   const existing=list.findIndex(x=>x.name.toLowerCase()===name.toLowerCase());
-  if(existing>=0)list[existing]={...list[existing],name,value};else list.push({name,value});
+  if(existing>=0)list[existing]={...list[existing],name,club,value};else list.push({name,club,value});
   stats[type]=list;
   stats[type]=cleanStats(stats[type]);
   const ok=await saveStats(stats);
