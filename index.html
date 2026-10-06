@@ -409,6 +409,95 @@ async function loadOnlineComments(){
   const {data,error}=await fyflSupabase.from('fyfl_comments').select('*').order('created_at',{ascending:false});
   if(!error){fyflComments=data||[];fyflCommentsReady=true;}
 }
+async function refreshAllFYFLRemoteData(){
+  if(!fyflSupabase)return;
+  try{
+    const [matches,settings,stats,comments]=await Promise.all([
+      fyflSupabase.from('fyfl_matches').select('*'),
+      fyflSupabase.from('fyfl_settings').select('*').eq('id','main').maybeSingle(),
+      fyflSupabase.from('fyfl_stats').select('*').order('stat_value',{ascending:false}).order('player_name',{ascending:true}),
+      fyflSupabase.from('fyfl_comments').select('*').order('created_at',{ascending:false})
+    ]);
+    if(!matches.error){setRemoteResults(matches.data||[]);fyflRemoteReady=true;}
+    if(!settings.error && settings.data){
+      const remoteStandings=(settings.data.standings&&typeof settings.data.standings==='object')?settings.data.standings:{};
+      fyflSettings={...fyflSettings,breaking:settings.data.breaking||fyflSettings.breaking,player:settings.data.player||fyflSettings.player,news:settings.data.news||fyflSettings.news,standings:remoteStandings};
+      fyflSettingsReady=true;applyAdminPrefs();
+    }
+    if(!stats.error)fyflStats=sortStatsRows((stats.data||[]).map(normalizeStatRow));
+    if(!comments.error){fyflComments=comments.data||[];fyflCommentsReady=true;}
+  }catch(e){console.warn('FYFL remote refresh:',e)}
+}
+function stopFYFLRealtime(){
+  if(!fyflSupabase||!fyflRealtimeChannel)return;
+  try{fyflSupabase.removeChannel(fyflRealtimeChannel)}catch(e){}
+  fyflRealtimeChannel=null;
+}
+async function setupFYFLRealtime(){
+  if(!fyflSupabase)return;
+  stopFYFLRealtime();
+  const channelName='fyfl-live-'+Math.random().toString(36).slice(2);
+  const ch=fyflSupabase.channel(channelName);
+  ch.on('postgres_changes',{event:'*',schema:'public',table:'fyfl_matches'},payload=>{
+    if(payload.eventType==='DELETE'){
+      const key=payload.old?.match_key;
+      const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===key);
+      if(i>=0)results.splice(i,1);
+    }else if(payload.new){
+      const incoming=fyflFromRow(payload.new);
+      const key=payload.new.match_key||fyflMatchKey(incoming);
+      const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===key);
+      if(i>=0)results[i]={...incoming};else results.push(incoming);
+      const newGoals=Array.isArray(payload.new.goals)?payload.new.goals:[];
+      const g=newGoals[newGoals.length-1];
+      const sig=g?JSON.stringify(g):'';
+      if(g&&sig!==window.__lastGoalSignature){window.__lastGoalSignature=sig;showGoalAnimation(g.team,g.scorer,g.minute)}
+    }
+    flashLive();
+    const pg=getCurrentPage();if(['home','matches','ranking'].includes(pg))render(pg,false);
+  });
+  ch.on('postgres_changes',{event:'*',schema:'public',table:'fyfl_settings'},payload=>{
+    if(payload.new){
+      const remoteStandings=(payload.new.standings&&typeof payload.new.standings==='object')?payload.new.standings:{};
+      fyflSettings={...fyflSettings,breaking:payload.new.breaking||fyflSettings.breaking,player:payload.new.player||fyflSettings.player,news:payload.new.news||fyflSettings.news,standings:remoteStandings};
+      fyflSettingsReady=true;applyAdminPrefs();
+    }
+    flashLive();const pg=getCurrentPage();if(['home','news','ranking'].includes(pg))render(pg,false);
+  });
+  ch.on('postgres_changes',{event:'*',schema:'public',table:'fyfl_stats'},payload=>{
+    if(payload.eventType==='DELETE'){fyflStats=fyflStats.filter(x=>x.id!==payload.old?.id);}
+    else if(payload.new){
+      const row=normalizeStatRow(payload.new);
+      const i=fyflStats.findIndex(x=>x.id===row.id);
+      if(i>=0)fyflStats[i]=row;else fyflStats.push(row);
+    }
+    fyflStats=sortStatsRows(fyflStats);
+    flashLive();const pg=getCurrentPage();if(['stats','admin'].includes(pg))render(pg,false);
+  });
+  ch.on('postgres_changes',{event:'*',schema:'public',table:'fyfl_comments'},payload=>{
+    if(payload.eventType==='DELETE')fyflComments=fyflComments.filter(c=>c.id!==payload.old?.id);
+    else if(payload.new){const i=fyflComments.findIndex(c=>c.id===payload.new.id);if(i>=0)fyflComments[i]=payload.new;else fyflComments.unshift(payload.new);}
+    flashLive();if(getCurrentPage()==='comments')render('comments',false);
+  });
+  fyflRealtimeChannel=ch;
+  await new Promise(resolve=>{
+    let settled=false;
+    const done=()=>{if(!settled){settled=true;resolve();}};
+    ch.subscribe(async status=>{
+      if(status==='SUBSCRIBED'){
+        window.__fyflRealtimeConnected=true;
+        await refreshAllFYFLRemoteData();
+        flashLive();done();
+      }else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){
+        window.__fyflRealtimeConnected=false;
+        done();
+        setTimeout(()=>{if(fyflSupabase)setupFYFLRealtime()},1500);
+      }
+    });
+    setTimeout(done,5000);
+  });
+}
+
 async function initFYFLSupabase(){
   if(fyflInitPromise)return fyflInitPromise;
   fyflInitPromise=(async()=>{
@@ -429,28 +518,7 @@ async function initFYFLSupabase(){
       await loadOnlineSettings();
       await loadOnlineStats();
       await loadOnlineComments();
-      fyflRealtimeChannel=fyflSupabase.channel('fyfl-live-all')
-        .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_matches'},payload=>{
-          if(payload.eventType==='DELETE'){const key=payload.old?.match_key;const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===key);if(i>=0)results.splice(i,1);}
-          else if(payload.new){const incoming=fyflFromRow(payload.new);const allowedIncoming=isCurrentPlayedMatch(incoming)||incoming.status==='À venir'||incoming.status==='En direct';if(allowedIncoming){const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===payload.new.match_key);if(i>=0)results[i]=incoming;else results.push(incoming);}}
-          flashLive();
-          const pg=getCurrentPage();if(['home','matches','ranking'].includes(pg))render(pg,false);
-          if(payload.eventType==='UPDATE'&&payload.new?.status==='En direct'){const newGoals=Array.isArray(payload.new.goals)?payload.new.goals:[];const g=newGoals[newGoals.length-1];const sig=g?JSON.stringify(g):'';if(g&&sig!==window.__lastGoalSignature){window.__lastGoalSignature=sig;showGoalAnimation(g.team,g.scorer,g.minute)}}
-        })
-        .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_settings'},payload=>{
-          if(payload.new){const remoteStandings=(payload.new.standings&&typeof payload.new.standings==='object')?payload.new.standings:(fyflSettings.standings||{});fyflSettings={...fyflSettings,breaking:payload.new.breaking||fyflSettings.breaking,player:payload.new.player||fyflSettings.player,news:payload.new.news||fyflSettings.news,standings:remoteStandings};fyflSettingsReady=true;applyAdminPrefs();flashLive();const pg=getCurrentPage();if(['home','news','ranking'].includes(pg))render(pg,false);}
-        })
-        .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_stats'},payload=>{
-          if(payload.eventType==='DELETE'){fyflStats=fyflStats.filter(x=>x.id!==payload.old?.id);}
-          else if(payload.new){const row=normalizeStatRow(payload.new);const i=fyflStats.findIndex(x=>x.id===row.id);if(i>=0)fyflStats[i]=row;else fyflStats.push(row);}
-          fyflStats=sortStatsRows(fyflStats);flashLive();const pg=getCurrentPage();if(['stats','admin'].includes(pg))render(pg,false);
-        })
-        .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_comments'},payload=>{
-          if(payload.eventType==='DELETE'){fyflComments=fyflComments.filter(c=>c.id!==payload.old?.id);}
-          else if(payload.new){const i=fyflComments.findIndex(c=>c.id===payload.new.id);if(i>=0)fyflComments[i]=payload.new;else fyflComments.unshift(payload.new);}
-          flashLive();if(getCurrentPage()==='comments')render('comments',false);
-        })
-        .subscribe();
+      await setupFYFLRealtime();
     }catch(e){console.warn('FYFL Supabase:',e);return false}
     return !!fyflSupabase;
   })();
@@ -731,7 +799,9 @@ render();applyAdminPrefs();
 (async()=>{await initFYFLSupabase();await refreshAdminSession();await ensureRemoteFixtureSeed();updateAuthUI();applyAdminPrefs();if(getCurrentPage()==="comments")render("comments",false);})();
 function detectDevice(){const mobile=/Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(navigator.userAgent)||window.innerWidth<=700;document.body.classList.toggle("device-mobile",mobile);document.body.classList.toggle("device-desktop",!mobile);document.body.dataset.device=mobile?"mobile":"desktop"}
 window.addEventListener("resize",detectDevice);detectDevice();
-setTimeout(()=>{if(fyflSupabase)fyflSupabase.auth.onAuthStateChange((_event,session)=>{supabaseAdminUser=session?.user||null;adminUnlocked=!!supabaseAdminUser&&String(supabaseAdminUser.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();updateAuthUI();/* Ne jamais rerendre le panneau admin automatiquement. */});},0);
+setTimeout(()=>{if(fyflSupabase)fyflSupabase.auth.onAuthStateChange(async (_event,session)=>{supabaseAdminUser=session?.user||null;adminUnlocked=!!supabaseAdminUser&&String(supabaseAdminUser.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();updateAuthUI();if(_event==='SIGNED_IN' || _event==='TOKEN_REFRESHED')await refreshAllFYFLRemoteData();});},0);
+
+document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'&&fyflSupabase){await refreshAllFYFLRemoteData();if(!window.__fyflRealtimeConnected)await setupFYFLRealtime();const pg=getCurrentPage();if(['home','matches','ranking','stats','comments','news'].includes(pg))render(pg,false);}});
 // Extras Halloween, alerte et compte à rebours.
 function toggleHalloween(){document.body.classList.toggle('halloween-theme');const b=document.getElementById('halloweenToggle');const on=document.body.classList.contains('halloween-theme');b.textContent=on?'🎃 Halloween ON':'🌙 Halloween OFF';b.classList.toggle('off',!on);if(!on){document.querySelectorAll('.halloween-fall').forEach(e=>e.remove())}}
 function spawnPumpkin(){const p=document.createElement('div');p.className='halloween-fall';p.textContent=['🎃','🦇','🍬','🕸️'][Math.floor(Math.random()*4)];p.style.left=(Math.random()*96)+'vw';p.style.fontSize=(18+Math.random()*18)+'px';p.style.animationDuration=(5+Math.random()*6)+'s';document.body.appendChild(p);setTimeout(()=>p.remove(),12000)}
