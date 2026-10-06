@@ -225,26 +225,6 @@ html,body{max-width:100%;overflow-x:hidden}.nav{gap:12px}.auth-actions{display:f
 @keyframes fyflItemIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .fyfl-live-sync{position:fixed;right:14px;bottom:14px;z-index:9998;background:rgba(12,17,24,.92);border:1px solid #2b3442;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:900;color:#7ee787;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none}
 .fyfl-live-sync.show{opacity:1;transform:none}
-
-.stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.stats-card{overflow:hidden}
-.stats-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
-.stats-card-head h3{margin:0;font-size:21px}
-.stats-card-head span{font-size:11px;font-weight:900;color:#8e9bb0;letter-spacing:.12em}
-.stats-table{min-width:0}
-.stats-table th:first-child,.stats-table td:first-child{width:45px}
-.stats-table td:nth-child(3),.stats-table th:nth-child(3){text-align:right}.stats-player{display:flex;align-items:center;gap:10px;min-width:0}.stats-player-logo{width:28px;height:28px;object-fit:contain;flex:0 0 28px}.stats-player-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stats-club{display:block;font-size:10px;color:var(--muted);font-weight:700;margin-top:2px}.stats-admin-player{display:flex;align-items:center;gap:8px;min-width:0}.stats-admin-player img{width:24px;height:24px;object-fit:contain;flex:0 0 24px}.stats-admin-player-info{min-width:0}.stats-admin-player-info b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stats-admin-player-info small{color:var(--muted)}
-.stats-live-note{margin-top:14px;text-align:center;color:#7ee787;font-size:12px;font-weight:800}
-.stats-admin-box{min-height:100%}
-.stats-admin-list{margin-top:12px;display:grid;gap:7px}
-.stats-admin-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;background:#151c27;border:1px solid #252e3b;border-radius:9px;font-size:12px}
-.stats-admin-row span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.stats-admin-row strong{color:#7ee787;margin-left:6px}
-.stats-admin-row button{flex:0 0 auto;padding:5px 9px!important;background:#303846!important}
-@media(max-width:700px){
-  .stats-grid{grid-template-columns:1fr}
-  .stats-card-head h3{font-size:18px}
-}
 </style>
 <style id="fyfl-credit-fix">
 .fyfl-credit-card{display:flex;align-items:center;justify-content:center;text-align:center;min-height:150px}
@@ -259,6 +239,24 @@ html,body{max-width:100%;overflow-x:hidden}.nav{gap:12px}.auth-actions{display:f
   header .nav nav button:first-child{margin-left:0}
   header .nav nav button:nth-child(2){margin-left:0}
 }
+</style>
+
+<style id="fyfl-stats-live">
+.stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.stats-card{background:#101722;border:1px solid #293342;border-radius:18px;padding:18px}
+.stats-card h3{margin:0 0 14px}
+.stat-row{display:grid;grid-template-columns:38px 42px minmax(0,1fr) auto;align-items:center;gap:10px;padding:12px 5px;border-bottom:1px solid #222b37}
+.stat-row:last-child{border-bottom:0}
+.stat-pos{font-weight:900;color:#ff9b42;text-align:center}
+.stat-club-logo{width:34px;height:34px;object-fit:contain}
+.stat-player{font-weight:900;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stat-value{font-weight:1000;color:#fff;white-space:nowrap}
+.stat-empty{padding:25px;text-align:center;color:#7f8998;border:1px dashed #303846;border-radius:12px}
+.stat-live{color:#72e3a2;font-weight:900}
+.admin-stats-list{display:grid;gap:8px;margin-top:12px}
+.admin-stat-player{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#151d29;border:1px solid #303846;border-radius:10px;padding:9px}
+.admin-stat-player small{color:#8d98a8}
+@media(max-width:700px){.stats-grid{grid-template-columns:1fr}.stat-row{grid-template-columns:30px 36px minmax(0,1fr) auto;gap:7px}.stat-club-logo{width:30px;height:30px}}
 </style>
 </head><body>
 
@@ -286,7 +284,7 @@ html,body{max-width:100%;overflow-x:hidden}.nav{gap:12px}.auth-actions{display:f
 
 <div class="breaking-news"><b>BREAKING</b><span id="breakingNewsText">REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !</span><a href="https://discord.gg/fyfl" target="_blank" rel="noopener">↗</a></div><div id="fyflLiveSync" class="fyfl-live-sync">● EN DIRECT</div>
 <header><div class="nav"><div class="brand"><img src="fyfl-logo.png"><span>FYFL</span></div>
-<nav><button class="active" data-page="home">Accueil</button><button data-page="matches">Matchs / Résultats</button><button data-page="ranking">Classement</button><button data-page="stats">STATS</button><button data-page="teams">Équipes</button><button data-page="competitions">Compétitions</button><button data-page="news">FYFL - NEWS</button><button data-page="comments">💬 Commentaires</button></nav><div class="auth-actions" id="authActions"></div></div></header>
+<nav><button class="active" data-page="home">Accueil</button><button data-page="matches">Matchs / Résultats</button><button data-page="ranking">Classement</button><button data-page="teams">Équipes</button><button data-page="competitions">Compétitions</button><button data-page="stats">📊 STATS</button><button data-page="news">FYFL - NEWS</button><button data-page="comments">💬 Commentaires</button></nav><div class="auth-actions" id="authActions"></div></div></header>
 <main id="app"></main><footer>FYFL — French Youth Fut League · Saison 1<br><small>Les écussons appartiennent à leurs clubs respectifs.</small></footer>
 <div id="newsAlert" class="news-alert"><button onclick="document.getElementById('newsAlert').remove()" aria-label="Fermer">×</button><div style="font-size:11px;letter-spacing:.12em;color:#ff8a22;font-weight:900">📢 FYFL NEWS</div><strong>Les matchs sont les mercredis et les week-ends !</strong><div style="color:#aaa;margin-top:5px;font-size:13px">Pense à rester actif sur le Discord.</div></div>
 <button id="halloweenToggle" class="halloween-toggle" onclick="toggleHalloween()">🎃 Halloween ON</button>
@@ -306,10 +304,114 @@ let fyflInitPromise=null;
 const groups={"A": ["ASTON VILLA", "OM", "BAYER LEVERKUSEN", "NEWCASTLE"], "B": ["BARCELONE", "BESIKTAS", "LIVERPOOL", "REAL MADRID"], "C": ["CRYSTAL PALACE", "PSG", "ATLETICO MADRID", "JUVENTUS"], "D": ["AS MONACO", "LAZIO FC", "D2T", "FIORENTINA"], "E": ["INTER MILAN", "RED STAR", "ARSENAL", "AC MILAN"], "F": ["RENNES", "CHELSEA", "MANCHESTER CITY", "BAYERN MUNICH"]};
 const defaultResults=[];
 let results=defaultResults.map(x=>({...x}));
-let fyflSettings={breaking:'REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !',player:'À déterminer',news:'Les matchs FYFL se joueront les mercredis et les week-ends !',standings:{__stats:{scorers:[],assists:[]}}};
+let fyflSettings={breaking:'REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !',player:'À déterminer',news:'Les matchs FYFL se joueront les mercredis et les week-ends !',standings:{}};
 let fyflComments=[];
 let fyflSettingsReady=false;
 let fyflCommentsReady=false;
+let fyflStats=[];
+let fyflStatsReady=false;
+let fyflStatsChannelReady=false;
+
+function normalizeStatRow(r){
+  if(!r) return null;
+  return {
+    id:r.id,
+    stat_type:r.stat_type==='passeur'?'passeur':'buteur',
+    player_name:String(r.player_name||'').trim(),
+    club_name:String(r.club_name||'').trim(),
+    club_logo:String(r.club_logo||'').trim(),
+    stat_value:Math.max(0,Number(r.stat_value)||0),
+    created_at:r.created_at,
+    updated_at:r.updated_at
+  };
+}
+function sortStats(type){
+  return fyflStats
+    .filter(s=>s && s.stat_type===type)
+    .sort((a,b)=>(b.stat_value-a.stat_value)||String(a.player_name).localeCompare(String(b.player_name),'fr'))
+    .slice(0,15);
+}
+function statUnit(type){return type==='passeur'?'passe'+(arguments[1]===1?'':'s'):'but'+(arguments[1]===1?'':'s')}
+function statClubLogo(s){
+  return s.club_logo || logoUrls[String(s.club_name||'').toUpperCase()] || '';
+}
+function renderStatRows(type){
+  const rows=sortStats(type);
+  if(!rows.length)return '<div class="stat-empty">Aucun joueur dans ce classement pour le moment.</div>';
+  return rows.map((s,i)=>{
+    const logo=statClubLogo(s);
+    return `<div class="stat-row">
+      <div class="stat-pos">${i+1}</div>
+      <div>${logo?`<img class="stat-club-logo" src="${escapeHtml(logo)}" alt="${escapeHtml(s.club_name||'Club')}" loading="lazy">`:'<span class="mini-badge">⚽</span>'}</div>
+      <div class="stat-player">${escapeHtml(s.player_name)}<small style="display:block;color:#7f8998;font-size:10px;margin-top:2px">${escapeHtml(s.club_name||'Club')}</small></div>
+      <div class="stat-value">${s.stat_value} ${statUnit(type,s.stat_value)}</div>
+    </div>`;
+  }).join('');
+}
+function pageStats(){
+  return `<section class="section">
+    <div class="section-head"><h2>📊 STATS</h2><small class="stat-live">● EN DIRECT SUPABASE</small></div>
+    <div class="stats-grid">
+      <div class="stats-card"><h3>⚽ Meilleurs buteurs</h3><div id="statsButeurs">${renderStatRows('buteur')}</div></div>
+      <div class="stats-card"><h3>🎯 Meilleurs passeurs</h3><div id="statsPasseurs">${renderStatRows('passeur')}</div></div>
+    </div>
+  </section>`;
+}
+async function loadOnlineStats(){
+  if(!fyflSupabase)return;
+  const {data,error}=await fyflSupabase.from('fyfl_stats').select('*').order('stat_value',{ascending:false});
+  if(error){console.warn('FYFL stats lecture:',error.message);return false;}
+  fyflStats=(data||[]).map(normalizeStatRow).filter(Boolean);
+  fyflStatsReady=true;
+  if(getCurrentPage()==='stats')render('stats',false);
+  return true;
+}
+async function saveStatFromAdmin(){
+  if(!fyflSupabase||!isCurrentAccountAdminVerified()){alert('Connecte-toi avec le compte administrateur Supabase.');return;}
+  const id=(document.getElementById('adminStatId')?.value||'').trim();
+  const type=document.getElementById('adminStatType')?.value==='passeur'?'passeur':'buteur';
+  const name=(document.getElementById('adminStatName')?.value||'').trim();
+  const club=(document.getElementById('adminStatClub')?.value||'').trim();
+  const value=Math.max(0,Number(document.getElementById('adminStatValue')?.value||0));
+  if(!name||!club){alert('Renseigne le nom du joueur et son club.');return;}
+  const logo=logoUrls[club.toUpperCase()]||'';
+  const payload={stat_type:type,player_name:name,club_name:club,club_logo:logo,stat_value:value,updated_at:new Date().toISOString()};
+  const {data,error}=id
+    ? await fyflSupabase.from('fyfl_stats').update(payload).eq('id',id).select().single()
+    : await fyflSupabase.from('fyfl_stats').insert(payload).select().single();
+  if(error){alert('Impossible de sauvegarder la statistique : '+error.message);return;}
+  const normalized=normalizeStatRow(data);
+  if(normalized){
+    const i=fyflStats.findIndex(s=>s.id===normalized.id);
+    if(i>=0)fyflStats[i]=normalized;else fyflStats.push(normalized);
+  }
+  clearAdminStatForm();
+  render('admin',false);
+  flashLive();
+}
+async function deleteStatFromAdmin(id){
+  if(!fyflSupabase||!isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée.');return;}
+  if(!confirm('Supprimer ce joueur du classement ?'))return;
+  const {error}=await fyflSupabase.from('fyfl_stats').delete().eq('id',id);
+  if(error){alert('Impossible de supprimer : '+error.message);return;}
+  fyflStats=fyflStats.filter(s=>s.id!==id);
+  render('admin',false);flashLive();
+}
+function editStatFromAdmin(id){
+  const s=fyflStats.find(x=>x.id===id);if(!s)return;
+  const a=document.getElementById('adminStatId'),b=document.getElementById('adminStatType'),c=document.getElementById('adminStatName'),d=document.getElementById('adminStatClub'),e=document.getElementById('adminStatValue');
+  if(a)a.value=s.id;if(b)b.value=s.stat_type;if(c)c.value=s.player_name;if(d)d.value=s.club_name;if(e)e.value=s.stat_value;
+  document.getElementById('adminStatSaveBtn')?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function clearAdminStatForm(){
+  ['adminStatId','adminStatName','adminStatClub','adminStatValue'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const t=document.getElementById('adminStatType');if(t)t.value='buteur';
+}
+function adminStatsList(type){
+  const rows=fyflStats.filter(s=>s.stat_type===type).sort((a,b)=>b.stat_value-a.stat_value);
+  return rows.length?rows.map(s=>`<div class="admin-stat-player"><div><strong>${escapeHtml(s.player_name)}</strong><small>${escapeHtml(s.club_name)} · ${s.stat_value} ${statUnit(type,s.stat_value)}</small></div><div class="admin-actions"><button onclick="editStatFromAdmin('${escapeHtml(s.id)}')">✏️</button><button onclick="deleteStatFromAdmin('${escapeHtml(s.id)}')">🗑️</button></div></div>`).join(''):'<div class="admin-help">Aucun joueur.</div>';
+}
+
 async function saveResults(){
   if(!fyflSupabase || !fyflRemoteReady || !isCurrentAccountAdminVerified()) return false;
   return await syncAllRemoteMatches();
@@ -379,20 +481,19 @@ async function loadOnlineSettings(){
   const {data,error}=await fyflSupabase.from('fyfl_settings').select('*').eq('id','main').maybeSingle();
   if(!error&&data){
     let standings=cleanStandingsOverrides(data.standings);
-    // Les statistiques sont stockées dans le même JSON que les anciens
-    // overrides du classement, mais elles ne doivent jamais être purgées.
-    const stats=cleanStats(standings.__stats);
-    delete standings.__stats;
-    // Ancienne migration : on purge uniquement les overrides d'équipes si
-    // presque toutes les équipes ont été enregistrées manuellement.
+    // Migration de sécurité : une ancienne version pouvait enregistrer un override
+    // pour toutes les équipes (ex. 3 MJ / 3 nuls / 3 pts partout). Dans ce cas,
+    // le classement calculé à partir des matchs ne doit plus être écrasé.
     const overrideKeys=Object.keys(standings).filter(k=>allTeams.includes(k));
+    // Purge l’ancien classement manuel global qui pouvait afficher 3 MJ / 3 nuls / 3 pts partout.
     const blanketOverride=allTeams && overrideKeys.length>=Math.max(12,Math.ceil(allTeams.length*0.75));
     if(blanketOverride){
       standings={};
-      // Ne pas écrire {} ici : cela pourrait supprimer les statistiques de la base.
-      // Les anciennes données seront simplement ignorées côté affichage.
+      if(isCurrentAccountAdminVerified()){
+        const {error:clearError}=await fyflSupabase.from('fyfl_settings').update({standings:{},updated_at:new Date().toISOString()}).eq('id','main');
+        if(clearError)console.warn('FYFL nettoyage classement:',clearError.message);
+      }
     }
-    standings.__stats=stats;
     fyflSettings={...fyflSettings,breaking:data.breaking||fyflSettings.breaking,player:data.player||fyflSettings.player,news:data.news||fyflSettings.news,standings};
     fyflSettingsReady=true;applyAdminPrefs();
   }
@@ -409,93 +510,26 @@ async function loadOnlineComments(){
   const {data,error}=await fyflSupabase.from('fyfl_comments').select('*').order('created_at',{ascending:false});
   if(!error){fyflComments=data||[];fyflCommentsReady=true;}
 }
-async function refreshAllFYFLRemoteData(){
+
+async function initFYFLRealtimeStatsOnly(){
   if(!fyflSupabase)return;
   try{
-    const [matches,settings,stats,comments]=await Promise.all([
-      fyflSupabase.from('fyfl_matches').select('*'),
-      fyflSupabase.from('fyfl_settings').select('*').eq('id','main').maybeSingle(),
-      fyflSupabase.from('fyfl_stats').select('*').order('stat_value',{ascending:false}).order('player_name',{ascending:true}),
-      fyflSupabase.from('fyfl_comments').select('*').order('created_at',{ascending:false})
-    ]);
-    if(!matches.error){setRemoteResults(matches.data||[]);fyflRemoteReady=true;}
-    if(!settings.error && settings.data){
-      const remoteStandings=(settings.data.standings&&typeof settings.data.standings==='object')?settings.data.standings:{};
-      fyflSettings={...fyflSettings,breaking:settings.data.breaking||fyflSettings.breaking,player:settings.data.player||fyflSettings.player,news:settings.data.news||fyflSettings.news,standings:remoteStandings};
-      fyflSettingsReady=true;applyAdminPrefs();
+    if(window.__fyflStatsChannel){
+      try{await fyflSupabase.removeChannel(window.__fyflStatsChannel);}catch(e){}
     }
-    if(!stats.error)fyflStats=sortStatsRows((stats.data||[]).map(normalizeStatRow));
-    if(!comments.error){fyflComments=comments.data||[];fyflCommentsReady=true;}
-  }catch(e){console.warn('FYFL remote refresh:',e)}
-}
-function stopFYFLRealtime(){
-  if(!fyflSupabase||!fyflRealtimeChannel)return;
-  try{fyflSupabase.removeChannel(fyflRealtimeChannel)}catch(e){}
-  fyflRealtimeChannel=null;
-}
-async function setupFYFLRealtime(){
-  if(!fyflSupabase)return;
-  stopFYFLRealtime();
-  const channelName='fyfl-live-'+Math.random().toString(36).slice(2);
-  const ch=fyflSupabase.channel(channelName);
-  ch.on('postgres_changes',{event:'*',schema:'public',table:'fyfl_matches'},payload=>{
-    if(payload.eventType==='DELETE'){
-      const key=payload.old?.match_key;
-      const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===key);
-      if(i>=0)results.splice(i,1);
-    }else if(payload.new){
-      const incoming=fyflFromRow(payload.new);
-      const key=payload.new.match_key||fyflMatchKey(incoming);
-      const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===key);
-      if(i>=0)results[i]={...incoming};else results.push(incoming);
-      const newGoals=Array.isArray(payload.new.goals)?payload.new.goals:[];
-      const g=newGoals[newGoals.length-1];
-      const sig=g?JSON.stringify(g):'';
-      if(g&&sig!==window.__lastGoalSignature){window.__lastGoalSignature=sig;showGoalAnimation(g.team,g.scorer,g.minute)}
-    }
-    flashLive();
-    const pg=getCurrentPage();if(['home','matches','ranking'].includes(pg))render(pg,false);
-  });
-  ch.on('postgres_changes',{event:'*',schema:'public',table:'fyfl_settings'},payload=>{
-    if(payload.new){
-      const remoteStandings=(payload.new.standings&&typeof payload.new.standings==='object')?payload.new.standings:{};
-      fyflSettings={...fyflSettings,breaking:payload.new.breaking||fyflSettings.breaking,player:payload.new.player||fyflSettings.player,news:payload.new.news||fyflSettings.news,standings:remoteStandings};
-      fyflSettingsReady=true;applyAdminPrefs();
-    }
-    flashLive();const pg=getCurrentPage();if(['home','news','ranking'].includes(pg))render(pg,false);
-  });
-  ch.on('postgres_changes',{event:'*',schema:'public',table:'fyfl_stats'},payload=>{
-    if(payload.eventType==='DELETE'){fyflStats=fyflStats.filter(x=>x.id!==payload.old?.id);}
-    else if(payload.new){
-      const row=normalizeStatRow(payload.new);
-      const i=fyflStats.findIndex(x=>x.id===row.id);
-      if(i>=0)fyflStats[i]=row;else fyflStats.push(row);
-    }
-    fyflStats=sortStatsRows(fyflStats);
-    flashLive();const pg=getCurrentPage();if(['stats','admin'].includes(pg))render(pg,false);
-  });
-  ch.on('postgres_changes',{event:'*',schema:'public',table:'fyfl_comments'},payload=>{
-    if(payload.eventType==='DELETE')fyflComments=fyflComments.filter(c=>c.id!==payload.old?.id);
-    else if(payload.new){const i=fyflComments.findIndex(c=>c.id===payload.new.id);if(i>=0)fyflComments[i]=payload.new;else fyflComments.unshift(payload.new);}
-    flashLive();if(getCurrentPage()==='comments')render('comments',false);
-  });
-  fyflRealtimeChannel=ch;
-  await new Promise(resolve=>{
-    let settled=false;
-    const done=()=>{if(!settled){settled=true;resolve();}};
-    ch.subscribe(async status=>{
-      if(status==='SUBSCRIBED'){
-        window.__fyflRealtimeConnected=true;
-        await refreshAllFYFLRemoteData();
-        flashLive();done();
-      }else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){
-        window.__fyflRealtimeConnected=false;
-        done();
-        setTimeout(()=>{if(fyflSupabase)setupFYFLRealtime()},1500);
-      }
-    });
-    setTimeout(done,5000);
-  });
+    window.__fyflStatsChannel=fyflSupabase.channel('fyfl-stats-live-'+Math.random().toString(36).slice(2))
+      .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_stats'},payload=>{
+        if(payload.eventType==='DELETE') fyflStats=fyflStats.filter(s=>s.id!==payload.old?.id);
+        else if(payload.new){
+          const incoming=normalizeStatRow(payload.new);
+          const i=fyflStats.findIndex(s=>s.id===incoming.id);
+          if(i>=0)fyflStats[i]=incoming; else fyflStats.push(incoming);
+        }
+        fyflStatsReady=true; flashLive();
+        const pg=getCurrentPage(); if(pg==='stats'||pg==='admin')render(pg,false);
+      })
+      .subscribe(status=>{fyflStatsChannelReady=status==='SUBSCRIBED';});
+  }catch(e){console.warn('FYFL stats realtime:',e);}
 }
 
 async function initFYFLSupabase(){
@@ -516,9 +550,25 @@ async function initFYFLSupabase(){
         }
       }else console.warn('FYFL Supabase lecture:',error.message);
       await loadOnlineSettings();
-      await loadOnlineStats();
       await loadOnlineComments();
-      await setupFYFLRealtime();
+      await loadOnlineStats();
+      fyflRealtimeChannel=fyflSupabase.channel('fyfl-live-all')
+        .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_matches'},payload=>{
+          if(payload.eventType==='DELETE'){const key=payload.old?.match_key;const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===key);if(i>=0)results.splice(i,1);}
+          else if(payload.new){const incoming=fyflFromRow(payload.new);const allowedIncoming=isCurrentPlayedMatch(incoming)||incoming.status==='À venir'||incoming.status==='En direct';if(allowedIncoming){const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===payload.new.match_key);if(i>=0)results[i]=incoming;else results.push(incoming);}}
+          flashLive();
+          const pg=getCurrentPage();if(['home','matches','ranking'].includes(pg))render(pg,false);
+          if(payload.eventType==='UPDATE'&&payload.new?.status==='En direct'){const newGoals=Array.isArray(payload.new.goals)?payload.new.goals:[];const g=newGoals[newGoals.length-1];const sig=g?JSON.stringify(g):'';if(g&&sig!==window.__lastGoalSignature){window.__lastGoalSignature=sig;showGoalAnimation(g.team,g.scorer,g.minute)}}
+        })
+        .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_settings'},payload=>{
+          if(payload.new){fyflSettings={...fyflSettings,breaking:payload.new.breaking||fyflSettings.breaking,player:payload.new.player||fyflSettings.player,news:payload.new.news||fyflSettings.news,standings:(payload.new.standings&&typeof payload.new.standings==='object')?payload.new.standings:(fyflSettings.standings||{})};fyflSettingsReady=true;applyAdminPrefs();flashLive();const pg=getCurrentPage();if(['home','news','ranking'].includes(pg))render(pg,false);}
+        })
+        .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_comments'},payload=>{
+          if(payload.eventType==='DELETE'){fyflComments=fyflComments.filter(c=>c.id!==payload.old?.id);}
+          else if(payload.new){const i=fyflComments.findIndex(c=>c.id===payload.new.id);if(i>=0)fyflComments[i]=payload.new;else fyflComments.unshift(payload.new);}
+          flashLive();if(getCurrentPage()==='comments')render('comments',false);
+        })
+        .subscribe();
     }catch(e){console.warn('FYFL Supabase:',e);return false}
     return !!fyflSupabase;
   })();
@@ -696,78 +746,23 @@ function adminLoadStandingFields(){const team=document.getElementById('adminStan
 async function adminSaveStanding(){if(!fyflSupabase||!fyflRemoteReady||!isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée.');return}const team=document.getElementById('adminStandingTeam')?.value;if(!team)return;const standings={...(fyflSettings.standings||{})};const row={manual:true};['p','w','d','l','gf','ga','pts','diff'].forEach(k=>{const v=Number(document.getElementById('adminStand_'+k)?.value||0);row[k]=Number.isFinite(v)?Math.max(0,v):0;});standings[team]=row;const ok=await saveOnlineSettings({...fyflSettings,standings});if(!ok){alert('Impossible de synchroniser le classement avec Supabase.');return}render('admin',false);flashLive();alert('Classement de la poule modifié et synchronisé en direct pour tout le monde !');}
 async function adminResetStanding(){if(!fyflSupabase||!isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée.');return}const team=document.getElementById('adminStandingTeam')?.value;if(!team)return;const standings={...(fyflSettings.standings||{})};delete standings[team];const ok=await saveOnlineSettings({...fyflSettings,standings});if(!ok){alert('Impossible de réinitialiser le classement.');return}render('admin',false);flashLive();alert('Classement de cette équipe remis au calcul automatique des matchs.');}
 async function adminSaveText(){const p=getAdminPrefs();p.breaking=(document.getElementById('adminBreaking').value||'').trim()||'REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !';p.player=(document.getElementById('adminPlayer').value||'').trim()||'À déterminer';p.news=(document.getElementById('adminNews').value||'').trim()||'Les matchs FYFL se joueront les mercredis et les week-ends !';const ok=await saveOnlineSettings(p);if(!ok){alert('Impossible de synchroniser les modifications avec Supabase.');return}alert('Modifications enregistrées et visibles en direct pour tout le monde !')}
-
-let fyflStats=[];
-function normalizeStatRow(x){
-  return {id:String(x?.id||''),stat_type:String(x?.stat_type||''),name:String(x?.player_name||x?.name||'').trim(),club:String(x?.club_name||x?.club||'').trim(),club_logo:String(x?.club_logo||'').trim(),value:Math.max(0,Number(x?.stat_value??x?.value)||0)};
-}
-function sortStatsRows(rows){
-  return (Array.isArray(rows)?rows:[]).filter(x=>x&&x.name).sort((a,b)=>b.value-a.value||a.name.localeCompare(b.name,'fr'));
-}
-async function loadOnlineStats(){
-  if(!fyflSupabase)return;
-  const {data,error}=await fyflSupabase.from('fyfl_stats').select('*').order('stat_value',{ascending:false}).order('player_name',{ascending:true});
-  if(error){console.warn('FYFL stats lecture:',error.message);return;}
-  fyflStats=sortStatsRows((data||[]).map(normalizeStatRow));
-}
-function getStats(){
-  const scorers=fyflStats.filter(x=>x.stat_type==='buteur').slice(0,15);
-  const assists=fyflStats.filter(x=>x.stat_type==='passeur').slice(0,15);
-  return {scorers,assists};
-}
-function statsClubLogo(club, explicitLogo=''){
-  const c=String(club||'').trim();
-  const u=explicitLogo||logoUrls[c];
-  return u?`<img class="stats-player-logo" src="${u}" alt="${escapeHtml(c)}" loading="lazy">`:`<span class="mini-badge" title="${escapeHtml(c||'Club')}" style="width:28px;height:28px;font-size:9px">${initials(c||'Club')}</span>`;
-}
-function statsRows(list,unit){
-  return list.length?list.map((p,i)=>`<tr><td class="pos">${i+1}</td><td><div class="stats-player">${statsClubLogo(p.club,p.club_logo)}<div class="stats-player-name"><strong>${escapeHtml(p.name)}</strong>${p.club?`<span class="stats-club">${escapeHtml(p.club)}</span>`:''}</div></div></td><td class="pts">${p.value} ${unit}</td></tr>`).join(""):`<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:22px">Aucun joueur enregistré.</td></tr>`;
-}
-function statsCard(title,icon,list,unit){
-  return `<div class="card stats-card"><div class="stats-card-head"><h3>${icon} ${title}</h3><span>TOP 15</span></div><div class="table-wrap"><table class="stats-table"><thead><tr><th>#</th><th>Joueur</th><th>${unit}</th></tr></thead><tbody>${statsRows(list,unit)}</tbody></table></div></div>`;
-}
-function pageStats(){
-  const stats=getStats();
-  return `<section class="section"><div class="section-head"><h2>📊 STATS</h2><small>Classements des meilleurs joueurs · mis à jour en direct</small></div><div class="stats-grid">${statsCard("Meilleur buteur","⚽",stats.scorers,"Buts")}${statsCard("Meilleur passeur","🎯",stats.assists,"Passes")}</div><div class="stats-live-note">🟢 Les classements se mettent à jour automatiquement dès qu'une modification est enregistrée par l'administration.</div></section>`;
-}
-function statsAdminList(type){
-  const list=getStats()[type];
-  const label=type==='scorers'?'buts':'passes';
-  return list.length?list.map((p,i)=>`<div class="stats-admin-row"><span class="stats-admin-player">${statsClubLogo(p.club,p.club_logo)}<span class="stats-admin-player-info"><b>${i+1}. ${escapeHtml(p.name)}</b><small>${escapeHtml(p.club||'Club non renseigné')} · ${p.value} ${label}</small></span></span><button class="reset" onclick="adminRemoveStat('${escapeHtml(p.id)}')">×</button></div>`).join(""):'<div class="admin-help">Aucun joueur enregistré.</div>';
-}
-function statsClubOptions(selected=''){
-  const clubs=Object.keys(logoUrls).sort((a,b)=>a.localeCompare(b,'fr'));
-  return `<option value="">Sélectionner un club</option>${clubs.map(c=>`<option value="${escapeHtml(c)}" ${c===selected?'selected':''}>${escapeHtml(c)}</option>`).join('')}`;
-}
-function pageStatsAdminBox(type,title,icon){
-  const label=type==='scorers'?'Buts':'Passes';
-  return `<div class="admin-box stats-admin-box"><h3>${icon} ${title}</h3><label>Nom du joueur</label><input id="adminStatName_${type}" maxlength="40" placeholder="Ex. Kylian"><label>Club</label><select id="adminStatClub_${type}">${statsClubOptions()}</select><label>Nombre de ${label.toLowerCase()}</label><input id="adminStatValue_${type}" type="number" min="0" max="9999" step="1" placeholder="0"><button class="live" onclick="adminAddStat('${type}')">➕ Ajouter au classement</button><div class="stats-admin-list">${statsAdminList(type)}</div><p class="admin-help">Choisis le club avant l'ajout. Le logo du club apparaîtra automatiquement dans le classement. Le classement affiche les 15 meilleurs ${label.toLowerCase()}.</p></div>`;
-}
-async function adminAddStat(type){
-  const name=(document.getElementById('adminStatName_'+type)?.value||'').trim();
-  const club=(document.getElementById('adminStatClub_'+type)?.value||'').trim();
-  const value=Math.max(0,Math.floor(Number(document.getElementById('adminStatValue_'+type)?.value||0)));
-  const statType=type==='scorers'?'buteur':'passeur';
-  if(!name){alert('Entre le nom du joueur.');return}
-  if(!club){alert('Sélectionne le club du joueur.');return}
-  if(!Number.isFinite(value)){alert('Entre un nombre valide.');return}
-  if(!isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée.');return}
-  const existing=fyflStats.find(x=>x.stat_type===statType&&x.name.toLowerCase()===name.toLowerCase());
-  const payload={stat_type:statType,player_name:name,club_name:club,club_logo:logoUrls[club]||null,stat_value:value,updated_at:new Date().toISOString()};
-  let data,error;
-  if(existing){({data,error}=await fyflSupabase.from('fyfl_stats').update(payload).eq('id',existing.id).select().single());}
-  else {({data,error}=await fyflSupabase.from('fyfl_stats').insert(payload).select().single());}
-  if(error){console.warn('FYFL stats save:',error);alert('Impossible d’enregistrer le joueur : '+error.message+'\n\nVérifie les policies INSERT/UPDATE de fyfl_stats.');return}
-  const row=normalizeStatRow(data);const i=fyflStats.findIndex(x=>x.id===row.id);if(i>=0)fyflStats[i]=row;else fyflStats.push(row);fyflStats=sortStatsRows(fyflStats);
-  render('admin',false);flashLive();
-}
-async function adminRemoveStat(id){
-  if(!isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée.');return}
-  const {error}=await fyflSupabase.from('fyfl_stats').delete().eq('id',id);
-  if(error){alert('Impossible de supprimer le joueur : '+error.message+'\n\nVérifie la policy DELETE de fyfl_stats.');return}
-  fyflStats=fyflStats.filter(x=>x.id!==id);render('admin',false);flashLive();
-}
-function pageAdmin(){if(!isCurrentAccountAdminVerified())return `<section class="section"><div class="card"><h2>🔐 Accès administrateur</h2><p>Connecte-toi avec ton compte administrateur Supabase.</p><button class="admin-btn" onclick="openAdminLogin()">Ouvrir l’administration</button></div></section>`;const p=getAdminPrefs();return `<section class="section admin-panel"><div class="section-head"><h2>⚙️ Panneau administrateur FYFL</h2><small>Contrôle en direct</small></div><div class="admin-grid"><div class="admin-box"><h3>⚽ Match en direct</h3><select id="adminMatchSelect" onchange="adminLoadMatch()">${adminMatchOptions()}</select><div class="admin-stat"><span>Score</span><input id="adminHomeScore" type="number" min="0" style="width:80px"><b>—</b><input id="adminAwayScore" type="number" min="0" style="width:80px"></div><label>Minute du match</label><input id="adminMinute" type="number" min="0" max="130" placeholder="0"><div class="admin-actions"><button class="live" onclick="adminSetStatus('En direct')">🔴 Lancer / mettre à jour en direct</button><button class="done" onclick="adminFinish()">✅ Terminer le match</button><button class="reset" onclick="adminResetMatch()">🧹 Match jamais commencé</button></div><h4>⚽ Ajouter un but</h4><select id="adminGoalTeam"><option></option></select><input id="adminScorer" maxlength="40" placeholder="Nom du buteur"><input id="adminGoalMinute" type="number" min="0" max="130" placeholder="Minute du but"><button onclick="adminAddGoal()">⚽ Ajouter le but + animation</button><div id="adminGoals"></div><p class="admin-help">Les scores, minutes et buteurs sont sauvegardés ${fyflRemoteReady?"dans Supabase et diffusés en direct à tous les visiteurs":"dans ce navigateur"}. « Match jamais commencé » efface complètement le match et ses buts.</p></div><div class="admin-box"><h3>📢 Site & annonces</h3><label>Breaking News</label><input id="adminBreaking" value="${escapeHtml(p.breaking||'REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !')}"><label>Joueur du mois</label><input id="adminPlayer" value="${escapeHtml(p.player||'À déterminer')}"><label>Message FYFL</label><textarea id="adminNews" rows="5">${escapeHtml(p.news||'Les matchs FYFL se joueront les mercredis et les week-ends !')}</textarea><button onclick="adminSaveText()">💾 Enregistrer les modifications</button><p class="admin-help">Tu peux changer les infos affichées sans modifier le code du site.</p></div>${pageStatsAdminBox('scorers','Meilleurs buteurs','⚽')}${pageStatsAdminBox('assists','Meilleurs passeurs','🎯')}<div class="admin-box"><h3>🏆 Modifier le classement des poules</h3><label>Poule</label><select id="adminStandingGroup" onchange="adminLoadStanding()">${Object.keys(groups).map(g=>`<option value="${g}">Poule ${g}</option>`).join('')}</select><label>Équipe</label><select id="adminStandingTeam" onchange="adminLoadStandingFields()"></select><div class="admin-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"><label>MJ<input id="adminStand_p" type="number" min="0"></label><label>V<input id="adminStand_w" type="number" min="0"></label><label>N<input id="adminStand_d" type="number" min="0"></label><label>D<input id="adminStand_l" type="number" min="0"></label><label>BP<input id="adminStand_gf" type="number" min="0"></label><label>BC<input id="adminStand_ga" type="number" min="0"></label><label>Diff<input id="adminStand_diff" type="number"></label><label>Pts<input id="adminStand_pts" type="number" min="0"></label></div><div class="admin-actions"><button class="live" onclick="adminSaveStanding()">💾 Enregistrer le classement</button><button class="reset" onclick="adminResetStanding()">↩️ Revenir au calcul automatique</button></div><p class="admin-help">Les valeurs enregistrées sont stockées dans Supabase et envoyées en direct à tous les visiteurs. Tu peux modifier chaque équipe de chaque poule.</p></div></div></section>`}
+function pageAdmin(){if(!isCurrentAccountAdminVerified())return `<section class="section"><div class="card"><h2>🔐 Accès administrateur</h2><p>Connecte-toi avec ton compte administrateur Supabase.</p><button class="admin-btn" onclick="openAdminLogin()">Ouvrir l’administration</button></div></section>`;const p=getAdminPrefs();return `<section class="section admin-panel"><div class="section-head"><h2>⚙️ Panneau administrateur FYFL</h2><small>Contrôle en direct</small></div><div class="admin-grid"><div class="admin-box"><h3>⚽ Match en direct</h3><select id="adminMatchSelect" onchange="adminLoadMatch()">${adminMatchOptions()}</select><div class="admin-stat"><span>Score</span><input id="adminHomeScore" type="number" min="0" style="width:80px"><b>—</b><input id="adminAwayScore" type="number" min="0" style="width:80px"></div><label>Minute du match</label><input id="adminMinute" type="number" min="0" max="130" placeholder="0"><div class="admin-actions"><button class="live" onclick="adminSetStatus('En direct')">🔴 Lancer / mettre à jour en direct</button><button class="done" onclick="adminFinish()">✅ Terminer le match</button><button class="reset" onclick="adminResetMatch()">🧹 Match jamais commencé</button></div><h4>⚽ Ajouter un but</h4><select id="adminGoalTeam"><option></option></select><input id="adminScorer" maxlength="40" placeholder="Nom du buteur"><input id="adminGoalMinute" type="number" min="0" max="130" placeholder="Minute du but"><button onclick="adminAddGoal()">⚽ Ajouter le but + animation</button><div id="adminGoals"></div><p class="admin-help">Les scores, minutes et buteurs sont sauvegardés ${fyflRemoteReady?"dans Supabase et diffusés en direct à tous les visiteurs":"dans ce navigateur"}. « Match jamais commencé » efface complètement le match et ses buts.</p></div><div class="admin-box"><h3>📢 Site & annonces</h3><label>Breaking News</label><input id="adminBreaking" value="${escapeHtml(p.breaking||'REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !')}"><label>Joueur du mois</label><input id="adminPlayer" value="${escapeHtml(p.player||'À déterminer')}"><label>Message FYFL</label><textarea id="adminNews" rows="5">${escapeHtml(p.news||'Les matchs FYFL se joueront les mercredis et les week-ends !')}</textarea><button onclick="adminSaveText()">💾 Enregistrer les modifications</button><p class="admin-help">Tu peux changer les infos affichées sans modifier le code du site.</p></div><div class="admin-box"><h3>🏆 Modifier le classement des poules</h3><label>Poule</label><select id="adminStandingGroup" onchange="adminLoadStanding()">${Object.keys(groups).map(g=>`<option value="${g}">Poule ${g}</option>`).join('')}</select><label>Équipe</label><select id="adminStandingTeam" onchange="adminLoadStandingFields()"></select><div class="admin-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"><label>MJ<input id="adminStand_p" type="number" min="0"></label><label>V<input id="adminStand_w" type="number" min="0"></label><label>N<input id="adminStand_d" type="number" min="0"></label><label>D<input id="adminStand_l" type="number" min="0"></label><label>BP<input id="adminStand_gf" type="number" min="0"></label><label>BC<input id="adminStand_ga" type="number" min="0"></label><label>Diff<input id="adminStand_diff" type="number"></label><label>Pts<input id="adminStand_pts" type="number" min="0"></label></div><div class="admin-actions"><button class="live" onclick="adminSaveStanding()">💾 Enregistrer le classement</button><button class="reset" onclick="adminResetStanding()">↩️ Revenir au calcul automatique</button></div><p class="admin-help">Les valeurs enregistrées sont stockées dans Supabase et envoyées en direct à tous les visiteurs. Tu peux modifier chaque équipe de chaque poule.</p></div>
+<div class="admin-box">
+<h3>📊 STATS — Buteurs & passeurs</h3>
+<p class="admin-help">Ajoute un joueur, choisis sa catégorie, son club et son nombre de buts/passes. Le TOP 15 est calculé automatiquement et envoyé en direct à tous les appareils.</p>
+<input type="hidden" id="adminStatId">
+<label>Catégorie</label>
+<select id="adminStatType"><option value="buteur">⚽ Meilleur buteur</option><option value="passeur">🎯 Meilleur passeur</option></select>
+<label>Nom du joueur</label>
+<input id="adminStatName" maxlength="80" placeholder="Nom du joueur">
+<label>Club</label>
+<select id="adminStatClub"><option value="">Choisir un club</option>${allTeams.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('')}</select>
+<label>Nombre</label>
+<input id="adminStatValue" type="number" min="0" step="1" placeholder="0">
+<div class="admin-actions"><button id="adminStatSaveBtn" class="live" onclick="saveStatFromAdmin()">💾 Enregistrer le joueur</button><button class="reset" onclick="clearAdminStatForm()">↩️ Nouveau</button><button onclick="render('stats')">📊 Voir les STATS</button></div>
+<h4>⚽ Buteurs</h4><div class="admin-stats-list">${adminStatsList('buteur')}</div>
+<h4>🎯 Passeurs</h4><div class="admin-stats-list">${adminStatsList('passeur')}</div>
+</div></div></section>`}
 function syncAdminGoalTeam(){const m=selectedAdminMatch();const sel=document.getElementById('adminGoalTeam');if(!m||!sel)return;sel.innerHTML=`<option>${escapeHtml(m.home)}</option><option>${escapeHtml(m.away)}</option>`;adminLoadMatch()}
 function showGoalAnimation(team,scorer,minute){const pop=document.createElement('div');pop.className='goal-pop';pop.innerHTML=`<div class="goal-box"><div class="big">⚽</div><h2>BUUUUUT !</h2><p>${escapeHtml(team)} · ${escapeHtml(scorer)} · ${minute}'</p></div>`;document.body.appendChild(pop);for(let i=0;i<45;i++){const c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.animationDelay=Math.random()*.25+'s';c.style.transform=`rotate(${Math.random()*360}deg)`;document.body.appendChild(c);setTimeout(()=>c.remove(),1800)}setTimeout(()=>pop.remove(),950)}
 function broadcastLive(){try{new BroadcastChannel('fyfl-live').postMessage({type:'update',at:Date.now()})}catch(e){} flashLive()}
@@ -793,15 +788,13 @@ function showMatchDay(mode){const modes=['day1','day2','day3','allDays'];documen
 function pageTeams(){return `<section class="section"><div class="section-head"><h2>Les équipes</h2><small>24 équipes réparties en 6 poules</small></div><div class="teams">${Object.entries(groups).flatMap(([g,arr])=>arr.map(t=>`<div class="card team-card">${crest(t,"team-logo large")}<h3>${t}</h3><p>Poule ${g}</p></div>`)).join("")}</div></section>`}
 function pageCompetitions(){return `<section class="section"><div class="section-head"><h2>🏆 Compétitions</h2><small>Toutes les compétitions de la FYFL</small></div><div class="fyfl-comp-grid"><div class="fyfl-comp-card"><div><div class="comp-name">🏆 FYFL — Saison 1</div><p>Compétition officielle avec les 24 équipes réparties en 6 poules.</p></div><span class="coming">En cours</span></div><div class="fyfl-comp-card"><div><div class="comp-name">⚽ Matchs</div><p>Résultats et prochaines rencontres de la compétition.</p></div><button onclick="render('matches')">Voir les matchs</button></div><div class="fyfl-comp-card"><div><div class="comp-name">🏆 Ligue des Champions</div><p>La compétition européenne de la FYFL.</p></div><span class="coming">À venir</span></div><div class="fyfl-comp-card"><div><div class="comp-name">🌟 Europa League</div><p>La deuxième compétition européenne.</p></div><span class="coming">À venir</span></div><div class="fyfl-comp-card"><div><div class="comp-name">🥉 Conference League</div><p>La troisième compétition européenne.</p></div><span class="coming">À venir</span></div></div></section>`}
 function pageNews(){const p=getAdminPrefs();return `<section class="section"><div class="section-head"><h2>📰 FYFL - NEWS</h2><small>Actualités officielles</small></div><div class="card news-card"><div style="display:inline-block;background:#e21d48;color:#fff;font-weight:800;padding:6px 10px;border-radius:8px;font-size:12px">FYFL - NEWS</div><h2 style="margin:14px 0 8px">FYFL NEW !</h2><p style="line-height:1.7;color:var(--muted)">${escapeHtml(p.news||'Les matchs FYFL se joueront les mercredis et les week-ends !')}</p><p style="font-weight:800">Message de Tutzou</p></div></section>`}
-function render(page="home",scroll=true){const app=document.getElementById("app");app.innerHTML=page==="home"?pageHome():page==="ranking"?pageRanking():page==="matches"?pageMatches():page==="stats"?pageStats():page==="teams"?pageTeams():page==="competitions"?pageCompetitions():page==="comments"?pageComments():page==="admin"?pageAdmin():pageNews();app.classList.remove("fyfl-render-tick");void app.offsetWidth;app.classList.add("fyfl-render-tick");app.querySelectorAll(".card,.feature-card,.fyfl-comp-card,.team-card,.fixture,.comment-item,.section-head,.tabs,.group-links").forEach((el,i)=>{el.classList.add("fyfl-animate-item");el.style.animationDelay=Math.min(i*35,420)+"ms"});document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));updateAuthUI();if(page==="admin"){setTimeout(()=>{syncAdminGoalTeam();adminLoadStanding()},0)}if(scroll)window.scrollTo({top:0,behavior:"smooth"})}
+function render(page="home",scroll=true){const app=document.getElementById("app");app.innerHTML=page==="home"?pageHome():page==="ranking"?pageRanking():page==="matches"?pageMatches():page==="teams"?pageTeams():page==="competitions"?pageCompetitions():page==="comments"?pageComments():page==="stats"?pageStats():page==="admin"?pageAdmin():pageNews();app.classList.remove("fyfl-render-tick");void app.offsetWidth;app.classList.add("fyfl-render-tick");app.querySelectorAll(".card,.feature-card,.fyfl-comp-card,.team-card,.fixture,.comment-item,.section-head,.tabs,.group-links").forEach((el,i)=>{el.classList.add("fyfl-animate-item");el.style.animationDelay=Math.min(i*35,420)+"ms"});document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));updateAuthUI();if(page==="admin"){setTimeout(()=>{syncAdminGoalTeam();adminLoadStanding()},0)}if(scroll)window.scrollTo({top:0,behavior:"smooth"})}
 document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>render(b.dataset.page)));
 render();applyAdminPrefs();
-(async()=>{await initFYFLSupabase();await refreshAdminSession();await ensureRemoteFixtureSeed();updateAuthUI();applyAdminPrefs();if(getCurrentPage()==="comments")render("comments",false);})();
+(async()=>{await initFYFLSupabase();await refreshAdminSession();await ensureRemoteFixtureSeed();await loadOnlineStats();await initFYFLRealtimeStatsOnly();updateAuthUI();applyAdminPrefs();if(getCurrentPage()==="comments")render("comments",false);})();
 function detectDevice(){const mobile=/Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(navigator.userAgent)||window.innerWidth<=700;document.body.classList.toggle("device-mobile",mobile);document.body.classList.toggle("device-desktop",!mobile);document.body.dataset.device=mobile?"mobile":"desktop"}
 window.addEventListener("resize",detectDevice);detectDevice();
-setTimeout(()=>{if(fyflSupabase)fyflSupabase.auth.onAuthStateChange(async (_event,session)=>{supabaseAdminUser=session?.user||null;adminUnlocked=!!supabaseAdminUser&&String(supabaseAdminUser.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();updateAuthUI();if(_event==='SIGNED_IN' || _event==='TOKEN_REFRESHED')await refreshAllFYFLRemoteData();});},0);
-
-document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'&&fyflSupabase){await refreshAllFYFLRemoteData();if(!window.__fyflRealtimeConnected)await setupFYFLRealtime();const pg=getCurrentPage();if(['home','matches','ranking','stats','comments','news'].includes(pg))render(pg,false);}});
+setTimeout(()=>{if(fyflSupabase)fyflSupabase.auth.onAuthStateChange((_event,session)=>{supabaseAdminUser=session?.user||null;adminUnlocked=!!supabaseAdminUser&&String(supabaseAdminUser.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();updateAuthUI();if(fyflSupabase)loadOnlineStats();/* Ne jamais rerendre le panneau admin automatiquement. */});},0);
 // Extras Halloween, alerte et compte à rebours.
 function toggleHalloween(){document.body.classList.toggle('halloween-theme');const b=document.getElementById('halloweenToggle');const on=document.body.classList.contains('halloween-theme');b.textContent=on?'🎃 Halloween ON':'🌙 Halloween OFF';b.classList.toggle('off',!on);if(!on){document.querySelectorAll('.halloween-fall').forEach(e=>e.remove())}}
 function spawnPumpkin(){const p=document.createElement('div');p.className='halloween-fall';p.textContent=['🎃','🦇','🍬','🕸️'][Math.floor(Math.random()*4)];p.style.left=(Math.random()*96)+'vw';p.style.fontSize=(18+Math.random()*18)+'px';p.style.animationDuration=(5+Math.random()*6)+'s';document.body.appendChild(p);setTimeout(()=>p.remove(),12000)}
