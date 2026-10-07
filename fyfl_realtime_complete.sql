@@ -2,7 +2,8 @@
 -- À exécuter dans Supabase SQL Editor.
 -- IMPORTANT : ce script ne contient aucun mot de passe.
 
-create extension if not exists pgcrypto;
+create schema if not exists extensions;
+create extension if not exists pgcrypto with schema extensions;
 
 -- =========================
 -- MATCHS
@@ -76,7 +77,7 @@ alter table public.fyfl_settings replica identity full;
 -- COMMENTAIRES
 -- =========================
 create table if not exists public.fyfl_comments (
-  id uuid primary key default gen_random_uuid(),
+  id uuid primary key default extensions.gen_random_uuid(),
   pseudo text not null,
   text text not null,
   created_at timestamptz not null default now()
@@ -98,7 +99,7 @@ alter table public.fyfl_comments replica identity full;
 -- NOTIFICATIONS
 -- =========================
 create table if not exists public.fyfl_notifications (
-  id uuid primary key default gen_random_uuid(),
+  id uuid primary key default extensions.gen_random_uuid(),
   title text not null,
   message text not null,
   created_by text,
@@ -135,7 +136,7 @@ alter table public.fyfl_site_status replica identity full;
 -- JOURNAL ADMIN
 -- =========================
 create table if not exists public.fyfl_admin_logs (
-  id uuid primary key default gen_random_uuid(),
+  id uuid primary key default extensions.gen_random_uuid(),
   action text not null,
   details text not null default '',
   created_by text,
@@ -154,7 +155,7 @@ alter table public.fyfl_admin_logs replica identity full;
 -- STATS : BUTEURS / PASSEURS
 -- =========================
 create table if not exists public.fyfl_stats (
-  id uuid primary key default gen_random_uuid(),
+  id uuid primary key default extensions.gen_random_uuid(),
   category text not null check (category in ('buteur','passeur')),
   player_name text not null,
   stat_count integer not null default 0 check (stat_count >= 0),
@@ -195,7 +196,7 @@ alter table public.fyfl_match_mvp replica identity full;
 -- COMPTES PSEUDO + MOT DE PASSE SANS EMAIL
 -- =========================
 create table if not exists public.fyfl_accounts (
-  id uuid primary key default gen_random_uuid(),
+  id uuid primary key default extensions.gen_random_uuid(),
   pseudo text not null,
   password_hash text not null,
   created_at timestamptz not null default now(),
@@ -205,19 +206,19 @@ create unique index if not exists fyfl_accounts_pseudo_unique on public.fyfl_acc
 alter table public.fyfl_accounts enable row level security;
 revoke all on public.fyfl_accounts from anon, authenticated;
 create or replace function public.fyfl_register_account(p_pseudo text, p_password text)
-returns table(pseudo text) language plpgsql security definer set search_path=public,pg_temp as $$
+returns table(pseudo text) language plpgsql security definer set search_path=public,extensions,pg_temp as $$
 declare clean_pseudo text:=trim(p_pseudo);
 begin
  if clean_pseudo !~ '^[A-Za-z0-9_À-ÿ -]{3,20}$' then raise exception 'Pseudo invalide.'; end if;
  if length(p_password)<4 or length(p_password)>100 then raise exception 'Mot de passe invalide.'; end if;
  if exists(select 1 from public.fyfl_accounts a where lower(trim(a.pseudo))=lower(clean_pseudo)) then raise exception 'Ce pseudo est déjà pris.' using errcode='23505'; end if;
- insert into public.fyfl_accounts(pseudo,password_hash) values(clean_pseudo,crypt(p_password,gen_salt('bf',12)));
+ insert into public.fyfl_accounts(pseudo,password_hash) values(clean_pseudo,extensions.crypt(p_password,extensions.gen_salt('bf',12)));
  return query select clean_pseudo;
 end $$;
 create or replace function public.fyfl_login_account(p_pseudo text, p_password text)
-returns table(pseudo text) language plpgsql security definer set search_path=public,pg_temp as $$
+returns table(pseudo text) language plpgsql security definer set search_path=public,extensions,pg_temp as $$
 begin
- return query select a.pseudo from public.fyfl_accounts a where lower(trim(a.pseudo))=lower(trim(p_pseudo)) and a.password_hash=crypt(p_password,a.password_hash) limit 1;
+ return query select a.pseudo from public.fyfl_accounts a where lower(trim(a.pseudo))=lower(trim(p_pseudo)) and a.password_hash=extensions.crypt(p_password,a.password_hash) limit 1;
 end $$;
 revoke all on function public.fyfl_register_account(text,text) from public;
 revoke all on function public.fyfl_login_account(text,text) from public;
@@ -246,7 +247,7 @@ end $$;
 -- Y COMPRIS SUR UN MATCH DÉJÀ TERMINÉ.
 -- =========================
 create or replace function public.fyfl_calculate_man_of_match()
-returns trigger language plpgsql security definer set search_path=public,pg_temp as $$
+returns trigger language plpgsql security definer set search_path=public,extensions,pg_temp as $$
 declare item jsonb; scorer text; assister text; best_player text; best_goals integer; best_assists integer; best_rating integer;
 begin
  if new.status<>'Terminé' then return new; end if;
