@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="FYFL">
+<defs>
+  <linearGradient id="shield" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#145cff"/><stop offset="1" stop-color="#ff1635"/></linearGradient>
+  <linearGradient id="ball" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#dfe7f4"/></linearGradient>
+</defs>
+<path d="M256 18 468 82v145c0 133-86 220-212 267C130 447 44 360 44 227V82z" fill="#080b12" stroke="url(#shield)" stroke-width="18"/>
+<path d="M256 77 412 124v102c0 99-60 166-156 207-96-41-156-108-156-207V124z" fill="none" stroke="#243249" stroke-width="7"/>
+<circle cx="256" cy="207" r="73" fill="url(#ball)"/>
+<path d="m256 158 21 16-8 26h-26l-8-26zM201 198l25-1 15 21-15 20-25-9zM311 198l-25-1-15 21 15 20 25-9zM222 256l34-15 34 15-12 30h-44z" fill="#101827"/>
+<text x="256" y="367" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="78" font-weight="900" letter-spacing="-4">FYFL</text>
+<text x="256" y="406" text-anchor="middle" fill="#9ca6b7" font-family="Arial,sans-serif" font-size="19" font-weight="700" letter-spacing="3">FRENCH YOUTH FUT LEAGUE</text>
+</svg>
