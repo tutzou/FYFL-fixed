@@ -706,7 +706,7 @@ async function submitAuth(mode){
       await loadCurrentProfile(data.user);
       closeAuth();updateAuthUI();render(getCurrentPage());alert("🎃 Compte créé ! Tu es connecté sur tous tes appareils avec ce pseudo.");
     }else{
-      err.textContent="Compte créé, mais la confirmation e-mail est activée dans Supabase. Désactive-la dans Authentication → Providers → Email pour utiliser uniquement pseudo + mot de passe.";
+      err.textContent="Compte créé. Active la connexion sans confirmation dans Supabase pour te connecter immédiatement avec ton pseudo et ton mot de passe.";
     }
   }else{
     const {data,error}=await fyflSupabase.auth.signInWithPassword({email:authEmail,password});
