@@ -331,8 +331,8 @@ body.halloween-theme .halloween-toggle{box-shadow:0 0 22px rgba(255,106,0,.45),0
 
 
 <div class="breaking-news"><b>BREAKING</b><span id="breakingNewsText">REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !</span><a href="https://discord.gg/fyfl" target="_blank" rel="noopener">↗</a></div><div id="fyflLiveSync" class="fyfl-live-sync">● EN DIRECT</div>
-<header><div class="nav"><div class="brand"><img src="fyfl-logo.svg" alt="FYFL"><span>FYFL</span></div>
-<nav><button class="active" data-page="home">Accueil</button><button data-page="matches">Matchs / Résultats</button><button data-page="ranking">Classement</button><button data-page="teams">Équipes</button><button data-page="competitions">Compétitions</button><button data-page="stats">🎃 STATS</button><button data-page="news">FYFL - NEWS</button><button data-page="comments">Commentaires</button></nav><div class="auth-actions" id="authActions"></div></div></header>
+<header><div class="nav"><div class="brand"><img src="fyfl-logo.png" alt="FYFL"><span>FYFL</span></div>
+<nav><button class="active" data-page="home">Accueil</button><button data-page="matches">Matchs / Résultats</button><button data-page="ranking">Classement</button><button data-page="teams">Équipes</button><button data-page="competitions">Compétitions</button><button data-page="stats">STATS</button><button data-page="news">FYFL - NEWS</button><button data-page="comments">Commentaires</button></nav><div class="auth-actions" id="authActions"></div></div></header>
 <main id="app"></main><footer>FYFL — French Youth Fut League · Saison 1<br><small>Les écussons appartiennent à leurs clubs respectifs.</small></footer>
 <div id="newsAlert" class="news-alert"><button onclick="document.getElementById('newsAlert').remove()" aria-label="Fermer">×</button><div style="font-size:11px;letter-spacing:.12em;color:#ff8a22;font-weight:900">📢 FYFL NEWS</div><strong>Les matchs sont les mercredis et les week-ends !</strong><div style="color:#aaa;margin-top:5px;font-size:13px">Pense à rester actif sur le Discord.</div></div>
 <button id="halloweenToggle" class="halloween-toggle" onclick="toggleHalloween()">🎃 Halloween ON</button>
@@ -669,53 +669,20 @@ function updateLiveMatchModal(m){const el=document.getElementById('liveMatchModa
 function refreshOpenLiveMatch(m){const modal=document.getElementById('liveMatchModal');if(!modal)return;if(!m){closeLiveMatch();return}if(document.getElementById('liveMatchModalContent')?.dataset.matchKey===liveMatchKey(m))updateLiveMatchModal(m)}
 function matchCard(m){const live=m.status==='En direct';const upcoming=m.status==='À venir';const finished=m.status==='Terminé';const statusHtml=live?`<span class="live-pill"><span class="live-dot"></span> En direct</span>`:(upcoming?`<span style="color:#ffb16f;font-weight:900">À venir</span>`:`<span style="color:#7ee787;font-weight:900">Terminé</span>`);const score=upcoming?'VS':`${m.hs} — ${m.as}`;const minute=live?`<span class="live-minute">🔴 ${getMatchMinute(m)}'</span>`:(finished?`<span style="opacity:.65">${m.minute||90}'</span>`:'');const clickable=live||finished;const key=encodeURIComponent(fyflMatchKey({...m,day:m.day||findMatchDay(m)}));return `<div class="card match-card ${live?'live-match':''} ${clickable?'clickable-match':''}" ${clickable?`onclick="openLiveMatch('${key}')"`:''}><div class="date">${statusHtml} · Journée ${m.day} · Poule ${m.group} ${minute}</div><div class="match"><div class="team">${crest(m.home,'team-logo')}<div>${m.home}</div></div><div class="score">${score}</div><div class="team">${crest(m.away,'team-logo')}<div>${m.away}</div></div></div>${live?`<div class="live-ticker">⏱️ MATCH EN DIRECT · ${getMatchMinute(m)} minutes</div><div class="live-click-hint">👆 Cliquer pour voir les buteurs et les minutes</div>`:finished?`<div class="live-click-hint">👆 Cliquer pour voir les buteurs et les minutes</div>`:''}</div>`}
 function groupBlock(g){const arr=groups[g];const pairs=[[[arr[0],arr[1]],1],[[arr[2],arr[3]],1],[[arr[0],arr[2]],2],[[arr[1],arr[3]],2],[[arr[0],arr[3]],3],[[arr[1],arr[2]],3]];const upcoming=pairs.filter(([[h,a]])=>!results.some(x=>x.status==="Terminé"&&((x.home===h&&x.away===a)||(x.home===a&&x.away===h))));return `<div class="group-title"><span>POULE ${g}</span><span class="group-count">4 équipes</span></div>${table(sortedGroup(g))}<div class="group-fixtures-title">⚽ Matchs à venir · Poule ${g}</div><div class="fixtures">${upcoming.length?upcoming.map(([[h,a],day])=>`<div class="fixture"><span><small style="opacity:.65">J${day}</small> ${crest(h,"mini-logo")}${h}</span><b>VS</b><span>${crest(a,"mini-logo")}${a}</span><em>À venir</em></div>`).join(""):`<div class="fixture"><span>Tous les matchs de la poule sont joués</span></div>`}</div>`}
-function getSession(){return fyflCurrentProfile?.pseudo||fyflCurrentUser?.user_metadata?.pseudo||""}
-function setSession(name){/* Session gérée exclusivement par Supabase Auth. */updateAuthUI()}
+function getSession(){return fyflCurrentProfile?.pseudo||fyflCurrentUser?.pseudo||""}
+function setSession(name){updateAuthUI()}
+const FYFL_SESSION_KEY="fyfl_player_session";
+function getPlayerToken(){try{return localStorage.getItem(FYFL_SESSION_KEY)||""}catch(e){return ""}}
+function setPlayerToken(token){try{if(token)localStorage.setItem(FYFL_SESSION_KEY,token);else localStorage.removeItem(FYFL_SESSION_KEY)}catch(e){}}
+async function restorePlayerSession(){const token=getPlayerToken();if(!token||!fyflSupabase)return null;const {data,error}=await fyflSupabase.rpc("fyfl_session",{p_token:token});if(error||!data?.[0]){setPlayerToken("");return null}const row=data[0];fyflCurrentUser={id:row.account_id,pseudo:row.pseudo};fyflCurrentProfile={user_id:row.account_id,pseudo:row.pseudo};return fyflCurrentUser}
 function normalizePseudo(pseudo){return String(pseudo||"").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
-function pseudoAuthEmail(pseudo){const key=normalizePseudo(pseudo);const hex=Array.from(key).map(ch=>ch.codePointAt(0).toString(16)).join("");return `u-${hex}@fyfl.com`}
-async function loadCurrentProfile(user=fyflCurrentUser){
-  fyflCurrentProfile=null;
-  if(!user||!fyflSupabase)return null;
-  const {data,error}=await fyflSupabase.from("fyfl_profiles").select("id,user_id,pseudo,created_at,updated_at").eq("user_id",user.id).maybeSingle();
-  if(!error&&data)fyflCurrentProfile=data;
-  else if(user.user_metadata?.pseudo)fyflCurrentProfile={user_id:user.id,pseudo:user.user_metadata.pseudo};
-  return fyflCurrentProfile;
-}
-function updateAuthUI(){const el=document.getElementById("authActions");if(!el)return;const user=getSession();const admin=isCurrentAccountAdminVerified();el.innerHTML=user?`<span class="auth-user">👤 ${escapeHtml(user)}</span><button class="admin-btn" type="button" onclick="openAdmin()">⚙️ Admin${admin?" ✓":""}</button><button type="button" onclick="logout()">Déconnexion</button>`:`<button class="admin-btn" type="button" onclick="openAdmin()">⚙️ Admin${admin?" ✓":""}</button><button type="button" onclick="openAuth('login')">Se connecter</button><button class="primary" type="button" onclick="openAuth('register')">S'inscrire</button>`}
-function escapeHtml(v){return String(v).replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c]))}
 function openAuth(mode="login"){const register=mode==="register";const wrap=document.createElement("div");wrap.className="modal-backdrop";wrap.id="authModal";wrap.innerHTML=`<div class="modal"><h2>${register?"Créer un compte":"Se connecter"}</h2><p>${register?"Choisis un pseudo unique et un mot de passe.":"Entre les identifiants de ton compte FYFL."}</p><input id="authPseudo" maxlength="20" placeholder="Pseudo" autocomplete="username"><input id="authPassword" type="password" maxlength="60" placeholder="Mot de passe" autocomplete="${register?"new-password":"current-password"}"><div class="auth-error" id="authError"></div><div class="modal-actions"><button onclick="closeAuth()">Annuler</button><button class="primary" onclick="submitAuth('${register?"register":"login"}')">${register?"S'inscrire":"Se connecter"}</button></div></div>`;document.body.appendChild(wrap);wrap.addEventListener("click",e=>{if(e.target===wrap)closeAuth()});setTimeout(()=>document.getElementById("authPseudo")?.focus(),50)}
 function closeAuth(){document.getElementById("authModal")?.remove()}
-async function submitAuth(mode){
-  const pseudo=(document.getElementById("authPseudo")?.value||"").trim();
-  const password=document.getElementById("authPassword")?.value||"";
-  const err=document.getElementById("authError");
-  if(!fyflSupabase){err.textContent="Connexion Supabase indisponible.";return}
-  if(!/^[A-Za-z0-9_À-ÿ -]{3,20}$/.test(pseudo)){err.textContent="Pseudo : 3 à 20 caractères.";return}
-  if(password.length<6){err.textContent="Mot de passe : 6 caractères minimum.";return}
-  const authEmail=pseudoAuthEmail(pseudo);
-  if(mode==="register"){
-    const {data,error}=await fyflSupabase.auth.signUp({email:authEmail,password,options:{data:{pseudo}}});
-    if(error){
-      const msg=String(error.message||"");
-      err.textContent=/already registered|already exists|duplicate/i.test(msg)?"Ce pseudo est déjà pris.":msg;return;
-    }
-    if(data?.session){
-      fyflCurrentUser=data.user;
-      await loadCurrentProfile(data.user);
-      closeAuth();updateAuthUI();render(getCurrentPage());alert("🎃 Compte créé ! Tu es connecté sur tous tes appareils avec ce pseudo.");
-    }else{
-      err.textContent="Compte créé. Active la connexion sans confirmation dans Supabase pour te connecter immédiatement avec ton pseudo et ton mot de passe.";
-    }
-  }else{
-    const {data,error}=await fyflSupabase.auth.signInWithPassword({email:authEmail,password});
-    if(error||!data?.user){err.textContent="Pseudo ou mot de passe incorrect.";return}
-    fyflCurrentUser=data.user;await loadCurrentProfile(data.user);closeAuth();updateAuthUI();render(getCurrentPage());
-  }
-}
-async function logout(){if(fyflSupabase){try{await fyflSupabase.auth.signOut()}catch(e){}}adminUnlocked=false;supabaseAdminUser=null;fyflCurrentUser=null;fyflCurrentProfile=null;updateAuthUI();render(getCurrentPage())}
+async function submitAuth(mode){const pseudo=(document.getElementById("authPseudo")?.value||"").trim();const password=document.getElementById("authPassword")?.value||"";const err=document.getElementById("authError");if(!fyflSupabase){err.textContent="Connexion Supabase indisponible.";return}if(!/^[A-Za-z0-9_À-ÿ -]{3,20}$/.test(pseudo)){err.textContent="Pseudo : 3 à 20 caractères.";return}if(password.length<6){err.textContent="Mot de passe : 6 caractères minimum.";return}const {data,error}=await fyflSupabase.rpc(mode==="register"?"fyfl_register":"fyfl_login",{p_pseudo:pseudo,p_password:password});if(error||!data?.[0]){const msg=String(error?.message||"");err.textContent=msg.includes("pseudo_deja_pris")?"Ce pseudo est déjà pris.":(mode==="login"?"Pseudo ou mot de passe incorrect.":"Impossible de créer le compte.");return}const row=data[0];setPlayerToken(row.session_token);fyflCurrentUser={id:row.account_id,pseudo:row.pseudo};fyflCurrentProfile={user_id:row.account_id,pseudo:row.pseudo};closeAuth();updateAuthUI();render(getCurrentPage())}
+async function logout(){const token=getPlayerToken();if(fyflSupabase&&token)try{await fyflSupabase.rpc("fyfl_logout",{p_token:token})}catch(e){}setPlayerToken("");adminUnlocked=false;supabaseAdminUser=null;fyflCurrentUser=null;fyflCurrentProfile=null;updateAuthUI();render(getCurrentPage())}
 function getCurrentPage(){const active=document.querySelector("nav button.active");return active?.dataset.page||"home"}
 function getComments(){return Array.isArray(fyflComments)?fyflComments:[]}
-async function publishComment(){const user=getSession();if(!user){openAuth("login");return}const box=document.getElementById("commentText");const text=(box?.value||"").trim();if(!text){alert("Écris un commentaire avant de publier.");return}if(!fyflSupabase){alert("Le service en ligne n'est pas disponible.");return}const {data,error}=await fyflSupabase.from('fyfl_comments').insert({user_id:fyflCurrentUser.id,pseudo:user,text}).select().single();if(error){alert('Impossible de publier le commentaire : '+error.message);return}fyflComments=[data,...fyflComments.filter(c=>c.id!==data.id)];render("comments",false)}
+async function publishComment(){const user=getSession();if(!user){openAuth("login");return}const box=document.getElementById("commentText");const text=(box?.value||"").trim();if(!text){alert("Écris un commentaire avant de publier.");return}if(!fyflSupabase){alert("Le service en ligne n'est pas disponible.");return}const {data,error}=await fyflSupabase.rpc("fyfl_publish_comment",{p_token:getPlayerToken(),p_text:text});if(error||!data?.[0]){alert("Impossible de publier le commentaire : "+(error?.message||"session invalide"));return}const row=data[0];fyflComments=[row,...fyflComments.filter(c=>c.id!==row.id)];render("comments",false)}
 function pageComments(){const user=getSession(),comments=getComments();return `<section class="section"><div class="section-head"><h2>💬 Commentaires</h2><small>${comments.length} commentaire${comments.length>1?"s":""} · EN DIRECT</small></div><div class="comments-wrap">${user?`<div class="comment-box"><h3 style="margin-top:0">Publier un commentaire</h3><textarea id="commentText" rows="4" maxlength="500" placeholder="Écris ton commentaire..."></textarea><div class="logged-note">Connecté en tant que <strong>${escapeHtml(user)}</strong></div><button class="results-head-actions" style="margin-top:10px;background:#ff8a22;color:#111;border:0;border-radius:10px;padding:11px 15px;font-weight:900;cursor:pointer" onclick="publishComment()">Publier en direct</button></div>`:`<div class="comment-box"><h3 style="margin-top:0">Connecte-toi pour commenter</h3><p>Tu dois avoir un compte FYFL connecté pour publier un commentaire.</p><button style="background:#ff8a22;color:#111;border:0;border-radius:10px;padding:11px 15px;font-weight:900;cursor:pointer" onclick="openAuth('login')">Se connecter</button><button style="margin-left:8px;background:#1a212d;color:#fff;border:1px solid #303846;border-radius:10px;padding:11px 15px;font-weight:900;cursor:pointer" onclick="openAuth('register')">S'inscrire</button></div>`}${comments.length?comments.map(c=>`<article class="comment-item fyfl-animate-item"><div class="comment-meta"><span class="comment-author">👤 ${escapeHtml(c.pseudo)}</span><span class="comment-date">${escapeHtml(new Date(c.created_at||Date.now()).toLocaleString('fr-FR'))}</span></div><div class="comment-text">${escapeHtml(c.text)}</div></article>`).join(""):`<div class="comment-empty">Aucun commentaire pour le moment. Sois le premier !</div>`}</div></section>`}
 
 const ADMIN_EMAIL="enzoadressepro888@gmail.com";
@@ -887,17 +854,13 @@ function pageNews(){const p=getAdminPrefs();return `<section class="section"><di
 function render(page="home",scroll=true){const app=document.getElementById("app");app.innerHTML=page==="home"?pageHome():page==="ranking"?pageRanking():page==="matches"?pageMatches():page==="teams"?pageTeams():page==="competitions"?pageCompetitions():page==="stats"?pageStats():page==="comments"?pageComments():page==="admin"?pageAdmin():pageNews();app.classList.remove("fyfl-render-tick");void app.offsetWidth;app.classList.add("fyfl-render-tick");app.querySelectorAll(".card,.feature-card,.fyfl-comp-card,.team-card,.fixture,.comment-item,.section-head,.tabs,.group-links").forEach((el,i)=>{el.classList.add("fyfl-animate-item");el.style.animationDelay=Math.min(i*35,420)+"ms"});document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));updateAuthUI();applyMaintenanceUI();if(page==="admin"){setTimeout(()=>{syncAdminGoalTeam();adminLoadStanding();renderAdminStatsList()},0)}if(scroll)window.scrollTo({top:0,behavior:"smooth"})}
 document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{render(b.dataset.page);try{if(fyflPresenceChannel)fyflPresenceChannel.track({online_at:new Date().toISOString(),page:b.dataset.page})}catch(e){}}));
 render();applyAdminPrefs();
-(async()=>{await initFYFLSupabase();const {data:authData}=await fyflSupabase.auth.getSession();fyflCurrentUser=authData?.session?.user||null;await loadCurrentProfile(fyflCurrentUser);await refreshAdminSession();await ensureRemoteFixtureSeed();updateAuthUI();applyAdminPrefs();if(getCurrentPage()==="comments")render("comments",false);})();
+(async()=>{await initFYFLSupabase();await restorePlayerSession();await refreshAdminSession();await ensureRemoteFixtureSeed();updateAuthUI();applyAdminPrefs();if(getCurrentPage()==="comments")render("comments",false);})();
 function detectDevice(){const mobile=/Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(navigator.userAgent)||window.innerWidth<=700;document.body.classList.toggle("device-mobile",mobile);document.body.classList.toggle("device-desktop",!mobile);document.body.dataset.device=mobile?"mobile":"desktop"}
 window.addEventListener("resize",detectDevice);detectDevice();
-setTimeout(()=>{if(fyflSupabase)fyflSupabase.auth.onAuthStateChange(async (_event,session)=>{
-  fyflCurrentUser=session?.user||null;
-  await loadCurrentProfile(fyflCurrentUser);
-  supabaseAdminUser=fyflCurrentUser;
+setTimeout(()=>{if(fyflSupabase)fyflSupabase.auth.onAuthStateChange((_event,session)=>{
+  supabaseAdminUser=session?.user||null;
   adminUnlocked=!!supabaseAdminUser&&String(supabaseAdminUser.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();
   updateAuthUI();applyMaintenanceUI();
-  const pg=getCurrentPage();
-  if(["comments","home"].includes(pg))render(pg,false);
 });},0);
 // Extras Halloween, alerte et compte à rebours.
 function toggleHalloween(){document.body.classList.toggle('halloween-theme');const b=document.getElementById('halloweenToggle');const on=document.body.classList.contains('halloween-theme');b.textContent=on?'🎃 Halloween ON':'🌙 Halloween OFF';b.classList.toggle('off',!on);if(!on){document.querySelectorAll('.halloween-fall').forEach(e=>e.remove())}}
