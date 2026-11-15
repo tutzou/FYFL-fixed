@@ -1,716 +1,566 @@
 <!DOCTYPE html>
-<html lang="fr"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FYFL — French Youth Fut League</title>
-<style>
-:root{--blue:#145cff;--red:#ff1635;--bg:#07090d;--card:#10141b;--text:#f5f7fb;--muted:#9ca6b7;--line:#252c38}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(145deg,#05070a,#0b0f16 55%,#080a0e);color:var(--text)}
-header{position:sticky;top:0;z-index:10;background:rgba(7,9,13,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
-.nav{max-width:1500px;margin:auto;height:76px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;gap:28px}.brand{display:flex;align-items:center;gap:14px;font-weight:900;flex-shrink:0}.brand img{width:48px;height:48px;object-fit:contain}.brand span{font-size:19px}
-nav{display:flex;gap:14px;flex:1;justify-content:center}nav button{background:transparent;border:0;color:#b7c0ce;padding:12px 17px;border-radius:10px;font-weight:700;cursor:pointer;white-space:nowrap}nav button:hover,nav button.active{background:#151b25;color:white}
-main{max-width:1180px;margin:auto;padding:34px 22px 70px}.hero{min-height:330px;border:1px solid var(--line);border-radius:26px;padding:42px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;background:radial-gradient(circle at 80% 20%,rgba(20,92,255,.22),transparent 35%),radial-gradient(circle at 20% 100%,rgba(255,22,53,.14),transparent 35%),#0c1017}
-.hero h1{font-size:clamp(38px,6vw,70px);line-height:.98;margin:0 0 14px}.hero h1 span{background:linear-gradient(90deg,#145cff,#fff,#ff1635);-webkit-background-clip:text;background-clip:text;color:transparent}.hero p{color:var(--muted);font-size:18px;margin:0;max-width:590px}.hero-logo{width:230px;filter:drop-shadow(0 0 35px rgba(255,255,255,.08))}.eyebrow{font-size:12px;letter-spacing:.18em;color:#8e9bb0;font-weight:900;margin-bottom:13px}.hero-actions{display:flex;gap:10px;margin-top:25px}.hero-actions button{border:0;border-radius:10px;padding:12px 17px;background:#145cff;color:#fff;font-weight:800;cursor:pointer}.hero-actions .secondary{background:#171e29;color:#e9edf5}
-.section{margin-top:30px}.section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:14px}.section h2{margin:0;font-size:25px}.section small{color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.card{background:linear-gradient(180deg,#11161e,#0d1117);border:1px solid var(--line);border-radius:18px;padding:20px}.match{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px}.team{text-align:center;font-weight:800}.badge{width:44px;height:44px;border-radius:50%;background:#1b222d;margin:0 auto 8px;display:grid;place-items:center;color:#dbe2ee;font-weight:900}.score{text-align:center;font-size:23px;font-weight:900}.date{font-size:12px;color:var(--muted);text-align:center;margin-bottom:12px}
-table{width:100%;border-collapse:collapse}.table-wrap{overflow:auto}.table-wrap table{min-width:680px}th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left}th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}th:first-child,td:first-child{text-align:center;width:45px}.pos{font-weight:900}.pts{font-weight:900}.team-cell{font-weight:800}.mini-badge{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:8px;background:#182131;color:#dfe7f4;font-size:9px;margin-right:8px;vertical-align:middle;object-fit:contain}.team-logo{width:42px;height:42px;object-fit:contain;display:block;margin:0 auto 8px}.mini-logo{width:30px;height:30px;object-fit:contain;display:inline-block;vertical-align:middle;margin-right:8px}.table-logo{width:30px;height:30px;object-fit:contain;display:inline-block;vertical-align:middle;margin-right:8px}
-.tabs,.group-links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tabs button,.group-links button{border:1px solid var(--line);background:#10151d;color:#aeb8c8;padding:10px 15px;border-radius:9px;font-weight:800;cursor:pointer}.tabs button.active,.group-links button:hover{background:#145cff;color:white;border-color:#145cff}
-.group-title{display:flex;justify-content:space-between;align-items:center;margin:20px 0 10px;font-weight:900;font-size:19px}.group-count{font-size:12px;color:var(--muted);font-weight:600}.group-fixtures-title{margin:18px 0 9px;font-weight:900;font-size:13px;color:#ffb16f}
-.fixtures{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.fixtures-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.fixture{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:17px 18px;background:#0e131a;border:1px solid var(--line);border-radius:14px}.fixture span:last-of-type{text-align:right}.fixture b{text-align:center;font-size:12px;color:#7e8a9d}.fixture em{position:absolute;right:12px;bottom:4px;font-size:10px;color:#6f7b8d;font-style:normal}.match-card{min-height:150px}.subheading{margin:26px 0 12px}
-.teams{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.team-card{text-align:center;padding:22px 14px}.team-icon{width:72px;height:72px;border-radius:18px;margin:0 auto 12px;background:linear-gradient(135deg,#182131,#0c1119);display:grid;place-items:center;font-size:20px;font-weight:900;border:1px solid #2a3341}.team-card p{margin:5px 0;color:var(--muted);font-size:13px}
-footer{border-top:1px solid var(--line);color:var(--muted);text-align:center;padding:26px 20px;font-size:13px}
-@media(max-width:800px){nav button{padding:10px 8px;font-size:12px}.hero{padding:28px;min-height:300px}.hero-logo{width:130px}.grid,.fixtures,.fixtures-grid{grid-template-columns:1fr}.teams{grid-template-columns:repeat(2,1fr)}}
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Subway Surfers</title>
 
-.live-match{cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.live-match:hover{transform:translateY(-2px);border-color:#ff1635;box-shadow:0 10px 35px rgba(255,22,53,.12)}
-.live-click-hint{margin-top:10px;text-align:center;font-size:11px;color:#9ca6b7;font-weight:800}
-.live-match-modal{position:fixed;inset:0;z-index:1000;background:rgba(2,4,8,.82);backdrop-filter:blur(12px);display:grid;place-items:center;padding:18px}
-.live-match-panel{width:min(680px,100%);max-height:min(88vh,760px);overflow:auto;background:linear-gradient(180deg,#121821,#0b0f15);border:1px solid #303947;border-radius:24px;box-shadow:0 30px 90px rgba(0,0,0,.5);padding:24px}
-.live-match-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.live-match-top h2{margin:0;font-size:20px}.live-close{border:1px solid #303947;background:#171d27;color:#fff;border-radius:10px;width:38px;height:38px;font-size:20px;cursor:pointer}
-.live-scoreboard{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:22px 12px;border:1px solid #252d39;border-radius:18px;background:#0b1017}.live-team{text-align:center;font-weight:900}.live-team img{width:62px;height:62px;object-fit:contain;display:block;margin:0 auto 8px}.live-score{font-size:38px;font-weight:1000;text-align:center}.live-clock{display:block;color:#ff5269;font-size:12px;text-align:center;margin-top:5px;font-weight:900}
-.live-events{margin-top:18px}.live-events h3{margin:0 0 10px;font-size:15px}.live-goal{display:flex;align-items:center;gap:10px;padding:12px 13px;border:1px solid #252d39;background:#0f151d;border-radius:12px;margin-bottom:8px}.live-goal-minute{font-weight:1000;color:#ff9b59;min-width:42px}.live-goal-team{font-weight:900}.live-goal-scorer{color:#d8dee9}.live-empty{padding:18px;border:1px dashed #303947;border-radius:12px;color:#8d98aa;text-align:center}
-.admin-log-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.admin-log-toolbar input,.admin-log-toolbar select{flex:1;min-width:160px;background:#0d131b;color:#fff;border:1px solid #2a3340;border-radius:9px;padding:10px}.admin-log-item{position:relative;padding:12px 13px;border:1px solid #252d39;background:#0d131a;border-radius:11px;margin-bottom:8px}.admin-log-item b{display:block;margin-bottom:4px}.admin-log-item small{color:#788597}.admin-log-empty{padding:15px;text-align:center;color:#7f8a9b;border:1px dashed #2b3442;border-radius:10px}
-@media(max-width:520px){.nav{height:68px;padding:0 12px}.brand span{display:none}main{padding:20px 12px 50px}.hero{border-radius:20px;padding:23px}.hero-logo{display:none}.hero h1{font-size:43px}nav{gap:1px}nav button{padding:9px 6px;font-size:11px}}
+    <script type="text/javascript" src="embed-loader.js"></script>
+    <script type="text/javascript" src="config.js"></script>
+    <script type="text/javascript" src="mods.js"></script>
+    <script type="text/javascript" src="4399.z.js"></script>
+    <script>
+      window.config = {
+        loader: "unity",
+        debug: false,
+        maxRatio: 16 / 9,
+        minRatio: 9 / 16,
 
+        title: "Subway Surfers: San Francisco",
 
-.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.feature-card{background:linear-gradient(145deg,#11161e,#0c1016);border:1px solid var(--line);border-radius:18px;padding:20px;min-height:150px}.feature-card h3{margin:0 0 8px}.feature-card p{color:var(--muted);line-height:1.5}.live-pill{display:inline-flex;align-items:center;gap:7px;background:#2a0e14;color:#ff6479;border:1px solid #63202e;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900}.live-dot{width:8px;height:8px;border-radius:50%;background:#ff2344;box-shadow:0 0 10px #ff2344;animation:pulseLive 1s infinite}.news-alert{position:fixed;top:92px;right:18px;z-index:80;max-width:340px;background:rgba(20,10,16,.96);border:1px solid #ff6a00;border-radius:14px;padding:14px 16px;box-shadow:0 12px 35px rgba(0,0,0,.4);animation:alertIn .45s ease}.news-alert button{float:right;border:0;background:transparent;color:#aaa;font-size:18px;cursor:pointer}.countdown{font-variant-numeric:tabular-nums;font-size:30px;font-weight:900;letter-spacing:.04em}.mini-label{font-size:11px;color:var(--muted);letter-spacing:.12em;font-weight:900}.player-month{display:flex;align-items:center;gap:15px}.next-match-status{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;text-align:center}.status-team{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px}.status-team .mini-logo{margin:0}.status-vs{font-size:13px;font-weight:900;color:#ff8a22}.player-avatar{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#ff6a00,#7c3aed);font-size:28px;box-shadow:0 0 25px rgba(255,106,0,.18)}
-@keyframes pulseLive{50%{opacity:.35}}@keyframes alertIn{from{transform:translateY(-12px);opacity:0}to{transform:translateY(0);opacity:1}}
-@media(max-width:850px){.feature-grid{grid-template-columns:1fr}.news-alert{left:14px;right:14px;top:84px;max-width:none}}
+        unityVersion: "2019.4.18f1",
+        unityWebglBuildUrl: "Build/SanFrancisco.json",
 
-/* Admin / live match / premium animations */
-.breaking-news{position:fixed;top:94px;left:14px;z-index:1200;display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,#d71920,#ff4b1f);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:9px 15px;box-shadow:0 10px 30px rgba(0,0,0,.35);font-size:12px;font-weight:900;animation:newsPulse 2.2s infinite;max-width:min(420px,calc(100vw - 28px))}.breaking-news span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.breaking-news b{background:#fff;color:#d71920;border-radius:999px;padding:3px 7px;font-size:10px}.breaking-news a{color:#fff;text-decoration:none}.breaking-news:hover{transform:translateY(-2px)}
-@keyframes newsPulse{0%,100%{box-shadow:0 10px 30px rgba(0,0,0,.35)}50%{box-shadow:0 10px 36px rgba(255,45,45,.55)}}
-.admin-btn{background:linear-gradient(135deg,#ff8a22,#ff4d00)!important;color:#111!important;border-color:#ff9b42!important}.admin-panel{display:grid;gap:16px}.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.admin-box{background:#0d131d;border:1px solid #303b4a;border-radius:16px;padding:16px}.admin-box h3{margin:0 0 10px}.admin-box input,.admin-box select,.admin-box textarea{width:100%;box-sizing:border-box;background:#080d14;color:#fff;border:1px solid #303846;border-radius:10px;padding:10px;margin:5px 0;font:inherit}.admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}.admin-actions button,.admin-box button{border:1px solid #303846;background:#17202c;color:#fff;border-radius:10px;padding:9px 12px;font-weight:900;cursor:pointer}.admin-actions button:hover,.admin-box button:hover{filter:brightness(1.15);transform:translateY(-1px)}.admin-actions .live{background:#e21d48;border-color:#e21d48}.admin-actions .done{background:#168447;border-color:#168447}.admin-actions .reset{background:#303846}.admin-help{font-size:12px;color:#8490a0;line-height:1.5}.goal-line{margin-top:10px;padding:8px 10px;border-left:3px solid #ff8a22;background:#151c27;border-radius:7px;font-size:12px}.live-minute{display:inline-flex;align-items:center;gap:5px;color:#ff5b68;font-weight:900}.match-card.live-match{border-color:#e21d48;box-shadow:0 0 0 1px rgba(226,29,72,.2),0 12px 35px rgba(226,29,72,.15);animation:liveGlow 1.8s infinite}.match-card.live-match .score{font-size:24px}.mvp-card{margin:16px 0;padding:18px;border:1px solid rgba(255,193,7,.35);border-radius:16px;background:linear-gradient(145deg,rgba(255,193,7,.13),rgba(255,255,255,.035));text-align:center}.mvp-title{font-size:12px;font-weight:900;letter-spacing:.12em;color:#ffd54a}.mvp-name{font-size:25px;font-weight:950;margin:7px 0}.mvp-stats{opacity:.8;font-size:13px}.clickable-match{cursor:pointer}.clickable-match:hover{transform:translateY(-2px);border-color:#ff8a22}.live-ticker{display:block;margin-top:7px;font-size:11px;color:#ff6670;font-weight:900}.goal-feed{margin-top:10px}.goal-feed strong{color:#fff}.goal-feed .goal-icon{color:#ffcf33;margin-right:4px}.admin-stat{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.admin-stat span{background:#151d29;border:1px solid #303846;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:800}.goal-pop{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(0,0,0,.2);animation:goalBg .9s ease forwards}.goal-pop .goal-box{background:linear-gradient(145deg,#ff8a22,#ff3d00);color:#111;border-radius:25px;padding:30px 42px;text-align:center;box-shadow:0 25px 90px rgba(255,75,0,.45);animation:goalPop .9s cubic-bezier(.2,1.4,.4,1) forwards}.goal-pop .goal-box .big{font-size:58px;line-height:1}.goal-pop .goal-box h2{font-size:36px;margin:8px 0}.goal-pop .goal-box p{margin:0;font-weight:900;font-size:16px}.confetti{position:fixed;top:-20px;width:8px;height:14px;z-index:9001;pointer-events:none;animation:confettiFall 1.5s linear forwards}.admin-lock{display:inline-flex;align-items:center;gap:7px}
-@keyframes liveGlow{0%,100%{box-shadow:0 0 0 1px rgba(226,29,72,.18),0 12px 35px rgba(226,29,72,.12)}50%{box-shadow:0 0 0 2px rgba(226,29,72,.35),0 15px 45px rgba(226,29,72,.25)}}
-@keyframes goalPop{0%{transform:scale(.4) rotate(-5deg);opacity:0}45%{transform:scale(1.08) rotate(2deg);opacity:1}100%{transform:scale(1);opacity:0}}
-@keyframes goalBg{0%,100%{opacity:0}15%,65%{opacity:1}}
-@keyframes confettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
-@media(max-width:800px){.admin-grid{grid-template-columns:1fr}.breaking-news{top:150px;left:7px;font-size:10px;padding:7px 10px}.breaking-news b{display:none}}
+        fileSize: 35,
+        cachedDecompressedFileSizes: {
+          "SanFrancisco.asm.code.unityweb": 9077143,
+          "SanFrancisco.asm.framework.unityweb": 86369,
+          "SanFrancisco.asm.memory.unityweb": 951447,
+          "SanFrancisco.data.unityweb": 18323917,
+          "SanFrancisco.wasm.code.unityweb": 7279617,
+          "SanFrancisco.wasm.framework.unityweb": 90693,
+        },
+      };
+    </script>
+  </head>
 
-/* Admin tools + global realtime notifications */
-.admin-tools-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}.admin-tool-card{background:#111a26;border:1px solid #303846;border-radius:12px;padding:12px}.admin-tool-card b{display:block;font-size:12px;margin-bottom:6px}.status-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:#777}.status-dot.online{background:#22c55e;box-shadow:0 0 10px rgba(34,197,94,.7)}.status-dot.offline{background:#ef4444}.site-status-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}.site-status-card{background:#111a26;border:1px solid #303846;border-radius:12px;padding:12px}.site-status-card b{display:block;font-size:12px;margin-bottom:6px}.site-ok{color:#22c55e;font-weight:900}.maintenance-overlay{position:fixed;inset:0;z-index:99999;background:rgba(7,10,16,.98);display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}.maintenance-overlay .maintenance-card{max-width:560px;background:#111722;border:1px solid #ff8a22;border-radius:22px;padding:34px;box-shadow:0 25px 100px rgba(0,0,0,.65)}.maintenance-overlay h1{margin:0 0 12px;font-size:30px}.maintenance-overlay p{color:#aab4c3;line-height:1.6;white-space:pre-wrap}.admin-log-list{display:grid;gap:8px;max-height:360px;overflow:auto;margin-top:10px}.admin-log-item{background:#111a26;border:1px solid #303846;border-radius:10px;padding:10px}.admin-log-item small{display:block;color:#7d8796;margin-top:4px}.maintenance-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#111a26;border:1px solid #303846;border-radius:12px;padding:12px;margin-top:10px}@media(max-width:800px){.site-status-grid{grid-template-columns:1fr}}.global-notification{position:fixed;right:18px;top:18px;z-index:10000;width:min(380px,calc(100vw - 36px));background:#111722;border:1px solid #ff8a22;border-radius:16px;padding:16px;box-shadow:0 20px 70px rgba(0,0,0,.5);animation:fyflNotifIn .35s ease}.global-notification .notif-title{font-weight:1000;color:#ffb16f;font-size:13px}.global-notification .notif-message{font-weight:900;font-size:16px;margin-top:7px;white-space:pre-wrap}.global-notification .notif-time{font-size:10px;color:#7d8796;margin-top:8px}@keyframes fyflNotifIn{from{transform:translateY(-15px);opacity:0}to{transform:translateY(0);opacity:1}}@media(max-width:800px){.admin-tools-grid{grid-template-columns:1fr}}
-</style>
-<style id="fyfl-responsive">
-*{box-sizing:border-box} html,body{max-width:100%;overflow-x:hidden} img{max-width:100%;height:auto}
-@media(max-width:700px){
- body{font-size:14px}
- .container,.content,.main,.page,.section{width:100%!important;max-width:100%!important;padding-left:14px!important;padding-right:14px!important}
- .grid,.cards,.teams-grid,.matches-grid,.stats-grid{grid-template-columns:1fr!important}
- table{display:block;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
- .hero{padding:28px 16px!important}.hero h1{font-size:30px!important;line-height:1.1}
- .team-logo{width:34px!important;height:34px!important;flex-basis:34px!important}
- .nav a,.navbar a{font-size:13px!important}
-}
-.fyfl-competitions{margin:34px 0}.fyfl-competitions h2{margin-bottom:16px}
-.fyfl-comp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.fyfl-comp-card{background:linear-gradient(145deg,rgba(25,37,70,.9),rgba(11,18,38,.95));border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px;min-height:130px;display:flex;flex-direction:column;justify-content:space-between}
-.fyfl-comp-card .comp-name{font-weight:800;font-size:18px}.fyfl-comp-card .coming{font-size:13px;opacity:.65}
-@media(max-width:700px){.fyfl-comp-grid{grid-template-columns:1fr}}
+  <body>
+    <script>
+      // Support WASD (QWERTY) et ZQSD (AZERTY) en plus des flèches
+      (function () {
+        var keyCodes = { 'ArrowUp': 38, 'ArrowDown': 40, 'ArrowLeft': 37, 'ArrowRight': 39 };
+        var map = {
+          'w': 'ArrowUp', 'z': 'ArrowUp',
+          'a': 'ArrowLeft', 'q': 'ArrowLeft',
+          's': 'ArrowDown',
+          'd': 'ArrowRight'
+        };
+        window.addEventListener('keydown', function (e) {
+          // ignore si déjà une flèche ou si focus dans un champ
+          var tag = (e.target && e.target.tagName) || '';
+          if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+          var k = (e.key || '').toLowerCase();
+          if (!map[k]) return;
+          var arrow = map[k];
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          var ne = new KeyboardEvent('keydown', {
+            key: arrow, code: arrow, keyCode: keyCodes[arrow], which: keyCodes[arrow],
+            bubbles: true, cancelable: true
+          });
+          // Certains navigateurs ignorent keyCode dans le constructeur : on force
+          try { Object.defineProperty(ne, 'keyCode', { value: keyCodes[arrow] }); } catch (err) {}
+          try { Object.defineProperty(ne, 'which', { value: keyCodes[arrow] }); } catch (err) {}
+          window.dispatchEvent(ne);
+          var c = document.querySelector('canvas');
+          if (c) c.dispatchEvent(ne);
+        }, true);
 
-/* Admin / live match / premium animations */
-.breaking-news{position:fixed;top:94px;left:14px;z-index:1200;display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,#d71920,#ff4b1f);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:9px 15px;box-shadow:0 10px 30px rgba(0,0,0,.35);font-size:12px;font-weight:900;animation:newsPulse 2.2s infinite;max-width:min(420px,calc(100vw - 28px))}.breaking-news span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.breaking-news b{background:#fff;color:#d71920;border-radius:999px;padding:3px 7px;font-size:10px}.breaking-news a{color:#fff;text-decoration:none}.breaking-news:hover{transform:translateY(-2px)}
-@keyframes newsPulse{0%,100%{box-shadow:0 10px 30px rgba(0,0,0,.35)}50%{box-shadow:0 10px 36px rgba(255,45,45,.55)}}
-.admin-btn{background:linear-gradient(135deg,#ff8a22,#ff4d00)!important;color:#111!important;border-color:#ff9b42!important}.admin-panel{display:grid;gap:16px}.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.admin-box{background:#0d131d;border:1px solid #303b4a;border-radius:16px;padding:16px}.admin-box h3{margin:0 0 10px}.admin-box input,.admin-box select,.admin-box textarea{width:100%;box-sizing:border-box;background:#080d14;color:#fff;border:1px solid #303846;border-radius:10px;padding:10px;margin:5px 0;font:inherit}.admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}.admin-actions button,.admin-box button{border:1px solid #303846;background:#17202c;color:#fff;border-radius:10px;padding:9px 12px;font-weight:900;cursor:pointer}.admin-actions button:hover,.admin-box button:hover{filter:brightness(1.15);transform:translateY(-1px)}.admin-actions .live{background:#e21d48;border-color:#e21d48}.admin-actions .done{background:#168447;border-color:#168447}.admin-actions .reset{background:#303846}.admin-help{font-size:12px;color:#8490a0;line-height:1.5}.goal-line{margin-top:10px;padding:8px 10px;border-left:3px solid #ff8a22;background:#151c27;border-radius:7px;font-size:12px}.live-minute{display:inline-flex;align-items:center;gap:5px;color:#ff5b68;font-weight:900}.match-card.live-match{border-color:#e21d48;box-shadow:0 0 0 1px rgba(226,29,72,.2),0 12px 35px rgba(226,29,72,.15);animation:liveGlow 1.8s infinite}.match-card.live-match .score{font-size:24px}.clickable-match{cursor:pointer}.clickable-match:hover{transform:translateY(-2px);border-color:#ff8a22}.live-ticker{display:block;margin-top:7px;font-size:11px;color:#ff6670;font-weight:900}.goal-feed{margin-top:10px}.goal-feed strong{color:#fff}.goal-feed .goal-icon{color:#ffcf33;margin-right:4px}.admin-stat{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.admin-stat span{background:#151d29;border:1px solid #303846;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:800}.goal-pop{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(0,0,0,.2);animation:goalBg .9s ease forwards}.goal-pop .goal-box{background:linear-gradient(145deg,#ff8a22,#ff3d00);color:#111;border-radius:25px;padding:30px 42px;text-align:center;box-shadow:0 25px 90px rgba(255,75,0,.45);animation:goalPop .9s cubic-bezier(.2,1.4,.4,1) forwards}.goal-pop .goal-box .big{font-size:58px;line-height:1}.goal-pop .goal-box h2{font-size:36px;margin:8px 0}.goal-pop .goal-box p{margin:0;font-weight:900;font-size:16px}.confetti{position:fixed;top:-20px;width:8px;height:14px;z-index:9001;pointer-events:none;animation:confettiFall 1.5s linear forwards}.admin-lock{display:inline-flex;align-items:center;gap:7px}
-@keyframes liveGlow{0%,100%{box-shadow:0 0 0 1px rgba(226,29,72,.18),0 12px 35px rgba(226,29,72,.12)}50%{box-shadow:0 0 0 2px rgba(226,29,72,.35),0 15px 45px rgba(226,29,72,.25)}}
-@keyframes goalPop{0%{transform:scale(.4) rotate(-5deg);opacity:0}45%{transform:scale(1.08) rotate(2deg);opacity:1}100%{transform:scale(1);opacity:0}}
-@keyframes goalBg{0%,100%{opacity:0}15%,65%{opacity:1}}
-@keyframes confettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
-@media(max-width:800px){.admin-grid{grid-template-columns:1fr}.breaking-news{top:150px;left:7px;font-size:10px;padding:7px 10px}.breaking-news b{display:none}}
-</style>
+        window.addEventListener('keyup', function (e) {
+          var tag = (e.target && e.target.tagName) || '';
+          if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+          var k = (e.key || '').toLowerCase();
+          if (!map[k]) return;
+          var arrow = map[k];
+          e.preventDefault();
+          var ne = new KeyboardEvent('keyup', {
+            key: arrow, code: arrow, keyCode: keyCodes[arrow], which: keyCodes[arrow],
+            bubbles: true, cancelable: true
+          });
+          try { Object.defineProperty(ne, 'keyCode', { value: keyCodes[arrow] }); } catch (err) {}
+          try { Object.defineProperty(ne, 'which', { value: keyCodes[arrow] }); } catch (err) {}
+          window.dispatchEvent(ne);
+          var c = document.querySelector('canvas');
+          if (c) c.dispatchEvent(ne);
+        }, true);
 
-
-
-<style id="fyfl-discord-button">
-.fyfl-discord-button{
-  position:fixed;left:18px;bottom:18px;width:52px;height:52px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;z-index:9999;
-  background:#5865F2;box-shadow:0 8px 24px rgba(0,0,0,.35);
-  transition:transform .18s ease,box-shadow .18s ease;
-}
-.fyfl-discord-button:hover{transform:scale(1.08);box-shadow:0 10px 28px rgba(0,0,0,.45)}
-.fyfl-discord-button svg{width:29px;height:29px;fill:white}
-@media(max-width:700px){.fyfl-discord-button{left:14px;bottom:14px;width:48px;height:48px}}
-
-.auth-actions{display:flex;align-items:center;gap:12px;margin-left:18px;flex-shrink:0}.auth-actions button{border:1px solid #303846;background:#151b25;color:#fff;border-radius:10px;padding:10px 13px;font-weight:800;cursor:pointer}.auth-actions .primary{background:#ff8a22;border-color:#ff8a22;color:#111}.auth-user{font-size:12px;color:#ffb16f;font-weight:800;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.results-head-actions{display:flex;align-items:center;gap:10px}.results-head-actions button{border:1px solid #303846;background:#151b25;color:#fff;border-radius:10px;padding:9px 12px;font-weight:800;cursor:pointer}.results-head-actions button:hover,.auth-actions button:hover{filter:brightness(1.12)}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(5px);z-index:5000;display:flex;align-items:center;justify-content:center;padding:20px}.modal{width:min(440px,100%);background:#111722;border:1px solid #2b3442;border-radius:18px;padding:24px;box-shadow:0 25px 80px rgba(0,0,0,.55)}.modal h2{margin:0 0 8px}.modal p{color:var(--muted);font-size:14px}.modal input,.comment-box textarea{width:100%;box-sizing:border-box;background:#0b1018;color:#fff;border:1px solid #303846;border-radius:10px;padding:12px;margin:7px 0;font:inherit;outline:none}.modal input:focus,.comment-box textarea:focus{border-color:#ff8a22}.modal-actions{display:flex;gap:8px;margin-top:10px}.modal-actions button{flex:1;padding:11px;border-radius:10px;border:1px solid #303846;background:#1a212d;color:#fff;font-weight:800;cursor:pointer}.modal-actions .primary{background:#ff8a22;border-color:#ff8a22;color:#111}.auth-error{color:#ff6b6b;font-size:13px;min-height:18px;margin-top:4px}.comments-wrap{display:grid;gap:16px}.comment-box{background:#111722;border:1px solid #293342;border-radius:15px;padding:16px}.comment-item{background:#111722;border:1px solid #293342;border-radius:14px;padding:15px}.comment-meta{display:flex;justify-content:space-between;gap:10px;align-items:center}.comment-author{font-weight:900;color:#ffad63}.comment-date{font-size:11px;color:#778294}.comment-text{margin:9px 0 0;color:#e4e8ee;line-height:1.5;white-space:pre-wrap}.comment-empty{padding:22px;text-align:center;color:#7d8796;border:1px dashed #303846;border-radius:14px}.logged-note{font-size:12px;color:#8f9aaa;margin-top:5px}
-@media(max-width:900px){.nav{height:auto;min-height:76px;flex-wrap:wrap;padding-bottom:10px;gap:12px}.auth-actions{margin-left:auto}nav{overflow-x:auto;max-width:100%;order:3;width:100%;padding-bottom:2px}}
-@media(max-width:520px){.auth-actions button{padding:8px 9px;font-size:11px}.auth-user{max-width:70px}.results-head-actions{flex-direction:column;align-items:flex-end;gap:5px}.results-head-actions button{font-size:11px;padding:8px 9px}}
-
-/* Admin / live match / premium animations */
-.breaking-news{position:fixed;top:94px;left:14px;z-index:1200;display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,#d71920,#ff4b1f);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:9px 15px;box-shadow:0 10px 30px rgba(0,0,0,.35);font-size:12px;font-weight:900;animation:newsPulse 2.2s infinite;max-width:min(420px,calc(100vw - 28px))}.breaking-news span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.breaking-news b{background:#fff;color:#d71920;border-radius:999px;padding:3px 7px;font-size:10px}.breaking-news a{color:#fff;text-decoration:none}.breaking-news:hover{transform:translateY(-2px)}
-@keyframes newsPulse{0%,100%{box-shadow:0 10px 30px rgba(0,0,0,.35)}50%{box-shadow:0 10px 36px rgba(255,45,45,.55)}}
-.admin-btn{background:linear-gradient(135deg,#ff8a22,#ff4d00)!important;color:#111!important;border-color:#ff9b42!important}.admin-panel{display:grid;gap:16px}.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.admin-box{background:#0d131d;border:1px solid #303b4a;border-radius:16px;padding:16px}.admin-box h3{margin:0 0 10px}.admin-box input,.admin-box select,.admin-box textarea{width:100%;box-sizing:border-box;background:#080d14;color:#fff;border:1px solid #303846;border-radius:10px;padding:10px;margin:5px 0;font:inherit}.admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}.admin-actions button,.admin-box button{border:1px solid #303846;background:#17202c;color:#fff;border-radius:10px;padding:9px 12px;font-weight:900;cursor:pointer}.admin-actions button:hover,.admin-box button:hover{filter:brightness(1.15);transform:translateY(-1px)}.admin-actions .live{background:#e21d48;border-color:#e21d48}.admin-actions .done{background:#168447;border-color:#168447}.admin-actions .reset{background:#303846}.admin-help{font-size:12px;color:#8490a0;line-height:1.5}.goal-line{margin-top:10px;padding:8px 10px;border-left:3px solid #ff8a22;background:#151c27;border-radius:7px;font-size:12px}.live-minute{display:inline-flex;align-items:center;gap:5px;color:#ff5b68;font-weight:900}.match-card.live-match{border-color:#e21d48;box-shadow:0 0 0 1px rgba(226,29,72,.2),0 12px 35px rgba(226,29,72,.15);animation:liveGlow 1.8s infinite}.match-card.live-match .score{font-size:24px}.clickable-match{cursor:pointer}.clickable-match:hover{transform:translateY(-2px);border-color:#ff8a22}.live-ticker{display:block;margin-top:7px;font-size:11px;color:#ff6670;font-weight:900}.goal-feed{margin-top:10px}.goal-feed strong{color:#fff}.goal-feed .goal-icon{color:#ffcf33;margin-right:4px}.admin-stat{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.admin-stat span{background:#151d29;border:1px solid #303846;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:800}.goal-pop{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(0,0,0,.2);animation:goalBg .9s ease forwards}.goal-pop .goal-box{background:linear-gradient(145deg,#ff8a22,#ff3d00);color:#111;border-radius:25px;padding:30px 42px;text-align:center;box-shadow:0 25px 90px rgba(255,75,0,.45);animation:goalPop .9s cubic-bezier(.2,1.4,.4,1) forwards}.goal-pop .goal-box .big{font-size:58px;line-height:1}.goal-pop .goal-box h2{font-size:36px;margin:8px 0}.goal-pop .goal-box p{margin:0;font-weight:900;font-size:16px}.confetti{position:fixed;top:-20px;width:8px;height:14px;z-index:9001;pointer-events:none;animation:confettiFall 1.5s linear forwards}.admin-lock{display:inline-flex;align-items:center;gap:7px}
-@keyframes liveGlow{0%,100%{box-shadow:0 0 0 1px rgba(226,29,72,.18),0 12px 35px rgba(226,29,72,.12)}50%{box-shadow:0 0 0 2px rgba(226,29,72,.35),0 15px 45px rgba(226,29,72,.25)}}
-@keyframes goalPop{0%{transform:scale(.4) rotate(-5deg);opacity:0}45%{transform:scale(1.08) rotate(2deg);opacity:1}100%{transform:scale(1);opacity:0}}
-@keyframes goalBg{0%,100%{opacity:0}15%,65%{opacity:1}}
-@keyframes confettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
-@media(max-width:800px){.admin-grid{grid-template-columns:1fr}.breaking-news{top:150px;left:7px;font-size:10px;padding:7px 10px}.breaking-news b{display:none}}
-
-<style id="fyfl-v5-device">
-/* V5 : adaptation automatique téléphone / tablette / PC */
-body.device-mobile .desktop-only{display:none!important}
-body.device-desktop .mobile-only{display:none!important}
-.device-mobile .nav{gap:6px}
-.device-mobile .auth-actions{gap:6px}
-.device-mobile .auth-user{display:none}
-.device-mobile .admin-box{padding:13px}
-.device-mobile .admin-actions{display:grid;grid-template-columns:1fr}
-.device-mobile .admin-actions button,.device-mobile .admin-box button{width:100%;min-height:42px}
-.device-mobile .modal{padding:19px}
-.device-mobile .teams{grid-template-columns:1fr 1fr}
-.device-mobile .team-card{min-width:0}
-.device-mobile .section-head{align-items:flex-start;gap:10px;flex-direction:column}
-.device-mobile .admin-stat{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
-.device-mobile .admin-stat span{grid-column:1/-1}
-.device-mobile .admin-stat input{width:100%!important}
-.device-mobile .auth-actions{width:100%;overflow-x:auto;scrollbar-width:none}
-@media(max-width:700px){
-  header{position:sticky}
-  .nav{padding-left:10px!important;padding-right:10px!important}
-  nav{scrollbar-width:none}
-  nav::-webkit-scrollbar{display:none}
-  nav button{font-size:11px!important;flex:0 0 auto}
-  .hero-actions{flex-direction:column}
-  .hero-actions button{width:100%}
-  .fixture{grid-template-columns:1fr auto 1fr;gap:6px;padding:13px 9px}
-  .match{gap:7px}
-  .score{font-size:20px}
-  .admin-stat input{width:70px!important}
-}
-</style>
-<style id="fyfl-sound-controls">
-.fyfl-bottom-controls{position:fixed;left:18px;bottom:18px;z-index:9999;display:flex;align-items:center;gap:8px}
-.fyfl-sound-button{position:fixed!important;left:78px!important;bottom:18px!important;width:52px!important;height:52px!important;z-index:10000!important;border-radius:50%;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;background:#151b25;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.35);cursor:pointer;font-size:20px;line-height:1;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;padding:0}
-.fyfl-sound-button:hover{transform:scale(1.08);box-shadow:0 10px 28px rgba(0,0,0,.45)}
-.fyfl-sound-button.muted{background:#1b2431;color:#8e9bb0}
-@media(max-width:700px){.fyfl-bottom-controls{left:0;bottom:0}.fyfl-sound-button{left:70px!important;bottom:14px!important;width:48px!important;height:48px!important}}
-</style>
-<style id="fyfl-v6-responsive">
-html,body{max-width:100%;overflow-x:hidden}.nav{gap:12px}.auth-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.auth-actions button{min-height:38px}.fyfl-sound-button{touch-action:manipulation}
-@media(max-width:900px){header .nav{align-items:flex-start;flex-direction:column}.brand{width:100%}nav{width:100%;display:flex;overflow-x:auto;gap:7px;padding-bottom:4px;scrollbar-width:thin}nav button{flex:0 0 auto;white-space:nowrap}.auth-actions{width:100%}}
-@media(max-width:600px){header .nav{padding:10px 12px}.auth-actions{gap:6px}.auth-actions button{font-size:12px;padding:8px 10px}.auth-user{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.breaking-news{max-width:calc(100vw - 14px)}.section{padding-left:12px!important;padding-right:12px!important}.match-card .match{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important}.match-card .team{font-size:11px}.match-card .team-logo{width:30px!important;height:30px!important}.match-card .score{font-size:19px!important}.admin-box input,.admin-box select,.admin-box textarea{font-size:16px!important}.modal{width:calc(100vw - 28px)!important;max-height:90vh;overflow:auto}.fyfl-discord-button{left:12px!important;bottom:12px!important}.fyfl-sound-button{left:70px!important;bottom:12px!important}}
-@media(max-width:600px){.breaking-news{top:150px!important;left:7px!important;right:7px!important;max-width:none!important}.breaking-news span{white-space:normal;line-height:1.25}.breaking-news a{flex-shrink:0}}
-
-/* ===== V9 LIVE + PAGE ANIMATIONS ===== */
-#app{animation:fyflPageIn .42s cubic-bezier(.2,.8,.2,1)}
-@keyframes fyflPageIn{from{opacity:0;transform:translateY(18px) scale(.99);filter:blur(2px)}to{opacity:1;transform:none;filter:none}}
-.fyfl-animate-item{animation:fyflItemIn .45s both cubic-bezier(.2,.8,.2,1)}
-@keyframes fyflItemIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.fyfl-live-sync{position:fixed;right:14px;bottom:14px;z-index:9998;background:rgba(12,17,24,.92);border:1px solid #2b3442;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:900;color:#7ee787;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none}
-.fyfl-live-sync.show{opacity:1;transform:none}
-</style>
-<style id="fyfl-credit-fix">
-.fyfl-credit-card{display:flex;align-items:center;justify-content:center;text-align:center;min-height:150px}
-.fyfl-credit-card h3{margin:0;font-size:22px}
-</style>
-<style id="fyfl-mobile-nav-fix">
-@media(max-width:700px){
-  header .nav{width:100%;box-sizing:border-box;overflow:visible}
-  header .nav nav{width:100%;max-width:100%;min-width:0;box-sizing:border-box;display:flex;justify-content:flex-start;align-items:center;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px 2px 8px;margin:0}
-  header .nav nav::-webkit-scrollbar{display:none}
-  header .nav nav button{flex:0 0 auto;display:block;visibility:visible;opacity:1;padding:9px 11px!important;font-size:11px!important}
-  header .nav nav button:first-child{margin-left:0}
-  header .nav nav button:nth-child(2){margin-left:0}
-}
-
-.stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.stats-list{display:grid;gap:8px}.stats-row{display:grid;grid-template-columns:28px 42px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px;border:1px solid #283240;background:#0d131b;border-radius:12px}.stats-rank{color:#ff9a3c}.stats-club-logo{width:38px;height:38px;object-fit:contain}.stats-player{min-width:0;display:grid;gap:3px}.stats-player strong,.stats-player small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stats-player small{color:#7f8a9b;font-size:11px}.stats-count{color:#ffb16f;white-space:nowrap}.admin-stats-list .stats-row{grid-template-columns:28px 38px minmax(0,1fr) auto auto}.admin-stats-list button{padding:5px 8px}.stats-grid .card{min-width:0}@media(max-width:700px){.stats-grid{grid-template-columns:1fr}.stats-row{grid-template-columns:24px 34px minmax(0,1fr) auto}.stats-club-logo{width:32px;height:32px}.stats-count{font-size:12px}}
-</style>
-</head><body>
-
-<div class="breaking-news"><b>BREAKING</b><span id="breakingNewsText">REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !</span><a href="https://discord.gg/fyfl" target="_blank" rel="noopener">↗</a></div><div id="fyflLiveSync" class="fyfl-live-sync">● EN DIRECT</div>
-<header><div class="nav"><div class="brand"><img src="fyfl-logo.png" alt="FYFL"><span>FYFL</span></div>
-<nav><button class="active" data-page="home">Accueil</button><button data-page="matches">Matchs / Résultats</button><button data-page="ranking">Classement</button><button data-page="stats">STATS</button><button data-page="teams">Équipes</button><button data-page="competitions">Compétitions</button><button data-page="news">FYFL - NEWS</button><button data-page="comments">Commentaires</button></nav><div class="auth-actions" id="authActions"></div></div></header>
-<main id="app"></main><footer>FYFL — French Youth Fut League · Saison 1<br><small>Les écussons appartiennent à leurs clubs respectifs.</small></footer>
-<div id="newsAlert" class="news-alert"><button onclick="document.getElementById('newsAlert').remove()" aria-label="Fermer">×</button><div style="font-size:11px;letter-spacing:.12em;color:#ff8a22;font-weight:900">📢 FYFL NEWS</div><strong>Les matchs sont les mercredis et les week-ends !</strong><div style="color:#aaa;margin-top:5px;font-size:13px">Pense à rester actif sur le Discord.</div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-/* ===== FYFL V3 — Supabase config =====
-   Colle ici ton URL Supabase et ta clé PUBLISHABLE/anon.
-   Ne mets JAMAIS la clé service_role/secret dans ce fichier. */
-const FYFL_SUPABASE_URL="https://dxbaicqbpccruebmlorb.supabase.co";
-const FYFL_DATA_RESET_AT='2026-10-05T15:40:00.000Z';
-const FYFL_SUPABASE_KEY="sb_publishable_pglwhtDgDHi6DV931NsfTQ_tUGo4-Jk";
-let fyflSupabase=null;
-let fyflRealtimeChannel=null;
-let fyflMatchMVPs={};
-let fyflPresenceChannel=null;
-let fyflRealtimeStatus='DISCONNECTED';
-let fyflOnlineCount=0;
-let fyflNotifications=[];
-let fyflNotificationChannel=null;
-let fyflSiteStatus={maintenance:false,message:'🔧 FYFL est actuellement en maintenance.\n\nLe site revient bientôt.'};
-let fyflAdminLogs=[];
-let fyflDatabaseStatus='CHECKING';
-let fyflPresenceKey=(crypto?.randomUUID?.()||('fyfl-'+Math.random().toString(36).slice(2)+Date.now()));
-let fyflRemoteReady=false;
-let fyflInitPromise=null;
-
-const groups={"A": ["ASTON VILLA", "OM", "BAYER LEVERKUSEN", "NEWCASTLE"], "B": ["BARCELONE", "BESIKTAS", "LIVERPOOL", "REAL MADRID"], "C": ["CRYSTAL PALACE", "PSG", "ATLETICO MADRID", "JUVENTUS"], "D": ["AS MONACO", "LAZIO FC", "D2T", "FIORENTINA"], "E": ["INTER MILAN", "RED STAR", "ARSENAL", "AC MILAN"], "F": ["RENNES", "CHELSEA", "MANCHESTER CITY", "BAYERN MUNICH"]};
-const defaultResults=[];
-let results=defaultResults.map(x=>({...x}));
-let fyflSettings={breaking:'REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !',player:'À déterminer',news:'Les matchs FYFL se joueront les mercredis et les week-ends !',standings:{}};
-let fyflComments=[];
-let fyflSettingsReady=false;
-let fyflCommentsReady=false;
-let fyflStats=[];
-async function saveResults(){
-  if(!fyflSupabase || !fyflRemoteReady || !isCurrentAccountAdminVerified()) return false;
-  return await syncAllRemoteMatches();
-}
-async function saveSingleRemoteMatch(m){
-  if(!fyflSupabase || !fyflRemoteReady || !isCurrentAccountAdminVerified()) return false;
-  const day=Number(m.day||findMatchDay(m));
-  const row=fyflToRow({...m,day});
-  const {error}=await fyflSupabase.from('fyfl_matches').upsert(row,{onConflict:'match_key'});
-  if(error){window.__fyflLastMatchSyncError=error.message||String(error);console.warn('FYFL Supabase match upsert:',error);return false;} window.__fyflLastMatchSyncError='';
-  return true;
-}
-
-function fyflMatchKey(m){return `${m.group||''}|${m.day||''}|${m.home||''}|${m.away||''}`}
-function fyflToRow(m){return {match_key:fyflMatchKey(m),group_name:m.group,day:Number(m.day||1),home:m.home,away:m.away,home_score:Number(m.hs||0),away_score:Number(m.as||0),status:m.status||'À venir',minute:Number(m.minute||0),goals:Array.isArray(m.goals)?m.goals:[],started_at:m.startedAt?new Date(m.startedAt).toISOString():null,updated_at:new Date().toISOString()}}
-function fyflFromRow(r){return {group:r.group_name,day:Number(r.day),home:r.home,away:r.away,hs:Number(r.home_score??r.hs??0),as:Number(r.away_score??r.as??0),status:r.status||'À venir',minute:Number(r.minute||0),goals:Array.isArray(r.goals)?r.goals:[],...(r.started_at?{startedAt:new Date(r.started_at).getTime()}: {}),...(r.updated_at?{updatedAt:new Date(r.updated_at).getTime()}: {})}}
-function isCurrentPlayedMatch(m){
-  return (m.group==='F'&&m.home==='RENNES'&&m.away==='CHELSEA'&&Number(m.hs)===9&&Number(m.as)===2&&m.status==='Terminé')
-      ||(m.group==='F'&&m.home==='MANCHESTER CITY'&&m.away==='BAYERN MUNICH'&&Number(m.hs)===7&&Number(m.as)===0&&m.status==='Terminé');
-}
-function normalizeSeasonResults(rows){
-  // La base Supabase est la source de vérité : on conserve les matchs distants
-  // (à venir, en direct ou terminés) et on complète uniquement les affiches manquantes.
-  const remote=new Map();
-  (Array.isArray(rows)?rows:[]).forEach(r=>{
-    const m=fyflFromRow(r);
-    const day=Number(m.day||findMatchDay(m));
-    const key=fyflMatchKey({...m,day});
-    remote.set(key,{...m,day});
-  });
-  const out=[];
-  Object.entries(groups).forEach(([g,arr])=>{
-    const pairs={1:[[arr[0],arr[1]],[arr[2],arr[3]]],2:[[arr[0],arr[2]],[arr[1],arr[3]]],3:[[arr[0],arr[3]],[arr[1],arr[2]]]};
-    Object.entries(pairs).forEach(([day,ps])=>ps.forEach(([home,away])=>{
-      const d=Number(day);
-      const key=fyflMatchKey({group:g,day:d,home,away});
-      const reverseKey=fyflMatchKey({group:g,day:d,home:away,away:home});
-      const found=remote.get(key)||remote.get(reverseKey);
-      out.push(found?{...found,group:g,day:d}:{group:g,day:d,home,away,hs:0,as:0,status:'À venir',minute:0,goals:[]});
-    }));
-  });
-  return out;
-}
-function cleanStandingsOverrides(value){
-  return (value && typeof value==='object') ? value : {};
-}
-function setRemoteResults(rows){
-  results=normalizeSeasonResults(rows);
-}
-function mergeRemoteRows(rows){
-  if(!Array.isArray(rows))return;
-  rows.forEach(r=>{const incoming=fyflFromRow(r);const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===r.match_key);if(i>=0)results[i]=incoming;else results.push(incoming);});
-}
-async function syncAllRemoteMatches(){
-  if(!fyflSupabase||!fyflRemoteReady||!isCurrentAccountAdminVerified())return false;
-  const rows=results.map(m=>{const day=m.day||findMatchDay(m);return fyflToRow({...m,day})});
-  if(!rows.length)return true;
-  const {error}=await fyflSupabase.from('fyfl_matches').upsert(rows,{onConflict:'match_key'});
-  if(error){window.__fyflLastMatchSyncError=error.message||String(error);console.warn('FYFL Supabase upsert:',error);return false} window.__fyflLastMatchSyncError='';
-  return true;
-}
-function findMatchDay(m){for(const [g,arr] of Object.entries(groups)){const pairs={1:[[arr[0],arr[1]],[arr[2],arr[3]]],2:[[arr[0],arr[2]],[arr[1],arr[3]]],3:[[arr[0],arr[3]],[arr[1],arr[2]]]};for(const [d,ps] of Object.entries(pairs))for(const [h,a] of ps)if((m.home===h&&m.away===a)||(m.home===a&&m.away===h))return Number(d)}return 1}
-async function deleteRemoteMatch(m){if(!fyflSupabase||!fyflRemoteReady||!isCurrentAccountAdminVerified())return false;const {error}=await fyflSupabase.from('fyfl_matches').delete().eq('match_key',fyflMatchKey({...m,day:m.day||findMatchDay(m)}));if(error){console.warn('FYFL Supabase delete:',error.message);return false}return true}
-function flashLive(){const el=document.getElementById('fyflLiveSync');if(!el)return;el.classList.add('show');clearTimeout(window.__fyflLiveFlash);window.__fyflLiveFlash=setTimeout(()=>el.classList.remove('show'),1200)}
-async function loadOnlineSettings(){
-  if(!fyflSupabase)return;
-  const {data,error}=await fyflSupabase.from('fyfl_settings').select('*').eq('id','main').maybeSingle();
-  if(!error&&data){
-    let standings=cleanStandingsOverrides(data.standings);
-    // Migration de sécurité : une ancienne version pouvait enregistrer un override
-    // pour toutes les équipes (ex. 3 MJ / 3 nuls / 3 pts partout). Dans ce cas,
-    // le classement calculé à partir des matchs ne doit plus être écrasé.
-    const overrideKeys=Object.keys(standings).filter(k=>allTeams.includes(k));
-    // Purge l’ancien classement manuel global qui pouvait afficher 3 MJ / 3 nuls / 3 pts partout.
-    const blanketOverride=allTeams && overrideKeys.length>=Math.max(12,Math.ceil(allTeams.length*0.75));
-    if(blanketOverride){
-      standings={};
-      if(isCurrentAccountAdminVerified()){
-        const {error:clearError}=await fyflSupabase.from('fyfl_settings').update({standings:{},updated_at:new Date().toISOString()}).eq('id','main');
-        if(clearError)console.warn('FYFL nettoyage classement:',clearError.message);
-      }
-    }
-    fyflSettings={...fyflSettings,breaking:data.breaking||fyflSettings.breaking,player:data.player||fyflSettings.player,news:data.news||fyflSettings.news,standings};
-    fyflSettingsReady=true;applyAdminPrefs();
-  }
-}
-async function saveOnlineSettings(p){
-  if(!fyflSupabase||!isCurrentAccountAdminVerified())return false;
-  const row={id:'main',breaking:p.breaking||'',player:p.player||'',news:p.news||'',standings:p.standings||fyflSettings.standings||{},updated_at:new Date().toISOString()};
-  const {error}=await fyflSupabase.from('fyfl_settings').upsert(row,{onConflict:'id'});
-  if(error){console.warn('FYFL settings:',error.message);return false}
-  fyflSettings={...fyflSettings,...p,standings:p.standings||fyflSettings.standings||{}};fyflSettingsReady=true;applyAdminPrefs();return true;
-}
-async function loadOnlineComments(){
-  if(!fyflSupabase)return;
-  const {data,error}=await fyflSupabase.from('fyfl_comments').select('*').order('created_at',{ascending:false});
-  if(!error){fyflComments=data||[];fyflCommentsReady=true;}
-}
-async function loadOnlineStats(){
-  if(!fyflSupabase)return;
-  const {data,error}=await fyflSupabase.from('fyfl_stats').select('*').order('stat_count',{ascending:false}).order('updated_at',{ascending:false});
-  if(!error)fyflStats=data||[];
-}
-function statsRows(category){return fyflStats.filter(x=>x.category===category).sort((a,b)=>Number(b.stat_count||0)-Number(a.stat_count||0)||String(a.player_name||'').localeCompare(String(b.player_name||''))).slice(0,15)}
-function statsLogo(club){return crest(club,'stats-club-logo')}
-function pageStats(){const pass=statsRows('passeur'),but=statsRows('buteur');const block=(title,category,rows,label)=>`<div class="card"><div class="section-head"><h2>${title}</h2><small>Top 15</small></div><div class="stats-list">${rows.length?rows.map((x,i)=>`<div class="stats-row"><b class="stats-rank">${i+1}</b>${statsLogo(x.club)}<div class="stats-player"><strong>${escapeHtml(x.player_name)}</strong><small>${escapeHtml(x.club||'Club non renseigné')}</small></div><b class="stats-count">${Number(x.stat_count)||0} ${label}</b></div>`).join(''):'<div class="live-empty">Aucune statistique enregistrée.</div>'}</div></div>`;return `<section class="section"><div class="section-head"><h2>STATS FYFL</h2><small>Synchronisé en direct avec Supabase</small></div><div class="stats-grid">${block('Meilleur passeur','passeur',pass,'passe'+(pass.length===1?'':'s'))}${block('Meilleur buteur','buteur',but,'but'+(but.length===1?'':'s'))}</div></section>`}
-async function adminAddStat(){if(!fyflSupabase||!isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée.');return}const category=document.getElementById('adminStatCategory')?.value;const player=(document.getElementById('adminStatPlayer')?.value||'').trim();const count=Math.max(0,Number(document.getElementById('adminStatCount')?.value||0));const club=(document.getElementById('adminStatClub')?.value||'').trim();if(!player||!club||!Number.isFinite(count)){alert('Remplis le joueur, le club et le nombre.');return}const {data:existing,error:findError}=await fyflSupabase.from('fyfl_stats').select('*').eq('category',category).ilike('player_name',player).ilike('club',club).maybeSingle();if(findError){alert('Impossible de vérifier la statistique : '+findError.message);return}let data,error;if(existing){({data,error}=await fyflSupabase.from('fyfl_stats').update({stat_count:count,updated_at:new Date().toISOString()}).eq('id',existing.id).select().single())}else{({data,error}=await fyflSupabase.from('fyfl_stats').insert({category,player_name:player,stat_count:count,club,updated_at:new Date().toISOString()}).select().single())}if(error){alert('Impossible d\'enregistrer la statistique : '+error.message);return}if(data){const i=fyflStats.findIndex(x=>x.id===data.id);if(i>=0)fyflStats[i]=data;else fyflStats.unshift(data);render('admin',false)}await writeAdminLog(existing?'Statistique modifiée':'Statistique ajoutée',`${category} · ${player} · ${count} · ${club}`);}
-async function adminDeleteStat(id){if(!fyflSupabase||!isCurrentAccountAdminVerified())return;const {error}=await fyflSupabase.from('fyfl_stats').delete().eq('id',id);if(error){alert('Impossible de supprimer la statistique : '+error.message);return}await writeAdminLog('Statistique supprimée',String(id));}
-
-function updateRealtimeIndicators(){
-  const status=document.getElementById('adminRealtimeStatus');
-  if(status){
-    const online=fyflRealtimeStatus==='SUBSCRIBED';
-    status.innerHTML=`<span class="status-dot ${online?'online':'offline'}"></span>${online?'Connecté':'Déconnecté'}`;
-  }
-  const status2=document.getElementById('adminRealtimeStatus2');
-  if(status2){const online=fyflRealtimeStatus==='SUBSCRIBED';status2.innerHTML=`<span class="status-dot ${online?'online':'offline'}"></span>${online?'Connecté':'Déconnecté'}`;}
-  const count=document.getElementById('adminOnlineCount');
-  if(count) count.textContent=String(fyflOnlineCount);
-}
-function updateSiteStatusIndicators(){
-  const db=document.getElementById('adminDatabaseStatus');
-  if(db){const ok=fyflDatabaseStatus==='OK';db.innerHTML=`<span class="status-dot ${ok?'online':'offline'}"></span>${ok?'Opérationnelle':'Indisponible'}`;}
-  const maint=document.getElementById('adminMaintenanceStatus');
-  if(maint)maint.innerHTML=fyflSiteStatus.maintenance?'<span class="status-dot offline"></span>Maintenance active':'<span class="status-dot online"></span>Site opérationnel';
-}
-function applyMaintenanceUI(){
-  const isAdmin=isCurrentAccountAdminVerified(); let el=document.getElementById('fyflMaintenanceOverlay');
-  if(fyflSiteStatus.maintenance&&!isAdmin){
-    if(!el){el=document.createElement('div');el.id='fyflMaintenanceOverlay';el.className='maintenance-overlay';document.body.appendChild(el);}
-    el.innerHTML=`<div class="maintenance-card"><div style="font-size:52px">🔧</div><h1>FYFL est actuellement en maintenance.</h1><p>${escapeHtml(fyflSiteStatus.message||'Le site revient bientôt.')}</p><small style="color:#7d8796">Mise à jour en direct via Supabase</small></div>`;
-  }else if(el)el.remove();
-}
-function formatAdminLogDate(v){try{return new Date(v).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'medium'})}catch(e){return v||''}}
-function renderAdminLogs(){const toolbar=document.getElementById('adminLogFilters');if(toolbar&&!toolbar.innerHTML)toolbar.innerHTML=adminLogFilters();const el=document.getElementById('adminLogList');if(!el)return;const q=(document.getElementById('adminLogSearch')?.value||'').trim().toLowerCase();const type=(document.getElementById('adminLogType')?.value||'').trim();const rows=fyflAdminLogs.filter(x=>(!q||`${x.action||''} ${x.details||''} ${x.created_by||''}`.toLowerCase().includes(q))&&(!type||x.action===type));el.innerHTML=rows.length?rows.map(x=>`<div class="admin-log-item"><b>${escapeHtml(x.action||'Action administrateur')}</b><div>${escapeHtml(x.details||'')}</div><small>👤 ${escapeHtml(x.created_by||'Admin')} · 🕒 ${escapeHtml(formatAdminLogDate(x.created_at))}</small></div>`).join(''):'<div class="admin-log-empty">Aucune action ne correspond au filtre.</div>';}
-function adminLogFilters(){const types=[...new Set(fyflAdminLogs.map(x=>x.action).filter(Boolean))];return `<div class="admin-log-toolbar"><input id="adminLogSearch" oninput="renderAdminLogs()" placeholder="🔎 Rechercher dans le journal..."><select id="adminLogType" onchange="renderAdminLogs()"><option value="">Toutes les actions</option>${types.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('')}</select></div>`;}
-async function loadSiteStatus(){if(!fyflSupabase)return;const {data,error}=await fyflSupabase.from('fyfl_site_status').select('*').eq('id','main').maybeSingle();if(!error){fyflSiteStatus={...fyflSiteStatus,...(data||{})};fyflDatabaseStatus='OK'}else fyflDatabaseStatus='ERROR';updateSiteStatusIndicators();applyMaintenanceUI();}
-async function loadAdminLogs(){if(!fyflSupabase)return;const {data,error}=await fyflSupabase.from('fyfl_admin_logs').select('*').order('created_at',{ascending:false}).limit(50);if(!error)fyflAdminLogs=data||[];renderAdminLogs();}
-async function writeAdminLog(action,details=''){if(!fyflSupabase||!isCurrentAccountAdminVerified())return;const {data,error}=await fyflSupabase.from('fyfl_admin_logs').insert({action,details,created_by:supabaseAdminUser?.email||'admin'}).select().single();if(error)console.warn('FYFL admin log:',error.message);else if(data){fyflAdminLogs.unshift(data);renderAdminLogs();}}
-async function setMaintenance(enabled){if(!fyflSupabase||!isCurrentAccountAdminVerified()){alert('Connecte-toi à l’administration Supabase.');return}const message=(document.getElementById('adminMaintenanceMessage')?.value||'🔧 FYFL est actuellement en maintenance.\\n\\nLe site revient bientôt.').trim();const row={id:'main',maintenance:!!enabled,message,updated_at:new Date().toISOString()};const {error}=await fyflSupabase.from('fyfl_site_status').upsert(row,{onConflict:'id'});if(error){alert('Impossible de modifier le mode maintenance : '+error.message);return}await writeAdminLog(enabled?'Mode maintenance activé':'Mode maintenance désactivé',message);fyflSiteStatus={...fyflSiteStatus,...row};applyMaintenanceUI();updateSiteStatusIndicators();render('admin',false);}
-async function saveMaintenanceMessage(){if(!fyflSupabase||!isCurrentAccountAdminVerified())return;await setMaintenance(!!fyflSiteStatus.maintenance)}
-function showGlobalNotification(n){
-  window.__shownNotificationIds=window.__shownNotificationIds||new Set();if(n?.id&&window.__shownNotificationIds.has(n.id))return;if(n?.id)window.__shownNotificationIds.add(n.id);
-  const old=document.querySelector('.global-notification'); if(old) old.remove();
-  const el=document.createElement('div'); el.className='global-notification';
-  el.innerHTML=`<div class="notif-title">${escapeHtml(n.title||'NOTIFICATION FYFL')}</div><div class="notif-message">${escapeHtml(n.message||'')}</div><div class="notif-time">Diffusé en direct · FYFL</div>`;
-  document.body.appendChild(el); setTimeout(()=>el.remove(),7000);
-}
-async function loadOnlineNotifications(){
-  if(!fyflSupabase)return;
-  const {data,error}=await fyflSupabase.from('fyfl_notifications').select('*').order('created_at',{ascending:false}).limit(20);
-  if(!error)fyflNotifications=data||[];
-}
-async function sendGlobalNotification(){
-  if(!fyflSupabase||!isCurrentAccountAdminVerified()){alert('Connecte-toi à l’administration Supabase.');return;}
-  const title=(document.getElementById('adminNotifTitle')?.value||'').trim()||'🔴 MATCH EN DIRECT';
-  const message=(document.getElementById('adminNotifMessage')?.value||'').trim();
-  if(!message){alert('Écris le message à envoyer.');return;}
-  const {data,error}=await fyflSupabase.from('fyfl_notifications').insert({title,message,created_by:supabaseAdminUser?.email||null}).select().single();
-  if(error){alert('Impossible d’envoyer la notification : '+error.message);return;}
-  if(data)showGlobalNotification(data);
-  await writeAdminLog('Notification globale envoyée',`${title} — ${message}`);
-  document.getElementById('adminNotifMessage').value='';
-}
-async function syncAllRemoteData(show=true){
-  if(!fyflSupabase){alert('Supabase n’est pas connecté.');return;}
-  try{
-    const [m,s,c,n,ss,l]=await Promise.all([
-      fyflSupabase.from('fyfl_matches').select('*'),
-      fyflSupabase.from('fyfl_settings').select('*').eq('id','main').maybeSingle(),
-      fyflSupabase.from('fyfl_comments').select('*').order('created_at',{ascending:false}),
-      fyflSupabase.from('fyfl_notifications').select('*').order('created_at',{ascending:false}).limit(20),
-      fyflSupabase.from('fyfl_site_status').select('*').eq('id','main').maybeSingle(),
-      fyflSupabase.from('fyfl_admin_logs').select('*').order('created_at',{ascending:false}).limit(50)
-    ]);
-    if(m.error)throw m.error;
-    setRemoteResults(m.data||[]); fyflRemoteReady=true;
-    if(!s.error&&s.data){fyflSettings={...fyflSettings,...s.data,standings:s.data.standings||{}};fyflSettingsReady=true;applyAdminPrefs();}
-    if(!c.error){fyflComments=c.data||[];fyflCommentsReady=true;}
-    if(!n.error)fyflNotifications=n.data||[];if(!ss.error&&ss.data){fyflSiteStatus={...fyflSiteStatus,...ss.data};fyflDatabaseStatus='OK';applyMaintenanceUI()}if(!l.error){fyflAdminLogs=l.data||[];renderAdminLogs();}
-    const pg=getCurrentPage(); if(['home','matches','ranking','news','comments','admin'].includes(pg))render(pg,false);
-    updateRealtimeIndicators();
-    if(show)alert('Toutes les données ont été resynchronisées avec Supabase.');
-  }catch(e){console.error(e);if(show)alert('Synchronisation impossible : '+(e.message||e));}
-}
-function initPresence(){
-  if(!fyflSupabase)return;
-  try{
-    if(fyflPresenceChannel)fyflSupabase.removeChannel(fyflPresenceChannel);
-    fyflPresenceChannel=fyflSupabase.channel('fyfl-online-users',{config:{presence:{key:fyflPresenceKey}}});
-    const refresh=()=>{
-      const state=fyflPresenceChannel.presenceState();
-      fyflOnlineCount=Object.values(state||{}).reduce((sum,arr)=>sum+(Array.isArray(arr)?arr.length:0),0);
-      updateRealtimeIndicators();
-    };
-    fyflPresenceChannel.on('presence',{event:'sync'},refresh).on('presence',{event:'join'},refresh).on('presence',{event:'leave'},refresh).subscribe(async status=>{
-      if(status==='SUBSCRIBED'){
-        fyflPresenceChannel.track({online_at:new Date().toISOString(),page:getCurrentPage()});
-      }
-    });
-  }catch(e){console.warn('FYFL presence:',e)}
-}
-async function initFYFLSupabase(){
-  if(fyflInitPromise)return fyflInitPromise;
-  fyflInitPromise=(async()=>{
-    if(!window.supabase||!FYFL_SUPABASE_URL||!FYFL_SUPABASE_KEY)return false;
-    try{
-      fyflSupabase=window.supabase.createClient(FYFL_SUPABASE_URL,FYFL_SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
-      const {data,error}=await fyflSupabase.from('fyfl_matches').select('*');
-      if(!error){
-        setRemoteResults(data||[]);fyflRemoteReady=true;
-        if(isCurrentAccountAdminVerified()){
-          const existingKeys=new Set((data||[]).map(r=>r.match_key));
-          const seed=[];
-          const days=buildAllMatchDays();
-          [1,2,3].forEach(day=>(days[day]||[]).forEach(m=>{const key=fyflMatchKey({...m,day});if(!existingKeys.has(key))seed.push(fyflToRow({...m,day}));}));
-          if(seed.length){const {error:seedError}=await fyflSupabase.from('fyfl_matches').upsert(seed,{onConflict:'match_key'});if(seedError)console.warn('FYFL seed:',seedError.message);else {const {data:all}=await fyflSupabase.from('fyfl_matches').select('*');if(Array.isArray(all))setRemoteResults(all);}}
+        // Démarrage automatique : simule "Press to Play" dès le chargement
+        function autoStart() {
+          var c = document.querySelector('canvas');
+          if (!c) return;
+          c.focus();
+          var click = new MouseEvent('click', { bubbles: true, clientX: c.width / 2, clientY: c.height / 2 });
+          c.dispatchEvent(click);
+          var sp = new KeyboardEvent('keydown', { key: ' ', code: 'Space', keyCode: 32, which: 32, bubbles: true, cancelable: true });
+          try { Object.defineProperty(sp, 'keyCode', { value: 32 }); } catch (err) {}
+          window.dispatchEvent(sp);
+          c.dispatchEvent(sp);
         }
-      }else console.warn('FYFL Supabase lecture:',error.message);
-      await loadOnlineSettings();
-      await loadOnlineComments();
-      await loadOnlineStats();
-      await loadSiteStatus();
-      await loadAdminLogs();
-      const {data:mvps}=await fyflSupabase.from('fyfl_match_mvp').select('*');
-      if(Array.isArray(mvps)){fyflMatchMVPs={};mvps.forEach(x=>{if(x.match_key)fyflMatchMVPs[x.match_key]=x;});}
-      fyflRealtimeChannel=fyflSupabase.channel('fyfl-live-all')
-        .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_matches'},payload=>{
-          if(payload.eventType==='DELETE'){const key=payload.old?.match_key;const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===key);if(i>=0)results.splice(i,1);}
-          else if(payload.new){const incoming=fyflFromRow(payload.new);const allowedIncoming=!!incoming;if(allowedIncoming){const i=results.findIndex(m=>fyflMatchKey({...m,day:m.day||findMatchDay(m)})===payload.new.match_key);if(i>=0)results[i]=incoming;else results.push(incoming);}}
-          flashLive();
-          const pg=getCurrentPage();if(document.getElementById('liveMatchModal')){refreshOpenLiveMatch(payload.eventType==='DELETE'?null:fyflFromRow(payload.new));} if(!document.getElementById('liveMatchModal')&&['home','matches','ranking','admin'].includes(pg))render(pg,false);
-          if(payload.eventType==='INSERT'||payload.eventType==='UPDATE'){const newGoals=Array.isArray(payload.new?.goals)?payload.new.goals:[];const g=newGoals[newGoals.length-1];const sig=g?JSON.stringify(g):'';if(g&&sig!==window.__lastGoalSignature){window.__lastGoalSignature=sig;if(payload.new?.status==='En direct')showGoalAnimation(g.team,g.scorer,g.minute);}}
-        })
-        .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_settings'},payload=>{
-          if(payload.new){fyflSettings={...fyflSettings,breaking:payload.new.breaking||fyflSettings.breaking,player:payload.new.player||fyflSettings.player,news:payload.new.news||fyflSettings.news,standings:(payload.new.standings&&typeof payload.new.standings==='object')?payload.new.standings:(fyflSettings.standings||{})};fyflSettingsReady=true;applyAdminPrefs();flashLive();const pg=getCurrentPage();if(['home','news','ranking'].includes(pg))render(pg,false);}
-        })
-        .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_comments'},payload=>{
-          if(payload.eventType==='DELETE'){fyflComments=fyflComments.filter(c=>c.id!==payload.old?.id);}
-          else if(payload.new){const i=fyflComments.findIndex(c=>c.id===payload.new.id);if(i>=0)fyflComments[i]=payload.new;else fyflComments.unshift(payload.new);}
-          flashLive();if(getCurrentPage()==='comments')render('comments',false);
-        })
-        .on('postgres_changes',{event:'INSERT',schema:'public',table:'fyfl_notifications'},payload=>{
-          if(payload.new){fyflNotifications.unshift(payload.new);showGlobalNotification(payload.new);}
-          flashLive();
-        })
-        .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_site_status'},payload=>{if(payload.new){fyflSiteStatus={...fyflSiteStatus,...payload.new};fyflDatabaseStatus='OK';applyMaintenanceUI();updateSiteStatusIndicators();flashLive();}})
-        .on('postgres_changes',{event:'INSERT',schema:'public',table:'fyfl_admin_logs'},payload=>{if(payload.new){fyflAdminLogs.unshift(payload.new);fyflAdminLogs=fyflAdminLogs.slice(0,50);renderAdminLogs();}flashLive();})
-        .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_stats'},payload=>{if(payload.eventType==='DELETE'){fyflStats=fyflStats.filter(x=>x.id!==payload.old?.id)}else if(payload.new){const i=fyflStats.findIndex(x=>x.id===payload.new.id);if(i>=0)fyflStats[i]=payload.new;else fyflStats.unshift(payload.new);}flashLive();const pg=getCurrentPage();if(pg==='stats'||pg==='admin')render(pg,false);})
-        .on('postgres_changes',{event:'*',schema:'public',table:'fyfl_match_mvp'},payload=>{if(payload.eventType==='DELETE'){delete fyflMatchMVPs[payload.old?.match_key];}else if(payload.new?.match_key){fyflMatchMVPs[payload.new.match_key]=payload.new;}const modal=document.getElementById('liveMatchModalContent');const key=modal?.dataset.matchKey;const m=key?findMatchByKey(key):null;if(m)updateLiveMatchModal(m);if(['home','matches'].includes(getCurrentPage())&&!document.getElementById('liveMatchModal'))render(getCurrentPage(),false);flashLive();})
-        .subscribe(status=>{fyflRealtimeStatus=status;updateRealtimeIndicators();if(status==='SUBSCRIBED')initPresence();});
-      await loadOnlineNotifications();
-      initPresence();
-    }catch(e){console.warn('FYFL Supabase:',e);return false}
-    return !!fyflSupabase;
-  })();
-  return fyflInitPromise;
-}
-const allTeams=Object.values(groups).flat();
-const logoUrls={"ASTON VILLA":"https://assets.football-logos.cc/logos/england/1500x1500/aston-villa.5265a6b0.png","OM":"https://assets.football-logos.cc/logos/france/1500x1500/marseille.6f770410.png","BAYER LEVERKUSEN":"https://assets.football-logos.cc/logos/germany/1500x1500/bayer-leverkusen.ada32552.png","NEWCASTLE":"https://assets.football-logos.cc/logos/england/1500x1500/newcastle.c19d66db.png","BARCELONE":"https://assets.football-logos.cc/logos/spain/1500x1500/barcelona.8e8b43a3.png","BESIKTAS":"https://media.api-sports.io/football/teams/549.png","LIVERPOOL":"https://assets.football-logos.cc/logos/england/1500x1500/liverpool.d03fd250.png","REAL MADRID":"https://assets.football-logos.cc/logos/spain/1500x1500/real-madrid.e34f5ba5.png","CRYSTAL PALACE":"https://assets.football-logos.cc/logos/england/1500x1500/crystal-palace.e3552a3a.png","PSG":"https://assets.football-logos.cc/logos/france/1500x1500/paris-saint-germain.976d063a.png","ATLETICO MADRID":"https://assets.football-logos.cc/logos/spain/1500x1500/atletico-madrid.1acb70ea.png","JUVENTUS":"https://assets.football-logos.cc/logos/italy/1500x1500/juventus.309408e0.png","AS MONACO":"https://assets.football-logos.cc/logos/france/1500x1500/as-monaco.1d58091e.png","LAZIO FC":"lazio-fc.png","D2T":"d2t-logo.png","FIORENTINA":"https://assets.football-logos.cc/logos/italy/1500x1500/fiorentina.3a19a902.png","INTER MILAN":"https://assets.football-logos.cc/logos/italy/1500x1500/inter.d4ebfb95.png","RED STAR":"https://commons.wikimedia.org/wiki/Special:FilePath/Red_Star_Belgrade_crest.svg","ARSENAL":"https://assets.football-logos.cc/logos/england/1500x1500/arsenal.d4144b2a.png","AC MILAN":"https://assets.football-logos.cc/logos/italy/1500x1500/milan.6b4c62be.png","RENNES":"https://assets.football-logos.cc/logos/france/1500x1500/rennes.f07dde44.png","CHELSEA":"https://assets.football-logos.cc/logos/england/1500x1500/chelsea.450170ff.png","MANCHESTER CITY":"https://assets.football-logos.cc/logos/england/1500x1500/manchester-city.8d2b6688.png","BAYERN MUNICH":"https://assets.football-logos.cc/logos/germany/1500x1500/bayern-munchen.1eac18e8.png"};
+        var tries = 0;
+        var iv = setInterval(function () {
+          autoStart();
+          // force la vitesse max en continu
+          try { window.unityGame.SendMessage('Game','SetGameSpeed', 200); } catch(e){}
+          try { window.unityGame.SendMessage('Game','LockGameSpeedTo', 200); } catch(e){}
+          try { window.unityGame.SendMessage('Game','SetCurrentSpeed', 200); } catch(e){}
+          tries++;
+          if (tries >= 12) clearInterval(iv);
+        }, 400);
+        // arrête après 6s au cas où
+        setTimeout(function () { clearInterval(iv); }, 6000);
 
+        // maintient la vitesse max toute la run
+        setInterval(function () {
+          try { window.unityGame.SendMessage('Game','SetGameSpeed', 200); } catch(e){}
+          try { window.unityGame.SendMessage('Game','LockGameSpeedTo', 200); } catch(e){}
+          try { window.unityGame.SendMessage('Game','SetCurrentSpeed', 200); } catch(e){}
+        }, 1000);
 
-function getRanking(){return allTeams.map(name=>{const r={name,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
- results.forEach(m=>{
-  if(m.status!=="Terminé") return;
-  if(m.home===name){r.p++;r.gf+=Number(m.hs)||0;r.ga+=Number(m.as)||0;if((Number(m.hs)||0)>(Number(m.as)||0)){r.w++;r.pts+=3}else if((Number(m.hs)||0)===(Number(m.as)||0)){r.d++;r.pts++}else r.l++}
-  if(m.away===name){r.p++;r.gf+=Number(m.as)||0;r.ga+=Number(m.hs)||0;if((Number(m.as)||0)>(Number(m.hs)||0)){r.w++;r.pts+=3}else if((Number(m.as)||0)===(Number(m.hs)||0)){r.d++;r.pts++}else r.l++}
- });r.diff=r.gf-r.ga;
-  const manual=fyflSettings?.standings?.[name];
-  if(manual?.manual){['p','w','d','l','gf','ga','pts','diff'].forEach(k=>{if(Number.isFinite(Number(manual[k])))r[k]=Number(manual[k])});}
-  return r;
-});}
+      })();
+    </script>
+    <script>
+/* ===== sauvegarde + unlock all + no tutorial : tout est ici, dans le HTML ===== */
+/* sauvegarde de base (progression d'origine) deja debloquee */
+window.SEED_SAVE_B64 = "FAAAADkusWONuJPBKjYEgkuIFwLB0KaV2SwAANksAAAQb2JmdXNjYXRlZENvaW5zAD9CDwAQb2JmdXNjYXRlZEtleXMADycAABBvYmZ1c2NhdGVkVW5yZXdhcmRlZENvaW5zAAAAAAADcG93ZXJ1cHMAOgAAABBob3ZlcmJvYXJkAGMAAAAQaGVhZHN0YXJ0MjAwMAAFAAAAEHNjb3JlYm9vc3RlcgAFAAAAAAN1cGdyYWRlcwBLAAAAEGpldHBhY2sABQAAABBzdXBlcnNuZWFrZXJzAAUAAAAQY29pbm1hZ25ldAAFAAAAEGRvdWJsZU11bHRpcGxpZXIABQAAAAAEcGVuZGluZ1Jld2FyZHMABQAAAAADYm9hcmRUaGVtZURhdGEABQAAAAAEdW5sb2NrZWRDaGFyYWN0ZXJzAMwAAAACMAAGAAAAc2xpY2sAAjEABwAAAHRyaWNreQACMgAGAAAAZnJlc2gAAjMABgAAAHNwaWtlAAI0AAcAAAB5dXRhbmkAAjUABQAAAGx1Y3kAAjYABgAAAG5pbmphAAI3AAYAAABmcmFuawACOAAFAAAAa2luZwACOQAHAAAAZnJpenp5AAIxMAAEAAAAdGFnAAIxMQAGAAAAdGFzaGEAAjEyAAQAAAB6b2UAAjEzAAYAAABicm9keQACMTQACAAAAHByaW5jZWsAAANjb2xsZWN0ZWRDaGFyYWN0ZXJUb2tlbnMABQAAAAADc2VsZWN0ZWRPdXRmaXRzAAUAAAAAA3VubG9ja2VkT3V0Zml0cwAFAAAAAAR1bmxvY2tlZEJvYXJkcwAnAAAAAjAACgAAAHN0YXJib2FyZAACMQAKAAAAc3VyZmJvYXJkAAAEaGFzU2tpcHBlZE1pc3Npb25zABEAAAAIMAAACDEAAAgyAAAAEHJ1bnNDb21wbGV0ZWRJbkN1cnJlbnRNaXNzaW9uU2V0AAcAAAAQY3VycmVudE1pc3Npb25TZXQAAQAAAARjdXJyZW50TWlzc2lvblByb2dyZXNzABoAAAAQMAAAAAAAEDEAFAAAABAyAAEAAAAAEG1pc3Npb25TZXRDb21wbGV0ZWRDb3VudAACAAAAEGN1cnJlbnRTa2lwRm9yVmlkZW9NaXNzaW9uSW5kZXgAAAAAAAljdXJyZW50U2tpcEZvclZpZGVvSW5kZXhTZXRBdABsaOvboQEAAAlsYXN0VGltZU1pc3Npb25XYXNTa2lwcGVkRm9yVmlkZW8AACjT7XzH//8IaGFzU2tpcHBlZE1pc3Npb25Gb3JWaWRlb1RoaXNTZXQAAARhY2hpZXZlbWVudFByb2dyZXNzAAUAAAAAEHVucmVwb3J0ZWRHYW1lcwAAAAAACXVucmVwb3J0ZWRHYW1lc1RpbWVTdGFtcAAAKNPtfMf//xBoaWdoU2NvcmUAJgsAAAR1bmxvY2tlZFRyb3BoaWVzACUAAAAIMAAACDEAAAgyAAAIMwAACDQAAAg1AAAINgAACDcAAAADYXdhcmRzUHJvZ3Jlc3MApA8AAANTQ09SRV9QT0lOVFNfU0lOR0xFX0xBTkUA8AAAAAJhY3RpdmVUaWVyVHlwZQAHAAAAQnJvbnplAAJwcm9ncmVzc1RpZXJUeXBlAAcAAABCcm9uemUAAmN1cnJlbnRBY3RpdmVBd2FyZFN0YXRlAAsAAABJblByb2dyZXNzAAJjdXJyZW50UHJvZ3Jlc3NBd2FyZFN0YXRlAAsAAABJblByb2dyZXNzAAlsYXN0QWN0aXZlU3RhdGVDaGFuZ2VEYXRlVGltZQAAKNPtfMf//xBvZmZzZXQA/////wNzdGF0T2Zmc2V0AAUAAAAACGhhc01pZ3JhdGVkVG9Vc2VTdGF0T2Zmc2V0AAAAA09QRU5fWF9TVVBFUl9NWVNURVJZX0JPWEVTAA0BAAACYWN0aXZlVGllclR5cGUABwAAAEJyb256ZQACcHJvZ3Jlc3NUaWVyVHlwZQAHAAAAQnJvbnplAAJjdXJyZW50QWN0aXZlQXdhcmRTdGF0ZQALAAAASW5Qcm9ncmVzcwACY3VycmVudFByb2dyZXNzQXdhcmRTdGF0ZQALAAAASW5Qcm9ncmVzcwAJbGFzdEFjdGl2ZVN0YXRlQ2hhbmdlRGF0ZVRpbWUAACjT7XzH//8Qb2Zmc2V0AP////8Dc3RhdE9mZnNldAAiAAAAEFN1cGVyTXlzdGVyeUJveGVzT3BlbmVkAAAAAAAACGhhc01pZ3JhdGVkVG9Vc2VTdGF0T2Zmc2V0AAEAA1dJTl9YX0pBQ0tQT1RTAAEBAAACYWN0aXZlVGllclR5cGUABwAAAEJyb256ZQACcHJvZ3Jlc3NUaWVyVHlwZQAHAAAAQnJvbnplAAJjdXJyZW50QWN0aXZlQXdhcmRTdGF0ZQALAAAASW5Qcm9ncmVzcwACY3VycmVudFByb2dyZXNzQXdhcmRTdGF0ZQALAAAASW5Qcm9ncmVzcwAJbGFzdEFjdGl2ZVN0YXRlQ2hhbmdlRGF0ZVRpbWUAACjT7XzH//8Qb2Zmc2V0AP////8Dc3RhdE9mZnNldAAWAAAAEEphY2twb3RzV29uAAAAAAAACGhhc01pZ3JhdGVkVG9Vc2VTdGF0T2Zmc2V0AAEAA1NDT1JFX1BPSU5UU19TSU5HTEVfUlVOX05PX0pVTVBfT1JfUk9MTADwAAAAAmFjdGl2ZVRpZXJUeXBlAAcAAABCcm9uemUAAnByb2dyZXNzVGllclR5cGUABwAAAEJyb256ZQACY3VycmVudEFjdGl2ZUF3YXJkU3RhdGUACwAAAEluUHJvZ3Jlc3MAAmN1cnJlbnRQcm9ncmVzc0F3YXJkU3RhdGUACwAAAEluUHJvZ3Jlc3MACWxhc3RBY3RpdmVTdGF0ZUNoYW5nZURhdGVUaW1lAAAo0+18x///EG9mZnNldAD/////A3N0YXRPZmZzZXQABQAAAAAIaGFzTWlncmF0ZWRUb1VzZVN0YXRPZmZzZXQAAAADT1BFTl9YX01ZU1RFUllfQk9YRVMACAEAAAJhY3RpdmVUaWVyVHlwZQAHAAAAQnJvbnplAAJwcm9ncmVzc1RpZXJUeXBlAAcAAABCcm9uemUAAmN1cnJlbnRBY3RpdmVBd2FyZFN0YXRlAAsAAABJblByb2dyZXNzAAJjdXJyZW50UHJvZ3Jlc3NBd2FyZFN0YXRlAAsAAABJblByb2dyZXNzAAlsYXN0QWN0aXZlU3RhdGVDaGFuZ2VEYXRlVGltZQAAKNPtfMf//xBvZmZzZXQA/////wNzdGF0T2Zmc2V0AB0AAAAQTXlzdGVyeUJveGVzT3BlbmVkAAAAAAAACGhhc01pZ3JhdGVkVG9Vc2VTdGF0T2Zmc2V0AAEAA1BJQ0tfWF9LRVlTX0lOR0FNRQADAQAAAmFjdGl2ZVRpZXJUeXBlAAcAAABCcm9uemUAAnByb2dyZXNzVGllclR5cGUABwAAAEJyb256ZQACY3VycmVudEFjdGl2ZUF3YXJkU3RhdGUACwAAAEluUHJvZ3Jlc3MAAmN1cnJlbnRQcm9ncmVzc0F3YXJkU3RhdGUACwAAAEluUHJvZ3Jlc3MACWxhc3RBY3RpdmVTdGF0ZUNoYW5nZURhdGVUaW1lAAAo0+18x///EG9mZnNldAD/////A3N0YXRPZmZzZXQAGAAAABBLZXlzQ29sbGVjdGVkAAAAAAAACGhhc01pZ3JhdGVkVG9Vc2VTdGF0T2Zmc2V0AAEAA0NPTExFQ1RfQ09JTlNfU0lOR0xFX1JVTgDwAAAAAmFjdGl2ZVRpZXJUeXBlAAcAAABCcm9uemUAAnByb2dyZXNzVGllclR5cGUABwAAAEJyb256ZQACY3VycmVudEFjdGl2ZUF3YXJkU3RhdGUACwAAAEluUHJvZ3Jlc3MAAmN1cnJlbnRQcm9ncmVzc0F3YXJkU3RhdGUACwAAAEluUHJvZ3Jlc3MACWxhc3RBY3RpdmVTdGF0ZUNoYW5nZURhdGVUaW1lAAAo0+18x///EG9mZnNldAD/////A3N0YXRPZmZzZXQABQAAAAAIaGFzTWlncmF0ZWRUb1VzZVN0YXRPZmZzZXQAAAADSEFWRV9TVVBFUlNOSUNLRVJTX0FDVElWRV9YX01JTl9JTl9BX1JPVwDwAAAAAmFjdGl2ZVRpZXJUeXBlAAcAAABCcm9uemUAAnByb2dyZXNzVGllclR5cGUABwAAAEJyb256ZQACY3VycmVudEFjdGl2ZUF3YXJkU3RhdGUACwAAAEluUHJvZ3Jlc3MAAmN1cnJlbnRQcm9ncmVzc0F3YXJkU3RhdGUACwAAAEluUHJvZ3Jlc3MACWxhc3RBY3RpdmVTdGF0ZUNoYW5nZURhdGVUaW1lAAAo0+18x///EG9mZnNldAD/////A3N0YXRPZmZzZXQABQAAAAAIaGFzTWlncmF0ZWRUb1VzZVN0YXRPZmZzZXQAAAADQ09NUExFVEVfTUlTU0lPTlNfU0lOR0xFX1JVTgDxAAAAAmFjdGl2ZVRpZXJUeXBlAAcAAABCcm9uemUAAnByb2dyZXNzVGllclR5cGUABwAAAFNpbHZlcgACY3VycmVudEFjdGl2ZUF3YXJkU3RhdGUADAAAAENvbGxlY3RpYmxlAAJjdXJyZW50UHJvZ3Jlc3NBd2FyZFN0YXRlAAsAAABJblByb2dyZXNzAAlsYXN0QWN0aXZlU3RhdGVDaGFuZ2VEYXRlVGltZQB49+PboQEAABBvZmZzZXQA/////wNzdGF0T2Zmc2V0AAUAAAAACGhhc01pZ3JhdGVkVG9Vc2VTdGF0T2Zmc2V0AAAAA1NDT1JFX1BPSU5UU19TSU5HTEVfUlVOX05PX0NPSU5TAPAAAAACYWN0aXZlVGllclR5cGUABwAAAEJyb256ZQACcHJvZ3Jlc3NUaWVyVHlwZQAHAAAAQnJvbnplAAJjdXJyZW50QWN0aXZlQXdhcmRTdGF0ZQALAAAASW5Qcm9ncmVzcwACY3VycmVudFByb2dyZXNzQXdhcmRTdGF0ZQALAAAASW5Qcm9ncmVzcwAJbGFzdEFjdGl2ZVN0YXRlQ2hhbmdlRGF0ZVRpbWUAACjT7XzH//8Qb2Zmc2V0AP////8Dc3RhdE9mZnNldAAFAAAAAAhoYXNNaWdyYXRlZFRvVXNlU3RhdE9mZnNldAAAAANQSUNLVVBfUE9XRVJVUFMAAwEAAAJhY3RpdmVUaWVyVHlwZQAHAAAAQnJvbnplAAJwcm9ncmVzc1RpZXJUeXBlAAcAAABCcm9uemUAAmN1cnJlbnRBY3RpdmVBd2FyZFN0YXRlAAsAAABJblByb2dyZXNzAAJjdXJyZW50UHJvZ3Jlc3NBd2FyZFN0YXRlAAsAAABJblByb2dyZXNzAAlsYXN0QWN0aXZlU3RhdGVDaGFuZ2VEYXRlVGltZQAAKNPtfMf//xBvZmZzZXQA/////wNzdGF0T2Zmc2V0ABgAAAAQUGlja3VwUG93ZXJ1cAAAAAAAAAhoYXNNaWdyYXRlZFRvVXNlU3RhdE9mZnNldAABAANDT01QTEVURV9YX01JU1NJT05TAAYBAAACYWN0aXZlVGllclR5cGUABwAAAEJyb256ZQACcHJvZ3Jlc3NUaWVyVHlwZQAHAAAAQnJvbnplAAJjdXJyZW50QWN0aXZlQXdhcmRTdGF0ZQALAAAASW5Qcm9ncmVzcwACY3VycmVudFByb2dyZXNzQXdhcmRTdGF0ZQALAAAASW5Qcm9ncmVzcwAJbGFzdEFjdGl2ZVN0YXRlQ2hhbmdlRGF0ZVRpbWUAACjT7XzH//8Qb2Zmc2V0AP////8Dc3RhdE9mZnNldAAbAAAAEE1pc3Npb25Db21wbGV0ZWQAAAAAAAAIaGFzTWlncmF0ZWRUb1VzZVN0YXRPZmZzZXQAAQADQ09MTEVDVF9PTERfVFJPUEhZX0lURU1TX01CADABAAACYWN0aXZlVGllclR5cGUABwAAAEJyb256ZQACcHJvZ3Jlc3NUaWVyVHlwZQAHAAAAQnJvbnplAAJjdXJyZW50QWN0aXZlQXdhcmRTdGF0ZQALAAAASW5Qcm9ncmVzcwACY3VycmVudFByb2dyZXNzQXdhcmRTdGF0ZQALAAAASW5Qcm9ncmVzcwAJbGFzdEFjdGl2ZVN0YXRlQ2hhbmdlRGF0ZVRpbWUAACjT7XzH//8Qb2Zmc2V0AP////8Dc3RhdE9mZnNldABFAAAAEEdvbGRDaGFpbkNsb2NrAAAAAAAQSGVhZHBob25lcwAAAAAAEFRhcGVCbGFjawAAAAAAEExwQmxhY2sAAAAAAAAIaGFzTWlncmF0ZWRUb1VzZVN0YXRPZmZzZXQAAQADQ09MTEVDVF9PTERfVFJPUEhZX0lURU1TX1NNQgAuAQAAAmFjdGl2ZVRpZXJUeXBlAAcAAABCcm9uemUAAnByb2dyZXNzVGllclR5cGUABwAAAEJyb256ZQACY3VycmVudEFjdGl2ZUF3YXJkU3RhdGUACwAAAEluUHJvZ3Jlc3MAAmN1cnJlbnRQcm9ncmVzc0F3YXJkU3RhdGUACwAAAEluUHJvZ3Jlc3MACWxhc3RBY3RpdmVTdGF0ZUNoYW5nZURhdGVUaW1lAAAo0+18x///EG9mZnNldAD/////A3N0YXRPZmZzZXQAQwAAABBHb2xkQ2hhaW5Eb2xsYXIAAAAAABBHb2xkU2t1bGwAAAAAABBHb2xkYmFyAAAAAAAQRGlhbW9uZAAAAAAAAAhoYXNNaWdyYXRlZFRvVXNlU3RhdE9mZnNldAABAAAJd2Vla2x5R2lmdFVubG9ja1RpbWUAACjT7XzH//8Ec3RhdFZhbHVlcwAjAQAAEDAAAAAAABAxAAAAAAAQMgAAAAAAEDMAAAAAABA0AAAAAAAQNQAAAAAAEDYAAAAAABA3AAAAAAAQOAAAAAAAEDkAAAAAABAxMAAAAAAAEDExAAAAAAAQMTIAAAAAABAxMwAEAAAAEDE0AAAAAAAQMTUAAAAAABAxNgAAAAAAEDE3AAAAAAAQMTgAAAAAABAxOQAAAAAAEDIwAAAAAAAQMjEAAAAAABAyMgAAAAAAEDIzAAAAAAAQMjQAAAAAABAyNQAGAAAAEDI2AAAAAAAQMjcAAAAAABAyOAAAAAAAEDI5AAIAAAAQMzAAAAAAABAzMQAAAAAAEDMyAAAAAAAQMzMAAAAAABAzNAAAAAAAEDM1AAAAAAAQMzYAAAAAAAAEbXlzdGVyeUJveGVzT3BlbmVkABoAAAAQMAABAAAAEDEAAAAAABAyAAAAAAAAEGNvbXBsZXRlZFJ1bkNvdW50ABcAAAACY3VycmVudENoYXJhY3RlcklkAAYAAABzbGljawACY3VycmVudEJvYXJkSWQABwAAAG5vcm1hbAACcHJldmlvdXNCb2FyZElkAAcAAABub3JtYWwAA2F3YXJkSXNOZXcAkQEAAAhDT0xMRUNUX09MRF9UUk9QSFlfSVRFTVNfTUIAAAhDT0xMRUNUX09MRF9UUk9QSFlfSVRFTVNfU01CAAAIQ09NUExFVEVfWF9NSVNTSU9OUwAACFBJQ0tVUF9QT1dFUlVQUwAACFNDT1JFX1BPSU5UU19TSU5HTEVfUlVOX05PX0NPSU5TAAAIQ09NUExFVEVfTUlTU0lPTlNfU0lOR0xFX1JVTgAACEhBVkVfU1VQRVJTTklDS0VSU19BQ1RJVkVfWF9NSU5fSU5fQV9ST1cAAAhDT0xMRUNUX0NPSU5TX1NJTkdMRV9SVU4AAAhQSUNLX1hfS0VZU19JTkdBTUUAAAhPUEVOX1hfTVlTVEVSWV9CT1hFUwAACFNDT1JFX1BPSU5UU19TSU5HTEVfUlVOX05PX0pVTVBfT1JfUk9MTAAACFdJTl9YX0pBQ0tQT1RTAAAIT1BFTl9YX1NVUEVSX01ZU1RFUllfQk9YRVMAAAhTQ09SRV9QT0lOVFNfU0lOR0xFX0xBTkUAAAADYXdhcmRIYXNQYXllZE91dACRAQAACENPTExFQ1RfT0xEX1RST1BIWV9JVEVNU19NQgAACENPTExFQ1RfT0xEX1RST1BIWV9JVEVNU19TTUIAAAhDT01QTEVURV9YX01JU1NJT05TAAAIUElDS1VQX1BPV0VSVVBTAAAIU0NPUkVfUE9JTlRTX1NJTkdMRV9SVU5fTk9fQ09JTlMAAAhDT01QTEVURV9NSVNTSU9OU19TSU5HTEVfUlVOAAAISEFWRV9TVVBFUlNOSUNLRVJTX0FDVElWRV9YX01JTl9JTl9BX1JPVwAACENPTExFQ1RfQ09JTlNfU0lOR0xFX1JVTgAACFBJQ0tfWF9LRVlTX0lOR0FNRQAACE9QRU5fWF9NWVNURVJZX0JPWEVTAAAIU0NPUkVfUE9JTlRTX1NJTkdMRV9SVU5fTk9fSlVNUF9PUl9ST0xMAAAIV0lOX1hfSkFDS1BPVFMAAAhPUEVOX1hfU1VQRVJfTVlTVEVSWV9CT1hFUwAACFNDT1JFX1BPSU5UU19TSU5HTEVfTEFORQAAAAhhd2FyZHNGaXJzdExvYWRlZAABAndlZWtseUh1bnRQcm9ncmVzc1ZlcnNpb24ABAAAADEuMAAEaGFzTG9nZ2VkV2Vla2x5SHVudFBlcmlvZAAVAAAACDAAAQgxAAEIMgABCDMAAQADd2Vla2x5SHVudFByb2dyZXNzRGF0YQBfAAAAAmh1bnRTdGFydFZlcnNpb24AFAAAADA5LzEzLzIwMTggMDA6MDA6MDAABHRva2VuUHJvZ3Jlc3MAIQAAABAwAAAAAAAQMQAAAAAAEDIAAAAAABAzAAAAAAAAABB3b3JkSHVudFdvcmRzSW5Sb3cAAQAAAAh3b3JkSHVudFBheWVkT3V0AAEQd29yZEh1bnRVbmxvY2tlZE1hc2sADwAAABB3b3JkSHVudExhc3RQYXlvdXREYXlPZlllYXIAPgEAAANjaGFyYWN0ZXJOYW1lRXZlbnREYXRhAN0AAAACY3VycmVudENoYXJhY3RlcgAGAAAAc2xpY2sAEGNvbGxlY3RlZExldHRlckluZGV4AP////8Qc2tpcHBlZENoYXJhY3RlcnMAAAAAAAh3YXNMYXN0Q2hhcmFjdGVyQ29tcGxldGVkAAAQY29tcGxldGVkQ2hhcmFjdGVycwAAAAAABGNoYXJhY3RlcnNMaXN0AAUAAAAABGNhdGVnb3J5V29yZHNMaXN0AAUAAAAAEmV2ZW50SUQAAAAAAAAAAAACZXZlbnRDYXRlZ29yeQAFAAAAQ2F0MQAAEmxhc3RFdmVudElEAAAAAAAAAAAAEmxhc3RUaW1lQW5FdmVudEhhc0JlZW5UcmllZAAAAAAAAAAAABJsYXN0VGltZUFuRXZlbnRXYXNTdGFydGVkAK7L+GoAAAAAEmxhc3RUaW1lRXZlbnRQb3B1cFdhc0ZvcmNlU2hvd24AAAAAAAAAAAACbGFzdEV2ZW50SXRlbUlEAAEAAAAACHNob3VsZFJlc3RvcmVJdGVtQWZ0ZXJFdmVudAAAAndvcmRIdW50RGFpbHlXb3JkAAUAAABSVVNIAAl3b3JkSHVudEV4cGlyZVRpbWUAge6A3KEBAAACc3lib0FuYWx5dGljc1NhbXBsZVN0YXRlAAoAAABVbnNhbXBsZWQAAnN5Ym9BbmFseXRpY3NVc2VySWQAAQAAAAACc3lib0FnZ3JlZ2F0ZWREYXRhU3RyaW5nAAEAAAAAA3N5Ym9BbmFseXRpY3NVbmhhbmRsZWRBYlRlc3REYXRhAAUAAAAAEHN5Ym9BbmFseXRpY3NDdXJyZW50U2Vzc2lvbgD/////CGtpbG9vQW5hbHl0aWNzSGFzTG9nZ2VkU3lib1VzZXJJZAAAEHBlcnNpc3RlZFNlc3Npb25FdmVudE51bWJlcgD/////A21hbmFnZXJEYXRhAG8AAAAJbGFzdFN1Ym1pdHRlZFNjb3JlU3RhcnRUaW1lAAAo0+18x///CWxhc3RTdWJtaXR0ZWRTY29yZUVuZFRpbWUAACjT7XzH//8QdW5zdWJtaXR0ZWRTY29yZU5vVG91cm5hbWVudAAAAAAAAAJsYXN0VG9wUnVuUmVzdWx0QXdhcmRlZElEAAEAAAAAAnBlbmRpbmdUb3BSdW5SZXN1bHRJRAABAAAAABBwZW5kaW5nVG9wUnVuUmVzdWx0c1Njb3JlAP////8QcGVuZGluZ1RvcFJ1blJlc3VsdHNSYW5rAP////8QcGVuZGluZ1RvcFJ1blJlc3VsdHNXZWVrAP////8QcGVuZGluZ1RvcFJ1bkJlYXRlbkZyaWVuZHNBd2FyZAAAAAAACGJlaGF2aW9yYWxBZHNBbGxvd2VkAAEDaW50ZXJzdGl0aWFsU3RhdHMAewAAAANsaXN0VmVyc2lvbkZvcklEAAUAAAAAEHNlZW5UaGlzSG91cgABAAAAEGN1cnJlbnRIb3VyAM34DgEQc2VlblRoaXNEYXkAAQAAABBjdXJyZW50RGF5AF1KCwAIaGFzU2VlbkZpcnN0SW50ZXJzdGl0aWFsAAAAA2NvbnN1bWFibGVTZWVuVmlkZW9zQ291bnQABQAAAAADY29uc3VtYWJsZVZpZGVvU2VlbkF0AAUAAAAAA2Nvb2xkb3ducwB4AAAAA2FjdGl2ZUNvb2xkb3ducwBiAAAAA2NvaW5zAFYAAAACaWQABgAAAGNvaW5zABB0b3RhbENoYXJnZXMAAgAAABB1c2VkQ2hhcmdlcwAAAAAAEHNlY29uZHMAgHAAAAlzdGFydFRpbWUAACjT7XzH//8AAAAQaW5BcHBMZWdhY3lQdXJjaGFzZUNvdW50AAAAAAAQaW5BcHBDb25zdW1hYmxlUHVyY2hhc2VDb3VudAAAAAAAEGluQXBwUmVzdG9yZWRQdXJjaGFzZUNvdW50AAAAAAAQaW5BcHBOb25Db25zdW1hYmxlUHVyY2hhc2VDb3VudAAAAAAACGlzRnJlc2hJbnN0YWxsAAEIaGFzVXNlclJ1bkFwcEJlZm9yZQABCWxhc3REYWlseU9ubGluZUxvZwAAKNPtfMf//wlsYXN0UGxheURhdGUAACjT7XzH//8JbGFzdFF1aXREYXRlAAAo0+18x///Amxhc3RQdXJjaGFzZWRCdW5kbGUABQAAAE5vbmUACGhhc1BhaWRPdXRGYWNlYm9va1Jld2FyZAAACGhhc1NlZW5Gcm9udFNjcmVlbkZpcnN0VGltZQABCGhhc01hZGVPbmVWYWxpZFB1cmNoYXNlAAACZmlyc3RJbnN0YWxsZWRWZXJzaW9uAAEAAAAACWZpcnN0SW5zdGFsbERhdGUAgGXb26EBAAAIaGFzRG91YmxlQ29pbnNVcGdyYWRlAAAIaGFzQWRSZW1vdmFsVXBncmFkZQAAA2hhc0NoYXJhY3RlckJlZW5TZWVuAAUAAAAAA2hhc0JvYXJkQmVlblNlZW4ABQAAAAADY2hhcmFjdGVyT3V0Zml0c1NlZW4A5wAAAARraW5nAAwAAAAQMAAAAAAAAAR0YWcADAAAABAwAAAAAAAABHpvZQAMAAAAEDAAAAAAAAAEYnJvZHkADAAAABAwAAAAAAAABGx1Y3kADAAAABAwAAAAAAAABHRhc2hhAAwAAAAQMAAAAAAAAARwcmluY2VrAAwAAAAQMAAAAAAAAARmcmFuawAMAAAAEDAAAAAAAAAEZnJpenp5AAwAAAAQMAAAAAAAAAR0cmlja3kADAAAABAwAAAAAAAABGZyZXNoAAwAAAAQMAAAAAAAAARzcGlrZQAMAAAAEDAAAAAAAAAABGNvbGxlY3RDb2luc0R1bW15RGF0YQAjBAAAAzAASAAAAAJuYW1lABQAAABEVU1NWV9GUklFTkRfTkFNRV8xAAhoYXNCZWVuQ29sbGVjdGVkAAAQZmFrZVByb2dyZXNzAAAAAAAAAzEASAAAAAJuYW1lABQAAABEVU1NWV9GUklFTkRfTkFNRV8yAAhoYXNCZWVuQ29sbGVjdGVkAAAQZmFrZVByb2dyZXNzAAAAAAAAAzIASAAAAAJuYW1lABQAAABEVU1NWV9GUklFTkRfTkFNRV8zAAhoYXNCZWVuQ29sbGVjdGVkAAAQZmFrZVByb2dyZXNzAAAAAAAAAzMASAAAAAJuYW1lABQAAABEVU1NWV9GUklFTkRfTkFNRV8xAAhoYXNCZWVuQ29sbGVjdGVkAAEQZmFrZVByb2dyZXNzABgAAAAAAzQASAAAAAJuYW1lABQAAABEVU1NWV9GUklFTkRfTkFNRV81AAhoYXNCZWVuQ29sbGVjdGVkAAEQZmFrZVByb2dyZXNzABYAAAAAAzUASAAAAAJuYW1lABQAAABEVU1NWV9GUklFTkRfTkFNRV82AAhoYXNCZWVuQ29sbGVjdGVkAAEQZmFrZVByb2dyZXNzABMAAAAAAzYASAAAAAJuYW1lABQAAABEVU1NWV9GUklFTkRfTkFNRV83AAhoYXNCZWVuQ29sbGVjdGVkAAEQZmFrZVByb2dyZXNzAA8AAAAAAzcASAAAAAJuYW1lABQAAABEVU1NWV9GUklFTkRfTkFNRV8zAAhoYXNCZWVuQ29sbGVjdGVkAAEQZmFrZVByb2dyZXNzAA4AAAAAAzgASAAAAAJuYW1lABQAAABEVU1NWV9GUklFTkRfTkFNRV84AAhoYXNCZWVuQ29sbGVjdGVkAAEQZmFrZVByb2dyZXNzAAoAAAAAAzkASAAAAAJuYW1lABQAAABEVU1NWV9GUklFTkRfTkFNRV8xAAhoYXNCZWVuQ29sbGVjdGVkAAEQZmFrZVByb2dyZXNzAAcAAAAAAzEwAEgAAAACbmFtZQAUAAAARFVNTVlfRlJJRU5EX05BTUVfOQAIaGFzQmVlbkNvbGxlY3RlZAABEGZha2VQcm9ncmVzcwACAAAAAAMxMQBIAAAAAm5hbWUAFAAAAERVTU1ZX0ZSSUVORF9OQU1FXzQACGhhc0JlZW5Db2xsZWN0ZWQAARBmYWtlUHJvZ3Jlc3MAAgAAAAADMTIASAAAAAJuYW1lABQAAABEVU1NWV9GUklFTkRfTkFNRV8yAAhoYXNCZWVuQ29sbGVjdGVkAAEQZmFrZVByb2dyZXNzAAEAAAAAAzEzAEgAAAACbmFtZQAUAAAARFVNTVlfRlJJRU5EX05BTUVfMwAIaGFzQmVlbkNvbGxlY3RlZAABEGZha2VQcm9ncmVzcwAAAAAAAAADZWFybkN1cnJlbmN5RGF0YQAFAAAAAANpbkFwcFB1cmNoYXNlSGlzdG9yeQAFAAAAABBudW1iZXJPZkJyZWFkQ3J1bWJzU2hvd25PbkZyb250UGFnZQAQAAAAEGFnZVJlc3RyaWN0aW9uSW5wdXRWZXJzaW9uAAEAAAAQYWdlUmVzdHJpY3Rpb25JbnB1dE1vbnRoAAsAAAAQYWdlUmVzdHJpY3Rpb25JbnB1dFllYXIAzwcAAANicmVhZGNydW1icwBaAAAAAmxhc3REYWlseVdvcmQABQAAAFJVU0gAEndlZWtseUh1bnRQZXJpb2RFeHBpcmVEYXRlVGlja3MAAAAAAAAAAAAQbGFzdE1pc3Npb25TZXQAAgAAAAACbGFzdEV2ZW50VHlwZVNob3duAAUAAABOb25lAAlsYXN0RXZlbnRTaG93blRpbWVzdGFtcAAAKNPtfMf//wJsYXN0U2VlbkJ1bmRsZVZlcnNpb24ABAAAADEuMAAJbGFzdFRpbWVBVmlkZW9Gb3JLZXlzV2FzU2VlbgAAKNPtfMf//wl3ZWxjb21lUGFja1N0YXJ0VGltZQAAKNPtfMf//xBjdXJyZW50SW50cm9WaWRlb0FkUHJpemVJbmRleAAAAAAAEGN1cnJlbnRSYW5kb21WaWRlb0FkUHJpemVJbmRleAAAAAAAEGN1cnJlbnRWaWRlb0FkUHJpemVTZWVkAFBz0VUQdmlkZW9zV2F0Y2hlZFNpbmNlRGFpbHlLZXlzAAAAAAADZnJpZW5kU3RhdHVzAAUAAAAACGFsbG93U2VsbEhlYWRzdGFydER1cmluZ1J1bgAACGFsbG93U2VsbFNjb3JlYm9vc3RlckR1cmluZ1J1bgAACGhhc0NvbGxlY3RlZEZyb21GcmllbmRzAAAIaGFzU2hvd25Db2xsZWN0UG9wdXAAAAhoYXNTaG93bkZhY2Vib29rUG9wdXAAAAhoYXNTaG93bkhvdmVyYm9hcmRQb3B1cAAACGhhc1Nob3duTWlzc2lvbkludHJvUG9wdXAAAAhoYXNTaG93bkVuZEdhbWVNaXNzaW9uUG9wdXAAAAhpc1R1dG9yaWFsQ29tcGxldGVkAAEIc2hvdWxkU2hvd0NvbGxlY3RQb3B1cAAACHNob3VsZFNob3dGYWNlYm9va1BvcHVwAAAIc2hvdWxkU2hvd0hvdmVyYm9hcmRQb3B1cAABCHNob3VsZFNob3dNaXNzaW9uSW50cm9kdWN0aW9uUG9wdXAAAAhzaG91bGRTaG93RW5kR2FtZU1pc3Npb25Qb3B1cAAAEGxhc3RTaG93blRvcFJ1bkludHJvUG9wdXBWZXJzaW9uTnVtYmVyAAAAAAAIbmV2ZXJBc2tGb3JSYXRpbmcAAAJsYW5ndWFnZQABAAAAAAhzb3VuZEVmZmVjdHNFbmFibGVkAAEIbXVzaWNFbmFibGVkAAEIdG9wUnVuQ2hhbGxlbmdlcnNFbmFibGVkAAEIcmVtb3RlTm90aWZpY2F0aW9uc0VuYWJsZWQAARBsb2NhbE5vdGlmaWNhdGlvbnNFbmFibGVkAP////8IaGFzTG9nZ2VkU3RhdGljRGF0YQAACWxhc3RMb2dnZWREYWlseURhdGEAACjT7XzH//8BYW5hbHl0aWNzU2FtcGxpbmdLZXkAAAAAwPOZmj8JYWJUZXN0TGFzdERhaWx5RXZlbnRzUmVwb3J0RGF0ZQAAKNPtfMf//wJhYlRlc3RQbGF5ZXJTZWVkAAoAAAA4OTcxMTg0NTQAAmFiVGVzdFRhZ0RhdGEAAQAAAAACZmx1cnJ5VXNlcklkAAEAAAAACGhhc0xvZ2dlZEdhbWVDZW50ZXJMb2dpbgAACGhhc0xvZ2dlZEZhY2Vib29rTG9naW4AAANoYXNMb2dnZWRGbHVycnlEYWlseUV2ZW50U29jaWFsAAUAAAAAAA==";
 
-function initials(n){let a=n.split(" ");return (a.length>1?a[0][0]+a[1][0]:n.slice(0,3)).toUpperCase()}
-function crest(n, cls="team-logo"){const u=logoUrls[n]; return u?`<img class="${cls}" src="${u}" alt="${n}" loading="lazy">`:""}
-function sortedGroup(g){return getRanking().filter(t=>groups[g].includes(t.name)).sort((a,b)=>b.pts-a.pts||b.diff-a.diff||b.gf-a.gf)}
-function table(data){return `<div class="card table-wrap"><table><thead><tr><th>#</th><th>Équipe</th><th>MJ</th><th>V</th><th>N</th><th>D</th><th>BP</th><th>BC</th><th>Diff</th><th>Pts</th></tr></thead><tbody>${data.map((t,i)=>`<tr><td class="pos">${i+1}</td><td class="team-cell">${crest(t.name,"table-logo")}${!logoUrls[t.name]?`<span class="mini-badge">${initials(t.name)}</span>`:""}${t.name}</td><td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gf}</td><td>${t.ga}</td><td>${t.diff>0?"+":""}${t.diff}</td><td class="pts">${t.pts}</td></tr>`).join("")}</tbody></table></div>`}
-function getMatchMinute(m){if(m.status!=="En direct")return Math.max(0,Number(m.minute)||0);if(m.startedAt){return Math.min(130,Math.max(0,Math.floor((Date.now()-m.startedAt)/60000)));}return Math.max(0,Number(m.minute)||0)}
-function liveMatchKey(m){return fyflMatchKey({...m,day:m.day||findMatchDay(m)})}
-function findMatchByKey(key){return results.find(m=>liveMatchKey(m)===key)||null}
-function openLiveMatch(encodedKey){const key=decodeURIComponent(encodedKey);const m=findMatchByKey(key);if(!m||!['En direct','Terminé'].includes(m.status))return;let old=document.getElementById('liveMatchModal');if(old)old.remove();const el=document.createElement('div');el.id='liveMatchModal';el.className='live-match-modal';el.onclick=e=>{if(e.target===el)closeLiveMatch()};el.innerHTML=`<div class="live-match-panel"><div class="live-match-top"><h2>${m.status==='En direct'?'🔴 Match en direct':'✅ Match terminé'}</h2><button class="live-close" onclick="closeLiveMatch()">×</button></div><div id="liveMatchModalContent"></div></div>`;document.body.appendChild(el);updateLiveMatchModal(m)}
-function closeLiveMatch(){document.getElementById('liveMatchModal')?.remove()}
-function updateLiveMatchModal(m){const el=document.getElementById('liveMatchModalContent');if(!el||!m)return;const goals=(m.goals||[]).slice().sort((a,b)=>(Number(a.minute)||0)-(Number(b.minute)||0));const key=liveMatchKey(m);el.dataset.matchKey=key;const live=m.status==='En direct';const mvp=fyflMatchMVPs[key];const mvpHtml=!live&&mvp?`<div class="mvp-card"><div class="mvp-title">🏆 HOMME DU MATCH</div><div class="mvp-name">${escapeHtml(mvp.player_name)}</div><div class="mvp-stats">${Number(mvp.goals)||0} but${(Number(mvp.goals)||0)>1?'s':''}${Number(mvp.assists)||0?` · ${Number(mvp.assists)} passe${Number(mvp.assists)>1?'s':''}`:''} · ${Number(mvp.rating)||0} pts</div></div>`:'';el.innerHTML=`<div class="live-scoreboard"><div class="live-team">${crest(m.home,'team-logo')}<div>${escapeHtml(m.home)}</div></div><div><div class="live-score">${Number(m.hs)||0} — ${Number(m.as)||0}</div><span class="live-clock">${live?'🔴 '+getMatchMinute(m)+"'":'✅ Terminé'}</span></div><div class="live-team">${crest(m.away,'team-logo')}<div>${escapeHtml(m.away)}</div></div></div>${mvpHtml}<div class="live-events"><h3>⚽ Buteurs</h3>${goals.length?goals.map(g=>`<div class="live-goal"><span class="live-goal-minute">${escapeHtml(g.minute)}'</span><span class="live-goal-team">${escapeHtml(g.team)}</span><span class="live-goal-scorer">${escapeHtml(g.scorer||'Buteur')}</span></div>`).join(''):'<div class="live-empty">Aucun but enregistré.</div>'}</div>`}
-function refreshOpenLiveMatch(m){const modal=document.getElementById('liveMatchModal');if(!modal)return;if(!m){closeLiveMatch();return}if(document.getElementById('liveMatchModalContent')?.dataset.matchKey===liveMatchKey(m))updateLiveMatchModal(m)}
-function matchCard(m){const live=m.status==='En direct';const upcoming=m.status==='À venir';const finished=m.status==='Terminé';const statusHtml=live?`<span class="live-pill"><span class="live-dot"></span> En direct</span>`:(upcoming?`<span style="color:#ffb16f;font-weight:900">À venir</span>`:`<span style="color:#7ee787;font-weight:900">Terminé</span>`);const score=upcoming?'VS':`${m.hs} — ${m.as}`;const minute=live?`<span class="live-minute">🔴 ${getMatchMinute(m)}'</span>`:(finished?`<span style="opacity:.65">${m.minute||90}'</span>`:'');const clickable=live||finished;const key=encodeURIComponent(fyflMatchKey({...m,day:m.day||findMatchDay(m)}));return `<div class="card match-card ${live?'live-match':''} ${clickable?'clickable-match':''}" ${clickable?`onclick="openLiveMatch('${key}')"`:''}><div class="date">${statusHtml} · Journée ${m.day} · Poule ${m.group} ${minute}</div><div class="match"><div class="team">${crest(m.home,'team-logo')}<div>${m.home}</div></div><div class="score">${score}</div><div class="team">${crest(m.away,'team-logo')}<div>${m.away}</div></div></div>${live?`<div class="live-ticker">⏱️ MATCH EN DIRECT · ${getMatchMinute(m)} minutes</div><div class="live-click-hint">👆 Cliquer pour voir les buteurs et les minutes</div>`:finished?`<div class="live-click-hint">👆 Cliquer pour voir les buteurs et les minutes</div>`:''}</div>`}
-function groupBlock(g){const arr=groups[g];const pairs=[[[arr[0],arr[1]],1],[[arr[2],arr[3]],1],[[arr[0],arr[2]],2],[[arr[1],arr[3]],2],[[arr[0],arr[3]],3],[[arr[1],arr[2]],3]];const upcoming=pairs.filter(([[h,a]])=>!results.some(x=>x.status==="Terminé"&&((x.home===h&&x.away===a)||(x.home===a&&x.away===h))));return `<div class="group-title"><span>POULE ${g}</span><span class="group-count">4 équipes</span></div>${table(sortedGroup(g))}<div class="group-fixtures-title">⚽ Matchs à venir · Poule ${g}</div><div class="fixtures">${upcoming.length?upcoming.map(([[h,a],day])=>`<div class="fixture"><span><small style="opacity:.65">J${day}</small> ${crest(h,"mini-logo")}${h}</span><b>VS</b><span>${crest(a,"mini-logo")}${a}</span><em>À venir</em></div>`).join(""):`<div class="fixture"><span>Tous les matchs de la poule sont joués</span></div>`}</div>`}
-function getSession(){return localStorage.getItem("fyfl_session")||""}
-function setSession(name){if(name)localStorage.setItem("fyfl_session",name);else localStorage.removeItem("fyfl_session");updateAuthUI()}
-function updateAuthUI(){const el=document.getElementById("authActions");if(!el)return;const user=getSession();const admin=isCurrentAccountAdminVerified();el.innerHTML=user?`<span class="auth-user">${escapeHtml(user)}</span><button class="admin-btn" type="button" onclick="openAdmin()">Admin${admin?" ✓":""}</button><button type="button" onclick="logout()">Déconnexion</button>`:`<button class="admin-btn" type="button" onclick="openAdmin()">Admin${admin?" ✓":""}</button><button type="button" onclick="openAuth('login')">Se connecter</button><button class="primary" type="button" onclick="openAuth('register')">S'inscrire</button>`}
-function escapeHtml(v){return String(v).replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c]))}
-function openAuth(mode="login"){const register=mode==="register";const wrap=document.createElement("div");wrap.className="modal-backdrop";wrap.id="authModal";wrap.innerHTML=`<div class="modal"><h2>${register?"Créer un compte":"Se connecter"}</h2><p>${register?"Choisis un pseudo unique et un mot de passe.":"Entre les identifiants de ton compte FYFL."}</p><input id="authPseudo" maxlength="20" placeholder="Pseudo" autocomplete="username"><input id="authPassword" type="password" maxlength="60" placeholder="Mot de passe" autocomplete="${register?"new-password":"current-password"}"><div class="auth-error" id="authError"></div><div class="modal-actions"><button onclick="closeAuth()">Annuler</button><button class="primary" onclick="submitAuth('${register?"register":"login"}')">${register?"S'inscrire":"Se connecter"}</button></div></div>`;document.body.appendChild(wrap);wrap.addEventListener("click",e=>{if(e.target===wrap)closeAuth()});setTimeout(()=>document.getElementById("authPseudo")?.focus(),50)}
-function closeAuth(){document.getElementById("authModal")?.remove()}
-async function submitAuth(mode){const pseudo=(document.getElementById("authPseudo")?.value||"").trim();const password=document.getElementById("authPassword")?.value||"";const err=document.getElementById("authError");if(!/^[A-Za-z0-9_À-ÿ -]{3,20}$/.test(pseudo)){err.textContent="Pseudo : 3 à 20 caractères.";return}if(password.length<4){err.textContent="Mot de passe : 4 caractères minimum.";return}if(!fyflSupabase){err.textContent="Connexion au serveur impossible. Réessaie dans quelques secondes.";return}err.textContent="Connexion...";try{const fn=mode==="register"?'fyfl_register_account':'fyfl_login_account';const {data,error}=await fyflSupabase.rpc(fn,{p_pseudo:pseudo,p_password:password});if(error)throw error;const row=Array.isArray(data)?data[0]:data;if(!row?.pseudo)throw new Error(mode==="register"?"Impossible de créer le compte.":"Pseudo ou mot de passe incorrect.");setSession(row.pseudo);closeAuth();render(getCurrentPage());if(mode==="register")alert("Compte créé ! Tu es maintenant connecté.")}catch(e){console.error('FYFL account:',e);err.textContent=String(e.message||'Erreur de connexion').replace(/^.*?\:\s*/,'')||'Impossible de se connecter.'}}
-async function logout(){setSession("");render(getCurrentPage())}
-function getCurrentPage(){const active=document.querySelector("nav button.active");return active?.dataset.page||"home"}
-function getComments(){return Array.isArray(fyflComments)?fyflComments:[]}
-async function publishComment(){const user=getSession();if(!user){openAuth("login");return}const box=document.getElementById("commentText");const text=(box?.value||"").trim();if(!text){alert("Écris un commentaire avant de publier.");return}if(!fyflSupabase){alert("Le service en ligne n'est pas disponible.");return}const {data,error}=await fyflSupabase.from('fyfl_comments').insert({pseudo:user,text}).select().single();if(error){alert('Impossible de publier le commentaire : '+error.message);return}fyflComments=[data,...fyflComments.filter(c=>c.id!==data.id)];render("comments",false)}
-function pageComments(){const user=getSession(),comments=getComments();return `<section class="section"><div class="section-head"><h2>💬 Commentaires</h2><small>${comments.length} commentaire${comments.length>1?"s":""} · EN DIRECT</small></div><div class="comments-wrap">${user?`<div class="comment-box"><h3 style="margin-top:0">Publier un commentaire</h3><textarea id="commentText" rows="4" maxlength="500" placeholder="Écris ton commentaire..."></textarea><div class="logged-note">Connecté en tant que <strong>${escapeHtml(user)}</strong></div><button class="results-head-actions" style="margin-top:10px;background:#ff8a22;color:#111;border:0;border-radius:10px;padding:11px 15px;font-weight:900;cursor:pointer" onclick="publishComment()">Publier en direct</button></div>`:`<div class="comment-box"><h3 style="margin-top:0">Connecte-toi pour commenter</h3><p>Tu dois avoir un compte FYFL connecté pour publier un commentaire.</p><button style="background:#ff8a22;color:#111;border:0;border-radius:10px;padding:11px 15px;font-weight:900;cursor:pointer" onclick="openAuth('login')">Se connecter</button><button style="margin-left:8px;background:#1a212d;color:#fff;border:1px solid #303846;border-radius:10px;padding:11px 15px;font-weight:900;cursor:pointer" onclick="openAuth('register')">S'inscrire</button></div>`}${comments.length?comments.map(c=>`<article class="comment-item fyfl-animate-item"><div class="comment-meta"><span class="comment-author">👤 ${escapeHtml(c.pseudo)}</span><span class="comment-date">${escapeHtml(new Date(c.created_at||Date.now()).toLocaleString('fr-FR'))}</span></div><div class="comment-text">${escapeHtml(c.text)}</div></article>`).join(""):`<div class="comment-empty">Aucun commentaire pour le moment. Sois le premier !</div>`}</div></section>`}
+/* Subway Surfers save patcher (format reverse-engineered from the WebGL build).
+   Usage in browser: SS.__patchAll() before the Unity loader runs. */
+(function (root) {
+  var T_END = 0x00, T_F64 = 0x01, T_STR = 0x02, T_OBJ = 0x03, T_ARR = 0x04,
+      T_BOOL = 0x08, T_I64 = 0x09, T_I32 = 0x10, T_I64B = 0x12;
 
-const ADMIN_EMAIL="enzoadressepro888@gmail.com";
-let adminUnlocked=false;
-let supabaseAdminUser=null;
-async function refreshAdminSession(){
-  try{
-    if(!fyflSupabase) await initFYFLSupabase();
-    if(!fyflSupabase)return false;
-    const {data,error}=await fyflSupabase.auth.getSession();
-    if(error)throw error;
-    const user=data?.session?.user||null;
-    supabaseAdminUser=user;
-    adminUnlocked=!!user && String(user.email||'').toLowerCase()===ADMIN_EMAIL.toLowerCase();
-    return adminUnlocked;
-  }catch(e){
-    console.warn('FYFL admin session:',e);
-    supabaseAdminUser=null;
-    adminUnlocked=false;
-    return false;
+  function readName(b, i) {
+    var j = i;
+    while (b[j] !== 0) { j++; if (j >= b.length) throw new Error('name overflow'); }
+    return { name: String.fromCharCode.apply(null, b.subarray(i, j)), next: j + 1 };
   }
-}
-function isCurrentAccountAdminVerified(){return !!adminUnlocked && !!supabaseAdminUser && String(supabaseAdminUser.email||'').toLowerCase()===ADMIN_EMAIL.toLowerCase()}
-async function openAdmin(){
-  try{
-    await initFYFLSupabase();
-    if(await refreshAdminSession()){
-      render('admin');
-      return;
+
+  function readI32(b, i) {
+    return (b[i] | (b[i + 1] << 8) | (b[i + 2] << 16) | (b[i + 3] << 24));
+  }
+
+  function parseTree(b, i, end) {
+    var nodes = [];
+    while (i < end) {
+      var t = b[i];
+      if (t === T_END) { i++; return { nodes: nodes, next: i }; }
+      var r = readName(b, i + 1), name = r.name;
+      i = r.next;
+      var node = { t: t, name: name };
+      if (t === T_I32) { node.v = readI32(b, i); i += 4; }
+      else if (t === T_I64 || t === T_I64B || t === T_F64) { node.v = b.subarray(i, i + 8).slice(); i += 8; }
+      else if (t === T_BOOL) { node.v = b[i]; i += 1; }
+      else if (t === T_STR) {
+        var ln = readI32(b, i); i += 4;
+        node.raw = b.subarray(i, i + ln).slice(); i += ln;
+      } else if (t === T_OBJ || t === T_ARR) {
+        var bl = readI32(b, i); i += 4;
+        var bodyLen = bl - 4;
+        var sub = parseTree(b, i, i + bodyLen);
+        node.children = sub.nodes; i += bodyLen;
+      } else {
+        throw new Error('unknown type 0x' + t.toString(16) + ' at ' + i + ' name=' + name);
+      }
+      nodes.push(node);
     }
-    await openAdminLogin();
-  }catch(e){
-    console.error('FYFL admin:',e);
-    alert('Impossible d’ouvrir l’administration. Recharge la page avec Ctrl+F5 puis réessaie.');
+    return { nodes: nodes, next: i };
   }
-}
-async function openAdminLogin(){
-  await initFYFLSupabase();
-  if(await refreshAdminSession()){render('admin');return}
-  if(!fyflSupabase){alert('Supabase n’est pas configuré.');return}
-  const wrap=document.createElement('div');wrap.className='modal-backdrop';wrap.id='adminLoginModal';
-  wrap.innerHTML=`<div class="modal"><h2>🔐 Administration FYFL</h2><p>Connecte-toi avec le compte administrateur <strong>${ADMIN_EMAIL}</strong>.</p><input id="adminEmail" type="email" value="${ADMIN_EMAIL}" autocomplete="username"><input id="adminPassword" type="password" placeholder="Mot de passe Supabase" autocomplete="current-password"><div class="auth-error" id="adminError"></div><div class="modal-actions"><button onclick="document.getElementById('adminLoginModal')?.remove()">Annuler</button><button class="primary" onclick="checkSupabaseAdmin()">Accéder</button></div><p class="admin-help">🔒 Une fois connecté, Supabase conserve ta session. Tu n’auras normalement plus besoin de remettre le mot de passe sur ce navigateur.</p></div>`;
-  document.body.appendChild(wrap);setTimeout(()=>document.getElementById('adminPassword')?.focus(),50);
-}
-async function ensureRemoteFixtureSeed(){
-  if(!fyflSupabase||!fyflRemoteReady||!isCurrentAccountAdminVerified())return false;
-  const {data,error}=await fyflSupabase.from('fyfl_matches').select('*');
-  if(error){console.warn('FYFL seed read:',error.message);return false;}
-  const existingKeys=new Set((data||[]).map(r=>r.match_key));
-  const seed=[];
-  const days=buildAllMatchDays();
-  [1,2,3].forEach(day=>(days[day]||[]).forEach(m=>{
-    const row=fyflToRow({...m,day});
-    if(!existingKeys.has(row.match_key))seed.push(row);
-  }));
-  if(seed.length){
-    const {error:upError}=await fyflSupabase.from('fyfl_matches').upsert(seed,{onConflict:'match_key'});
-    if(upError){window.__fyflLastMatchSyncError=upError.message||String(upError);console.warn('FYFL seed upsert:',upError.message);return false;}
-  }
-  const {data:all}=await fyflSupabase.from('fyfl_matches').select('*');
-  if(Array.isArray(all))setRemoteResults(all);
-  return true;
-}
-async function checkSupabaseAdmin(){
-  const email=(document.getElementById('adminEmail')?.value||'').trim().toLowerCase();
-  const password=document.getElementById('adminPassword')?.value||'';
-  const err=document.getElementById('adminError');
-  if(email!==ADMIN_EMAIL.toLowerCase()){err.textContent='Ce compte n’est pas autorisé à accéder à l’administration.';return}
-  if(!password){err.textContent='Mot de passe requis.';return}
-  const {data,error}=await fyflSupabase.auth.signInWithPassword({email,password});
-  if(error){err.textContent=error.message;return}
-  if(String(data?.user?.email||'').toLowerCase()!==ADMIN_EMAIL.toLowerCase()){
-    await fyflSupabase.auth.signOut();err.textContent='Compte non autorisé.';return;
-  }
-  supabaseAdminUser=data.user;adminUnlocked=true;document.getElementById('adminLoginModal')?.remove();await ensureRemoteFixtureSeed();render('admin');
-}
-function getAdminPrefs(){return {...fyflSettings}}
-function saveAdminPrefs(p){fyflSettings={...fyflSettings,...p};applyAdminPrefs()}
-function applyAdminPrefs(){const b=document.getElementById('breakingNewsText');if(b)b.textContent=fyflSettings.breaking||'REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !'}
-function allMatchesFlat(){const days=buildAllMatchDays();return [1,2,3].flatMap(day=>days[day]||[])}
-function adminMatchOptions(){return allMatchesFlat().map((m,i)=>`<option value="${i}">J${m.day} · Poule ${m.group} · ${m.home} — ${m.away}</option>`).join('')}
-function selectedAdminMatch(){const i=Number(document.getElementById('adminMatchSelect')?.value||0);return allMatchesFlat()[i]}
-function adminLoadMatch(){const m=selectedAdminMatch();if(!m)return;document.getElementById('adminHomeScore').value=m.hs??0;document.getElementById('adminAwayScore').value=m.as??0;document.getElementById('adminMinute').value=m.minute??0;document.getElementById('adminScorer').value='';document.getElementById('adminGoalMinute').value=m.minute??0;document.getElementById('adminGoalTeam').value=m.home;const feed=document.getElementById('adminGoals');feed.innerHTML=(m.goals||[]).length?(m.goals||[]).map((g,i)=>`<div class="goal-line">⚽ ${escapeHtml(g.team)} · ${escapeHtml(g.scorer)} · ${escapeHtml(g.minute)}' <button onclick="adminDeleteGoal(${i})">×</button></div>`).join(''):'Aucun but enregistré.'}
-async function persistMatchFromAdmin(status){
-  const m=selectedAdminMatch();
-  if(!m)return;
-  if(!fyflSupabase || !fyflRemoteReady || !isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée. Recharge la page puis reconnecte-toi.');return;}
-  let existing=results.find(r=>fyflMatchKey({...r,day:r.day||findMatchDay(r)})===fyflMatchKey({...m,day:m.day||findMatchDay(m)}));
-  if(!existing){existing={group:m.group,day:m.day,home:m.home,away:m.away,hs:0,as:0,status:'À venir',minute:0,goals:[]};results.push(existing);}
-  existing.group=m.group; existing.day=Number(m.day||findMatchDay(m));
-  existing.hs=Number(document.getElementById('adminHomeScore').value||0);
-  existing.as=Number(document.getElementById('adminAwayScore').value||0);
-  existing.minute=Math.max(0,Number(document.getElementById('adminMinute').value||0));
-  existing.status=status; existing.goals=Array.isArray(existing.goals)?existing.goals:[];
-  if(status==='En direct') existing.startedAt=Date.now()-existing.minute*60000;
-  else if(status==='Terminé'){existing.minute=90;delete existing.startedAt;}
-  const ok=await saveSingleRemoteMatch(existing);
-  if(!ok){alert('Impossible de synchroniser ce match avec Supabase : '+(window.__fyflLastMatchSyncError||'erreur inconnue')+'\n\nVérifie les règles UPDATE/INSERT de fyfl_matches.');return;}
-  flashLive(); render('admin'); await writeAdminLog(status==='En direct'?'Match mis en direct':'Match terminé',`${existing.home} ${existing.hs} — ${existing.as} ${existing.away}`); if(status==='En direct')startLiveTicker();
-}
-async function adminSetStatus(status){await persistMatchFromAdmin(status)}
-async function adminAddGoal(){
-  const m=selectedAdminMatch(); if(!m)return;
-  if(!fyflSupabase || !fyflRemoteReady || !isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée.');return;}
-  let existing=results.find(r=>fyflMatchKey({...r,day:r.day||findMatchDay(r)})===fyflMatchKey({...m,day:m.day||findMatchDay(m)}));
-  if(!existing){existing={group:m.group,day:m.day,home:m.home,away:m.away,hs:0,as:0,status:'En direct',minute:0,goals:[]};results.push(existing);}
-  existing.goals=Array.isArray(existing.goals)?existing.goals:[];
-  const team=document.getElementById('adminGoalTeam').value;
-  const scorer=(document.getElementById('adminScorer').value||'').trim()||'Buteur';
-  const minute=Math.max(0,Number(document.getElementById('adminGoalMinute').value||existing.minute||0));
-  existing.goals.push({team,scorer,minute});
-  if(team===existing.home)existing.hs=(Number(existing.hs)||0)+1;else existing.as=(Number(existing.as)||0)+1;
-  if(existing.status!=='Terminé'){ existing.status='En direct'; existing.minute=Math.max(Number(existing.minute)||0,minute); existing.startedAt=Date.now()-existing.minute*60000; } else { existing.status='Terminé'; existing.minute=Math.max(90,Number(existing.minute)||0); delete existing.startedAt; }
-  const ok=await saveSingleRemoteMatch(existing);
-  if(!ok){existing.goals.pop();if(team===existing.home)existing.hs=Math.max(0,(Number(existing.hs)||0)-1);else existing.as=Math.max(0,(Number(existing.as)||0)-1);alert("Le but n'a pas pu être synchronisé avec Supabase : "+(window.__fyflLastMatchSyncError||'erreur inconnue')+"\n\nVérifie les règles UPDATE de fyfl_matches.");return;}
-  render('admin');await writeAdminLog('But ajouté',`${team} · ${scorer} · ${minute}'`);showGoalAnimation(team,scorer,minute);flashLive();
-}
-async function adminDeleteGoal(i){
-  const m=selectedAdminMatch();if(!m)return;
-  const existing=results.find(r=>fyflMatchKey({...r,day:r.day||findMatchDay(r)})===fyflMatchKey({...m,day:m.day||findMatchDay(m)}));
-  if(!existing||!existing.goals)return;
-  const g=existing.goals[i];if(!g)return;
-  const oldGoals=[...existing.goals]; const oldHs=existing.hs, oldAs=existing.as;
-  if(g.team===existing.home)existing.hs=Math.max(0,(Number(existing.hs)||0)-1);else existing.as=Math.max(0,(Number(existing.as)||0)-1);
-  existing.goals.splice(i,1);
-  const ok=await saveSingleRemoteMatch(existing);
-  if(!ok){existing.goals=oldGoals;existing.hs=oldHs;existing.as=oldAs;alert('Impossible de synchroniser la suppression du but.');return;}
-  await writeAdminLog('But supprimé',`${g.team} · ${g.scorer||'Buteur'} · ${g.minute}'`);render('admin');flashLive();
-}
-async function adminFinish(){await persistMatchFromAdmin('Terminé')}
-async function adminResetMatch(){const m=selectedAdminMatch();if(!m)return;const target={...m,day:m.day||findMatchDay(m)};if(!fyflSupabase||!fyflRemoteReady||!isCurrentAccountAdminVerified()){alert('Admin Supabase non connecté.');return}const deleted=await deleteRemoteMatch(target);if(!deleted){alert('Supabase a refusé la suppression. Vérifie la règle DELETE de fyfl_matches.');return}const i=results.findIndex(r=>fyflMatchKey({...r,day:r.day||findMatchDay(r)})===fyflMatchKey(target));if(i>=0)results.splice(i,1);await writeAdminLog('Match supprimé / remis à zéro',`${target.home} — ${target.away}`);flashLive();render('admin');broadcastLive()}
-function adminStandingTeamOptions(group){const arr=groups[group]||[];return arr.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('')}
-function adminLoadStanding(){const group=document.getElementById('adminStandingGroup')?.value||Object.keys(groups)[0];const teamSel=document.getElementById('adminStandingTeam');if(!teamSel)return;const current=teamSel.value;teamSel.innerHTML=adminStandingTeamOptions(group);if((groups[group]||[]).includes(current))teamSel.value=current;adminLoadStandingFields();}
-function adminLoadStandingFields(){const team=document.getElementById('adminStandingTeam')?.value;if(!team)return;const r=getRanking().find(x=>x.name===team)||{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0,diff:0};['p','w','d','l','gf','ga','pts','diff'].forEach(k=>{const el=document.getElementById('adminStand_'+k);if(el)el.value=r[k]??0;});}
-async function adminSaveStanding(){if(!fyflSupabase||!fyflRemoteReady||!isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée.');return}const team=document.getElementById('adminStandingTeam')?.value;if(!team)return;const standings={...(fyflSettings.standings||{})};const row={manual:true};['p','w','d','l','gf','ga','pts','diff'].forEach(k=>{const v=Number(document.getElementById('adminStand_'+k)?.value||0);row[k]=Number.isFinite(v)?Math.max(0,v):0;});standings[team]=row;const ok=await saveOnlineSettings({...fyflSettings,standings});if(!ok){alert('Impossible de synchroniser le classement avec Supabase.');return}render('admin',false);await writeAdminLog('Classement modifié',`${team} · Poule ${document.getElementById('adminStandingGroup')?.value||''}`);flashLive();alert('Classement de la poule modifié et synchronisé en direct pour tout le monde !');}
-async function adminResetStanding(){if(!fyflSupabase||!isCurrentAccountAdminVerified()){alert('Administration Supabase non connectée.');return}const team=document.getElementById('adminStandingTeam')?.value;if(!team)return;const standings={...(fyflSettings.standings||{})};delete standings[team];const ok=await saveOnlineSettings({...fyflSettings,standings});if(!ok){alert('Impossible de réinitialiser le classement.');return}render('admin',false);await writeAdminLog('Classement remis au calcul automatique',team);flashLive();alert('Classement de cette équipe remis au calcul automatique des matchs.');}
-async function adminSaveText(){const p=getAdminPrefs();p.breaking=(document.getElementById('adminBreaking').value||'').trim()||'REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !';p.player=(document.getElementById('adminPlayer').value||'').trim()||'À déterminer';p.news=(document.getElementById('adminNews').value||'').trim()||'Les matchs FYFL se joueront les mercredis et les week-ends !';const ok=await saveOnlineSettings(p);if(!ok){alert('Impossible de synchroniser les modifications avec Supabase.');return}await writeAdminLog('Paramètres du site modifiés','Breaking News / joueur du mois / message FYFL');alert('Modifications enregistrées et visibles en direct pour tout le monde !')}
-function pageAdmin(){if(!isCurrentAccountAdminVerified())return `<section class="section"><div class="card"><h2>🔐 Accès administrateur</h2><p>Connecte-toi avec ton compte administrateur Supabase.</p><button class="admin-btn" onclick="openAdminLogin()">Ouvrir l’administration</button></div></section>`;const p=getAdminPrefs();return `<section class="section admin-panel"><div class="section-head"><h2>⚙️ Panneau administrateur FYFL</h2><small>Contrôle en direct</small></div><div class="admin-box"><h3>🛠️ Outils administrateur</h3><div class="admin-tools-grid"><div class="admin-tool-card"><b>🔄 Synchroniser toutes les données</b><button onclick="syncAllRemoteData(true)">Synchroniser maintenant</button></div><div class="admin-tool-card"><b>🟢 Supabase Realtime</b><div id="adminRealtimeStatus"><span class="status-dot offline"></span>Vérification...</div></div><div class="admin-tool-card"><b>👥 Personnes connectées</b><div><strong id="adminOnlineCount">${fyflOnlineCount}</strong> personne(s) en ligne</div></div></div><div class="site-status-grid"><div class="site-status-card"><b>🌐 Site</b><div class="site-ok">🟢 Site opérationnel</div></div><div class="site-status-card"><b>🗄️ Base de données</b><div id="adminDatabaseStatus"><span class="status-dot offline"></span>Vérification...</div></div><div class="site-status-card"><b>⚡ Realtime</b><div id="adminRealtimeStatus2"><span class="status-dot offline"></span>Vérification...</div></div><div class="site-status-card"><b>🔧 Maintenance</b><div id="adminMaintenanceStatus">${fyflSiteStatus.maintenance?'🔴 Maintenance active':'🟢 Site opérationnel'}</div></div></div><p class="admin-help">Tous les indicateurs et le nombre de connexions sont synchronisés avec Supabase en temps réel.</p></div><div class="admin-box"><h3>🔧 Mode maintenance</h3><div class="maintenance-toggle"><div><b>État actuel</b><div>${fyflSiteStatus.maintenance?'🔴 Maintenance active':'🟢 Site opérationnel'}</div></div><button class="${fyflSiteStatus.maintenance?'reset':'live'}" onclick="setMaintenance(${!fyflSiteStatus.maintenance})">${fyflSiteStatus.maintenance?'🟢 Désactiver la maintenance':'🔴 Activer la maintenance'}</button></div><label>Message affiché aux visiteurs</label><textarea id="adminMaintenanceMessage" rows="3">${escapeHtml(fyflSiteStatus.message||'🔧 FYFL est actuellement en maintenance.\n\nLe site revient bientôt.')}</textarea><button onclick="saveMaintenanceMessage()">💾 Enregistrer le message</button><p class="admin-help">Le changement est immédiat pour tous les visiteurs connectés, sans actualisation.</p></div><div class="admin-box"><h3>📜 Journal administrateur</h3><div id="adminLogFilters"></div><div id="adminLogList" class="admin-log-list">Chargement...</div><p class="admin-help">Les actions des administrateurs sont enregistrées dans Supabase et apparaissent en direct.</p></div><div class="admin-box"><h3>🔔 Notifications globales</h3><label>Titre</label><input id="adminNotifTitle" value="🔴 MATCH EN DIRECT" maxlength="80"><label>Message</label><textarea id="adminNotifMessage" rows="3" maxlength="500" placeholder="PSG 2 — 1 Rennes"></textarea><div class="admin-actions"><button class="live" onclick="sendGlobalNotification()">📡 Envoyer à tout le monde en direct</button></div><p class="admin-help">Tous les visiteurs connectés reçoivent la notification instantanément, sans actualiser la page.</p></div><div class="admin-box"><h3>📊 STATS</h3><p class="admin-help">Ajoute un joueur au classement des buteurs ou passeurs. La modification est enregistrée dans Supabase et diffusée en direct.</p><select id="adminStatCategory"><option value="buteur">Buteur</option><option value="passeur">Passeur</option></select><input id="adminStatPlayer" maxlength=60 placeholder="Nom du joueur"><input id="adminStatCount" type="number" min="0" placeholder="Nombre de buts / passes"><input id="adminStatClub" maxlength="60" placeholder="Club"><button onclick="adminAddStat()">Ajouter à STATS</button><div class="stats-list admin-stats-list">${fyflStats.map(x=>`<div class="stats-row"><b class="stats-rank">${x.category==='buteur'?'⚽':'🎯'}</b>${statsLogo(x.club)}<div class="stats-player"><strong>${escapeHtml(x.player_name)}</strong><small>${escapeHtml(x.club)} · ${x.category}</small></div><b class="stats-count">${Number(x.stat_count)||0}</b><button onclick="adminDeleteStat('${x.id}')">×</button></div>`).join('')||'<div class="live-empty">Aucune statistique.</div>'}</div></div><div class="admin-grid"><div class="admin-box"><h3>⚽ Match en direct</h3><select id="adminMatchSelect" onchange="adminLoadMatch()">${adminMatchOptions()}</select><div class="admin-stat"><span>Score</span><input id="adminHomeScore" type="number" min="0" style="width:80px"><b>—</b><input id="adminAwayScore" type="number" min="0" style="width:80px"></div><label>Minute du match</label><input id="adminMinute" type="number" min="0" max="130" placeholder="0"><div class="admin-actions"><button class="live" onclick="adminSetStatus('En direct')">🔴 Lancer / mettre à jour en direct</button><button class="done" onclick="adminFinish()">✅ Terminer le match</button><button class="reset" onclick="adminResetMatch()">🧹 Match jamais commencé</button></div><h4>⚽ Ajouter un but</h4><select id="adminGoalTeam"><option></option></select><input id="adminScorer" maxlength="40" placeholder="Nom du buteur"><input id="adminGoalMinute" type="number" min="0" max="130" placeholder="Minute du but"><button onclick="adminAddGoal()">⚽ Ajouter le but + animation</button><div id="adminGoals"></div><p class="admin-help">Les scores, minutes et buteurs sont sauvegardés dans Supabase et diffusés en direct à tous les visiteurs.</p></div><div class="admin-box"><h3>📢 Site & annonces</h3><label>Breaking News</label><input id="adminBreaking" value="${escapeHtml(p.breaking||'REJOIGNEZ LE DISCORD POUR TOUTE LES INFO !')}"><label>Joueur du mois</label><input id="adminPlayer" value="${escapeHtml(p.player||'À déterminer')}"><label>Message FYFL</label><textarea id="adminNews" rows="5">${escapeHtml(p.news||'Les matchs FYFL se joueront les mercredis et les week-ends !')}</textarea><button onclick="adminSaveText()">💾 Enregistrer les modifications</button><p class="admin-help">Les changements sont sauvegardés dans Supabase et envoyés en direct.</p></div><div class="admin-box"><h3>🏆 Modifier le classement des poules</h3><label>Poule</label><select id="adminStandingGroup" onchange="adminLoadStanding()">${Object.keys(groups).map(g=>`<option value="${g}">Poule ${g}</option>`).join('')}</select><label>Équipe</label><select id="adminStandingTeam" onchange="adminLoadStandingFields()"></select><div class="admin-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"><label>MJ<input id="adminStand_p" type="number" min="0"></label><label>V<input id="adminStand_w" type="number" min="0"></label><label>N<input id="adminStand_d" type="number" min="0"></label><label>D<input id="adminStand_l" type="number" min="0"></label><label>BP<input id="adminStand_gf" type="number" min="0"></label><label>BC<input id="adminStand_ga" type="number" min="0"></label><label>Diff<input id="adminStand_diff" type="number"></label><label>Pts<input id="adminStand_pts" type="number" min="0"></label></div><div class="admin-actions"><button class="live" onclick="adminSaveStanding()">💾 Enregistrer le classement</button><button class="reset" onclick="adminResetStanding()">↩️ Revenir au calcul automatique</button></div></div></div></section>`}
-function syncAdminGoalTeam(){const m=selectedAdminMatch();const sel=document.getElementById('adminGoalTeam');if(!m||!sel)return;sel.innerHTML=`<option>${escapeHtml(m.home)}</option><option>${escapeHtml(m.away)}</option>`;adminLoadMatch()}
-function showGoalAnimation(team,scorer,minute){const pop=document.createElement('div');pop.className='goal-pop';pop.innerHTML=`<div class="goal-box"><div class="big">⚽</div><h2>BUUUUUT !</h2><p>${escapeHtml(team)} · ${escapeHtml(scorer)} · ${minute}'</p></div>`;document.body.appendChild(pop);for(let i=0;i<45;i++){const c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.animationDelay=Math.random()*.25+'s';c.style.transform=`rotate(${Math.random()*360}deg)`;document.body.appendChild(c);setTimeout(()=>c.remove(),1800)}setTimeout(()=>pop.remove(),950)}
-function broadcastLive(){flashLive()}
-function startLiveTicker(){/* Désactivé : aucune actualisation automatique de l'interface admin. */ return;}
-function pageHome(){return `<section class="hero"><div><div class="eyebrow">SAISON 1 · COMPÉTITION OFFICIELLE</div><h1>FRENCH YOUTH<br><span>FUT LEAGUE</span></h1><p>Bienvenue sur la plateforme officielle de la <b>FYFL</b>. Suivez les poules et tous les résultats.</p><div class="hero-actions"><button class="secondary" onclick="render('matches')">Voir les résultats</button><button class="secondary" onclick="render('ranking')">Voir le classement</button></div></div><img class="hero-logo" src="fyfl-logo.png"></section>
-<section class="section"><div class="section-head"><h2>⚡ Infos rapides</h2><small>FYFL Saison 1</small></div><div class="feature-grid">
-<div class="feature-card fyfl-credit-card"><h3>Website Created By Tutzou</h3><p style="margin:6px 0 0">Tutzou is the FYFL owner with Bs Pomier</p></div>
-<div class="feature-card"><div class="mini-label">🏅 JOUEUR DU MOIS</div><div class="player-month"><div class="player-avatar">🏆</div><div><h3 style="margin:8px 0 0">${escapeHtml(getAdminPrefs().player||"À déterminer")}</h3><p style="margin:6px 0 0">Le joueur du mois sera defini en fonction des performmence en match</p></div></div></div>
-<div class="feature-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="mini-label">⚽ STATUT DES MATCHS</div><button class="results-head-actions" style="font-size:11px;padding:7px 9px;background:#151b25;color:#fff;border:1px solid #303846;border-radius:9px;font-weight:800;cursor:pointer" onclick="render('matches')">Voir tous les matchs →</button></div><div style="margin-top:12px;max-height:320px;overflow:auto;padding-right:4px">${getUpcomingMatches().map(x=>`<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:7px;padding:9px 5px;border-bottom:1px solid #202834"><div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800">${crest(x.h,"mini-logo")}${x.h}</div><div style="text-align:center;font-size:11px;font-weight:900;color:#ff8a22">VS<br><small style="color:#7e8a9d">J${x.day} · P. ${x.g}</small></div><div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:11px;font-weight:800">${x.a}${crest(x.a,"mini-logo")}</div></div>`).join("")}</div><p style="margin:10px 0 0;text-align:center">${getUpcomingMatches().length} matchs à venir · Toutes les poules</p></div>
-</div></section>
-<section class="section"><div class="section-head"><h2>Derniers résultats</h2><div class="results-head-actions"><small>${results.filter(m=>m.status==='Terminé').length} match${results.filter(m=>m.status==='Terminé').length>1?'s':''} terminé${results.filter(m=>m.status==='Terminé').length>1?'s':''}</small><button onclick="render('matches')">Voir tous les résultats →</button></div></div><div class="grid">${results.filter(m=>m.status==='Terminé').sort((a,b)=>(Number(b.updatedAt||0)-Number(a.updatedAt||0))).map(matchCard).join("")||'<div class="card"><p>Aucun match terminé pour le moment.</p></div>'}</div></section>`}
-function pageRanking(){return `<section class="section"><div class="section-head"><h2>Classement FYFL</h2><small>Victoire = 3 pts · Nul = 1 pt</small></div><div class="tabs" id="tabs">${Object.keys(groups).map((g,i)=>`<button class="${i===0?"active":""}" onclick="showGroup('${g}')">Poule ${g}</button>`).join("")}</div><div id="group-content">${groupBlock("A")}</div></section>`}
-function showGroup(g){document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active",b.textContent==="Poule "+g));document.getElementById("group-content").innerHTML=groupBlock(g)}
-function getUpcomingMatches(){
-  const upcoming=[];
-  const days=buildAllMatchDays();
-  [1,2,3].forEach(day=>(days[day]||[]).forEach(m=>{if(m.status==='À venir')upcoming.push({g:m.group,h:m.home,a:m.away,day})}));
-  return upcoming;
-} 
-function buildAllMatchDays(){const days={1:[],2:[],3:[]};Object.entries(groups).forEach(([g,arr])=>{const pairs={1:[[arr[0],arr[1]],[arr[2],arr[3]]],2:[[arr[0],arr[2]],[arr[1],arr[3]]],3:[[arr[0],arr[3]],[arr[1],arr[2]]]};Object.entries(pairs).forEach(([day,ps])=>ps.forEach(([home,away])=>{const found=results.find(r=>(r.home===home&&r.away===away)||(r.home===away&&r.away===home));days[day].push(found?{...found,group:g,day:Number(day)}:{group:g,day:Number(day),home,away,hs:null,as:null,status:"À venir"});}));});return days}
-function pageMatches(){const days=buildAllMatchDays();const card=m=>matchCard(m);return `<section class="section"><div class="section-head"><h2>Matchs / Résultats</h2><small>3 journées · 6 poules</small></div><div class="tabs" id="matchTabs"><button class="active" onclick="showMatchDay('day1')">Journée 1</button><button onclick="showMatchDay('day2')">Journée 2</button><button onclick="showMatchDay('day3')">Journée 3</button><button onclick="showMatchDay('allDays')">Toutes les journées</button></div><div id="match-content"><h3 class="subheading">Journée 1 · Tous les matchs</h3><div class="grid">${days[1].map(card).join("")}</div></div></section>`}
-function showMatchDay(mode){const modes=['day1','day2','day3','allDays'];document.querySelectorAll("#matchTabs button").forEach((b,i)=>b.classList.toggle("active",modes[i]===mode));const days=buildAllMatchDays();const el=document.getElementById("match-content");if(!el)return;if(mode==='allDays'){el.innerHTML=[1,2,3].map(day=>`<h3 class="subheading">Journée ${day} · Tous les matchs</h3><div class="grid">${days[day].map(matchCard).join("")}</div>`).join("");return}const day=Number(mode.replace('day',''));el.innerHTML=`<h3 class="subheading">Journée ${day} · Tous les matchs</h3><div class="grid">${days[day].map(matchCard).join("")}</div>`}
-function pageTeams(){return `<section class="section"><div class="section-head"><h2>Les équipes</h2><small>24 équipes réparties en 6 poules</small></div><div class="teams">${Object.entries(groups).flatMap(([g,arr])=>arr.map(t=>`<div class="card team-card">${crest(t,"team-logo large")}<h3>${t}</h3><p>Poule ${g}</p></div>`)).join("")}</div></section>`}
-function pageCompetitions(){return `<section class="section"><div class="section-head"><h2>🏆 Compétitions</h2><small>Toutes les compétitions de la FYFL</small></div><div class="fyfl-comp-grid"><div class="fyfl-comp-card"><div><div class="comp-name">🏆 FYFL — Saison 1</div><p>Compétition officielle avec les 24 équipes réparties en 6 poules.</p></div><span class="coming">En cours</span></div><div class="fyfl-comp-card"><div><div class="comp-name">⚽ Matchs</div><p>Résultats et prochaines rencontres de la compétition.</p></div><button onclick="render('matches')">Voir les matchs</button></div><div class="fyfl-comp-card"><div><div class="comp-name">🏆 Ligue des Champions</div><p>La compétition européenne de la FYFL.</p></div><span class="coming">À venir</span></div><div class="fyfl-comp-card"><div><div class="comp-name">🌟 Europa League</div><p>La deuxième compétition européenne.</p></div><span class="coming">À venir</span></div><div class="fyfl-comp-card"><div><div class="comp-name">🥉 Conference League</div><p>La troisième compétition européenne.</p></div><span class="coming">À venir</span></div></div></section>`}
-function pageNews(){const p=getAdminPrefs();return `<section class="section"><div class="section-head"><h2>📰 FYFL - NEWS</h2><small>Actualités officielles</small></div><div class="card news-card"><div style="display:inline-block;background:#e21d48;color:#fff;font-weight:800;padding:6px 10px;border-radius:8px;font-size:12px">FYFL - NEWS</div><h2 style="margin:14px 0 8px">FYFL NEW !</h2><p style="line-height:1.7;color:var(--muted)">${escapeHtml(p.news||'Les matchs FYFL se joueront les mercredis et les week-ends !')}</p><p style="font-weight:800">Message de Tutzou</p></div></section>`}
-function render(page="home",scroll=true){const app=document.getElementById("app");app.innerHTML=page==="home"?pageHome():page==="ranking"?pageRanking():page==="stats"?pageStats():page==="matches"?pageMatches():page==="teams"?pageTeams():page==="competitions"?pageCompetitions():page==="comments"?pageComments():page==="admin"?pageAdmin():pageNews();app.classList.remove("fyfl-render-tick");void app.offsetWidth;app.classList.add("fyfl-render-tick");app.querySelectorAll(".card,.feature-card,.fyfl-comp-card,.team-card,.fixture,.comment-item,.section-head,.tabs,.group-links").forEach((el,i)=>{el.classList.add("fyfl-animate-item");el.style.animationDelay=Math.min(i*35,420)+"ms"});document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));updateAuthUI();applyMaintenanceUI();if(page==="admin"){setTimeout(()=>{syncAdminGoalTeam();adminLoadStanding()},0)}if(scroll)window.scrollTo({top:0,behavior:"smooth"})}
-document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{render(b.dataset.page);try{if(fyflPresenceChannel)fyflPresenceChannel.track({online_at:new Date().toISOString(),page:b.dataset.page})}catch(e){}}));
-render();applyAdminPrefs();
-(async()=>{await initFYFLSupabase();await refreshAdminSession();await ensureRemoteFixtureSeed();updateAuthUI();applyAdminPrefs();if(getCurrentPage()==="comments")render("comments",false);})();
-function detectDevice(){const mobile=/Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(navigator.userAgent)||window.innerWidth<=700;document.body.classList.toggle("device-mobile",mobile);document.body.classList.toggle("device-desktop",!mobile);document.body.dataset.device=mobile?"mobile":"desktop"}
-window.addEventListener("resize",detectDevice);detectDevice();
-setTimeout(()=>{if(fyflSupabase)fyflSupabase.auth.onAuthStateChange((_event,session)=>{supabaseAdminUser=session?.user||null;adminUnlocked=!!supabaseAdminUser&&String(supabaseAdminUser.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();updateAuthUI();applyMaintenanceUI();/* Ne jamais rerendre le panneau admin automatiquement. */});},0);
-// Compte à rebours et musique douce FYFL.
-function nextWednesday(){const d=new Date();const day=d.getDay();let add=(3-day+7)%7;if(add===0 && d.getHours()>=18)add=7;const n=new Date(d);n.setDate(d.getDate()+add);n.setHours(18,0,0,0);return n}
-function updateCountdown(){}
-setInterval(updateCountdown,1000);updateCountdown();
-window.openAdmin=openAdmin;window.openAdminLogin=openAdminLogin;window.toggleMusic=toggleMusic;
 
-let fyflAudio=document.getElementById("fyflMusic");
-if(!fyflAudio){
-  fyflAudio=document.createElement("audio");
-  fyflAudio.id="fyflMusic";
-  fyflAudio.src="fyfl-soft.mp3";
-  fyflAudio.preload="auto";
-  fyflAudio.loop=true;
-  fyflAudio.volume=0.12;
-  fyflAudio.setAttribute("playsinline","");
-  fyflAudio.style.cssText="position:fixed;width:1px;height:1px;left:-10px;bottom:-10px;opacity:0;pointer-events:none";
-  document.body.appendChild(fyflAudio);
-}
-function updateMusicButton(){const b=document.getElementById("musicToggle");if(!b)return;const paused=fyflAudio.paused;b.textContent=paused?"♪":"♫";b.classList.toggle("muted",paused);b.title=paused?"Activer la musique":"Couper la musique";b.setAttribute("aria-label",paused?"Activer la musique":"Couper la musique")}
-function toggleMusic(){if(fyflAudio.paused){fyflAudio.play().catch(()=>{})}else{fyflAudio.pause()}updateMusicButton()}
-function tryStartMusic(){fyflAudio.play().then(updateMusicButton).catch(()=>{});document.removeEventListener("pointerdown",tryStartMusic)}
-fyflAudio.addEventListener("play",updateMusicButton);fyflAudio.addEventListener("pause",updateMusicButton);
-tryStartMusic();
-document.addEventListener("pointerdown",tryStartMusic,{once:true});
-updateMusicButton();
+  function pushBytes(out, arr) { for (var i = 0; i < arr.length; i++) out.push(arr[i] & 0xff); }
+  function pushI32(out, v) { out.push(v & 0xff, (v >> 8) & 0xff, (v >> 16) & 0xff, (v >>> 24) & 0xff); }
+  function pushName(out, s) { for (var i = 0; i < s.length; i++) out.push(s.charCodeAt(i) & 0xff); out.push(0); }
+
+  /* SHA-1 (le header du save contient SHA1(payload) sur 20 octets, offset 4..24) */
+  function sha1(bytes) {
+    var ml = bytes.length;
+    var words = [];
+    var i;
+    for (i = 0; i + 3 < ml; i += 4) {
+      words.push(((bytes[i] << 24) | (bytes[i + 1] << 16) | (bytes[i + 2] << 8) | bytes[i + 3]) >>> 0);
+    }
+    var rem = ml % 4;
+    var tail = 0;
+    if (rem) {
+      for (var k = 0; k < rem; k++) tail |= bytes[ml - rem + k] << (24 - 8 * k);
+      tail |= 0x80 << (24 - 8 * rem);
+      words.push(tail >>> 0);
+    } else {
+      words.push(0x80000000);
+    }
+    while (words.length % 16 !== 14) words.push(0);
+    var bitLen = ml * 8;
+    words.push(Math.floor(bitLen / 4294967296) >>> 0);
+    words.push(bitLen >>> 0);
+
+    var h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE, h3 = 0x10325476, h4 = 0xC3D2E1F0;
+    function rotl(x, n) { return ((x << n) | (x >>> (32 - n))) >>> 0; }
+    var w = new Array(80);
+    for (var off = 0; off < words.length; off += 16) {
+      for (var j = 0; j < 16; j++) w[j] = words[off + j];
+      for (j = 16; j < 80; j++) w[j] = rotl(w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16], 1);
+      var a = h0, b = h1, c = h2, d = h3, e = h4;
+      for (j = 0; j < 80; j++) {
+        var f, kk;
+        if (j < 20) { f = (b & c) | ((~b) & d); kk = 0x5A827999; }
+        else if (j < 40) { f = b ^ c ^ d; kk = 0x6ED9EBA1; }
+        else if (j < 60) { f = (b & c) | (b & d) | (c & d); kk = 0x8F1BBCDC; }
+        else { f = b ^ c ^ d; kk = 0xCA62C1D6; }
+        var t = (rotl(a, 5) + (f >>> 0) + e + kk + w[j]) >>> 0;
+        e = d; d = c; c = rotl(b, 30); b = a; a = t;
+      }
+      h0 = (h0 + a) >>> 0; h1 = (h1 + b) >>> 0; h2 = (h2 + c) >>> 0;
+      h3 = (h3 + d) >>> 0; h4 = (h4 + e) >>> 0;
+    }
+    var out = [];
+    [h0, h1, h2, h3, h4].forEach(function (h) {
+      out.push((h >>> 24) & 0xff, (h >>> 16) & 0xff, (h >>> 8) & 0xff, h & 0xff);
+    });
+    return out;
+  }
+
+  function serNodes(nodes, out) {
+    for (var k = 0; k < nodes.length; k++) {
+      var n = nodes[k];
+      out.push(n.t);
+      pushName(out, n.name);
+      if (n.t === T_I32) pushI32(out, n.v);
+      else if (n.t === T_I64 || n.t === T_I64B || n.t === T_F64) pushBytes(out, n.v);
+      else if (n.t === T_BOOL) out.push(n.v);
+      else if (n.t === T_STR) { pushI32(out, n.raw.length); pushBytes(out, n.raw); }
+      else if (n.t === T_OBJ || n.t === T_ARR) {
+        var body = [];
+        serNodes(n.children, body);
+        body.push(0);
+        pushI32(out, body.length + 4);
+        pushBytes(out, body);
+      }
+    }
+  }
+
+  function mkStr(name, s) {
+    var raw = []; for (var i = 0; i < s.length; i++) raw.push(s.charCodeAt(i) & 0xff);
+    raw.push(0);
+    return { t: T_STR, name: name, raw: new Uint8Array(raw) };
+  }
+  function mkI32(name, v) { return { t: T_I32, name: name, v: v }; }
+  function mkArr(name, values) {
+    return { t: T_ARR, name: name, children: values.map(function (s, i) { return mkStr(String(i), s); }) };
+  }
+
+  function find(nodes, name) {
+    for (var i = 0; i < nodes.length; i++) if (nodes[i].name === name) return nodes[i];
+    return null;
+  }
+
+  // flags : #-lists,-powerups  desactive des parties ; chars=a+b / boards=a+b force les listes
+  var FLAGS = { coins: true, keys: true, powerups: true, lists: true };
+  var OVERRIDE = {};
+  try {
+    var h = (root.location && root.location.hash || '').replace(/^#/, '');
+    if (h) {
+      h.split(/[;,]/).forEach(function (tok) {
+        if (!tok) return;
+        var eq = tok.indexOf('=');
+        if (eq > 0) { OVERRIDE[tok.slice(0, eq)] = tok.slice(eq + 1).split('+').filter(Boolean); return; }
+        var off = tok.charAt(0) === '-';
+        var name = off ? tok.slice(1) : tok;
+        if (name in FLAGS) FLAGS[name] = !off;
+      });
+    }
+  } catch (e) {}
+
+  // uniquement les persos qui ont de vrais assets dans ce build (tony/seoul/amsterdam = slots vides)
+  var CHARACTERS = ['slick','tricky','fresh','spike','yutani','lucy','ninja','frank','king',
+    'frizzy','tag','tasha','zoe','brody','princek'];
+  var BOARDS = ['bouncer','gliderboard','greatWhiteWakeboard','hotrod','lowrider','miami','monster','rome','skullfire',
+    'snowboard','speedboard','starboard','surfboard','teleboard','theoriginal','treehugger'];
+
+  function buildSave(orig, coins, keys) {
+    var b = new Uint8Array(orig);
+    var tree = parseTree(b, 32, b.length).nodes;
+
+    var c = find(tree, 'obfuscatedCoins'); if (c && FLAGS.coins) c.v = coins;
+    var k = find(tree, 'obfuscatedKeys'); if (k && FLAGS.keys) k.v = keys;
+    var u = find(tree, 'obfuscatedUnrewardedCoins'); if (u) u.v = 0;
+    var ar = find(tree, 'ageRestrictionInputVersion'); if (ar) ar.v = 1;   // pas de popup "année de naissance"
+
+    var pu = find(tree, 'powerups');
+    if (pu && FLAGS.powerups) {
+      var hb = find(pu.children, 'hoverboard'); if (hb) hb.v = 9999;
+      var hs = find(pu.children, 'headstart2000'); if (hs) hs.v = 999;
+      var sb = find(pu.children, 'scorebooster'); if (sb) sb.v = 999;
+      var up = find(tree, 'upgrades');
+      if (up) {
+        ['jetpack','supersneakers','coinmagnet','doubleMultiplier'].forEach(function (n) {
+          var f = find(up.children, n); if (f) f.v = 5;
+        });
+      }
+    }
+
+    // unlocked characters / boards : on remplace completement (sinon d'anciens ids
+    // invalides restent dans la liste et creent des slots vides dans l'ecran persos)
+    function setList(name, ids) {
+      var node = find(tree, name);
+      if (node) { node.children = mkArr(name, ids).children; }
+      else tree.push(mkArr(name, ids));
+    }
+    if (FLAGS.lists) {
+      setList('unlockedCharacters', OVERRIDE.chars || CHARACTERS);
+      setList('unlockedBoards', OVERRIDE.boards || BOARDS);
+      // toutes les tenues (0 = de base, 1 et 2 = outfits) pour chaque perso qui en a
+      var outf = { t: T_OBJ, name: 'unlockedOutfits', children: CHARACTERS.map(function (c) {
+        var ids = (c === 'yutani') ? [0] : [0, 1, 2];
+        return { t: T_ARR, name: c, children: ids.map(function (v, i) { return mkI32(String(i), v); }) };
+      }) };
+      var uo = find(tree, 'unlockedOutfits'); if (uo) uo.children = outf.children; else tree.push(outf);
+    }
+    // skin choisi dans le menu perso (mods.js) : perso + tenue
+    try {
+      var sk = JSON.parse(root.localStorage.getItem('ssmod_skin') || 'null');
+      if (sk && sk.char && CHARACTERS.indexOf(sk.char) >= 0) {
+        var cc = find(tree, 'currentCharacterId'); if (cc) cc.raw = mkStr('currentCharacterId', sk.char).raw;
+        var so = find(tree, 'selectedOutfits'), node = mkI32(sk.char, sk.outfit | 0);
+        if (so) so.children = [node]; else tree.push({ t: T_OBJ, name: 'selectedOutfits', children: [node] });
+      }
+    } catch (eSk) {}
+    // pas de tuto / pas de popups d'intro
+    [['isTutorialCompleted', 1], ['hasSeenFrontScreenFirstTime', 1], ['hasUserRunAppBefore', 1],
+     ['hasShownHoverboardPopup', 1], ['shouldShowHoverboardPopup', 0], ['hasShownMissionIntroPopup', 1],
+     ['shouldShowMissionIntroductionPopup', 0], ['hasShownEndGameMissionPopup', 1], ['shouldShowEndGameMissionPopup', 0],
+     ['hasShownCollectPopup', 1], ['shouldShowCollectPopup', 0], ['hasShownFacebookPopup', 1], ['shouldShowFacebookPopup', 0],
+     ['neverAskForRating', 1]].forEach(function (f) { var n = find(tree, f[0]); if (n && n.t === T_BOOL) n.v = f[1]; });
+
+    var body = [];
+    serNodes(tree, body);
+    body.push(0);
+    var out = [];
+    pushBytes(out, b.subarray(0, 4));
+    for (var z = 0; z < 20; z++) out.push(0);      // reserve SHA1
+    var len = body.length + 4;
+    pushI32(out, len); pushI32(out, len);
+    pushBytes(out, body);
+    var hash = sha1(out.slice(28));                 // SHA1 sur tout ce qui suit l'offset 28
+    for (var q = 0; q < 20; q++) out[4 + q] = hash[q];
+    return new Uint8Array(out);
+  }
+
+  /* emballe un arbre en fichier de sauvegarde (header 4 octets + SHA1 + longueurs) */
+  function pack(tree, first4) {
+    var body = [];
+    serNodes(tree, body);
+    body.push(0);
+    var out = [];
+    pushBytes(out, first4);
+    for (var z = 0; z < 20; z++) out.push(0);
+    var len = body.length + 4;
+    pushI32(out, len); pushI32(out, len);
+    pushBytes(out, body);
+    var h = sha1(out.slice(28));
+    for (var q = 0; q < 20; q++) out[4 + q] = h[q];
+    return new Uint8Array(out);
+  }
+
+  /* ---------- browser: patch IndexedDB before Unity boots ---------- */
+  function localSave(tree, orig) { return pack(tree, orig.subarray(0, 4)); }
+
+  // sauvegarde "graine" (progression d'origine) fournie par seed.js
+  var SEED = null, SEED_SCORE = -1;
+  try {
+    var b64 = root.SEED_SAVE_B64;
+    if (b64) {
+      var bin = root.atob(b64);
+      var arr = new Uint8Array(bin.length);
+      for (var bi = 0; bi < bin.length; bi++) arr[bi] = bin.charCodeAt(bi);
+      SEED = arr;
+      var st = parseTree(arr, 32, arr.length).nodes;
+      var sh = find(st, 'highScore');
+      if (sh) SEED_SCORE = sh.v;
+    }
+  } catch (e) { SEED = null; }
+
+  function idbOpen() {
+    return new Promise(function (res, rej) {
+      var r = indexedDB.open('/idbfs');
+      r.onsuccess = function (e) { res(e.target.result); };
+      r.onerror = function (e) { rej(e.target.error); };
+    });
+  }
+
+  /* ---- 1er lancement : on cree directement la sauvegarde (persos/planches/tenues + pas de tuto) ---- */
+  var SEED_LOCAL_B64 = "FAAAAIEyKtnrCh4EIH01P1H+MJimZcoB4QMAAOEDAAAIaGFzTWlncmF0ZWRQbGF5ZXJJbmZvAAAQbWlncmF0ZWRQbGF5ZXJQcmVmc1ZlcnNpb24AAQAAAAlzY2hlZHVsZWRGaXJzdEludGVyc3RpdGlhbFNob3dUaW1lAAAo0+18x///A2xhc3RTaG93ZWRQcm92aWRlcnMABQAAAAAQbWlzc2lvbnNWZXJzaW9uAAAAAAAQc3lib0FuYWx5dGljc0dhbWVzU2luY2VGbHVzaAAAAAAAAnN5Ym9BbmFseXRpY3NQcmV2aW91c0NsaWVudFZlcnNpb24AAQAAAAACc3lib0FuYWx5dGljc09wZXJhdGluZ1N5c3RlbQABAAAAAAJzeWJvQW5hbHl0aWNzRGV2aWNlSUQAAQAAAAACc3lib0FuYWx5dGljc09TTGFuZ3VhZ2UAAQAAAAACc3lib0FuYWx5dGljc1BlcmZvcm1hbmNlTGV2ZWwABAAAAExvdwAQc3lib0FuYWx5dGljc0dwdVNjb3JlAP////8Cc3lib0FuYWx5dGljc09ubGluZVNldHRpbmdzTG9jYWxlAAEAAAAAA3N5Ym9BbmFseXRpY3NQZW5kaW5nT2ZmZXJSZXdhcmRUb09mZmVySWRNYXAABQAAAAAJbGFzdEtub3duU2VydmVyVGltZQAAKNPtfMf//wJsYXN0VmVyc2lvblJhdGVkAAEAAAAACWxhc3RUaW1lQXBwV2FzVXBkYXRlZE9ySW5zdGFsbGVkAD6wPuChAQAACGNsb3VkU2F2ZUVuYWJsZWQAAAlsYXRlc3RTdWNjZXNzZnVsQ2xvdWRTYXZlU3luY1RpbWUAACjT7XzH//8JbGFzdENsb3VkU2F2ZVJlbWluZGVyU2hvd25UaW1lAAAo0+18x///CGhhc0Nsb3VkU2F2ZUNlbGVicmF0aW9uQmVlblNob3duAAEQaW50cm9kdWN0aW9uUG9wdXBTaG93bkNvdW50ADIAAAAIYWxsQXNzZXRCdW5kbGVzRG93bmxvYWRlZAAAEGxhdGVzdEF2YWlsYWJsZUFzc2V0QnVuZGxlc1ZlcnNpb24AAQAAABBsYXN0V2Vla01lZGFsV2FzU2hvd24A/////wNwbGF5ZXJJZHNEYXRhABMAAAADcGxheWVycwAFAAAAAAADcmFua3NEYXRhABEAAAADcmFua3MABQAAAAAAEG51bWJlck9mUnVuc1NpbmNlTGFzdEd1aWRlbGluZQBkAAAACWxhc3RTaG93bkNsb3VkU2F2ZUludHJvZHVjdGlvbgAAKNPtfMf//whjbG91ZFNhdmVPcHRlZE91dAAAAA==";
+  function md5(str) {
+    function rh(n){var s='',j;for(j=0;j<=3;j++)s+=((n>>(j*8+4))&15).toString(16)+((n>>(j*8))&15).toString(16);return s;}
+    function ad(x,y){var l=(x&0xFFFF)+(y&0xFFFF);return (((x>>16)+(y>>16)+(l>>16))<<16)|(l&0xFFFF);}
+    function rl(n,c){return (n<<c)|(n>>>(32-c));}
+    function cm(q,a,b,x,s,t){return ad(rl(ad(ad(a,q),ad(x,t)),s),b);}
+    function ff(a,b,c,d,x,s,t){return cm((b&c)|((~b)&d),a,b,x,s,t);} function gg(a,b,c,d,x,s,t){return cm((b&d)|(c&(~d)),a,b,x,s,t);}
+    function hh(a,b,c,d,x,s,t){return cm(b^c^d,a,b,x,s,t);} function ii(a,b,c,d,x,s,t){return cm(c^(b|(~d)),a,b,x,s,t);}
+    var bytes=unescape(encodeURIComponent(str)),n=((bytes.length+8)>>6)+1,x=new Array(n*16),i;
+    for(i=0;i<n*16;i++)x[i]=0; for(i=0;i<bytes.length;i++)x[i>>2]|=bytes.charCodeAt(i)<<((i%4)*8);
+    x[i>>2]|=0x80<<((i%4)*8); x[n*16-2]=bytes.length*8;
+    var a=1732584193,b=-271733879,c=-1732584194,d=271733878,K=[],S=[7,12,17,22,5,9,14,20,4,11,16,23,6,10,15,21];
+    for(i=0;i<64;i++)K[i]=Math.floor(Math.abs(Math.sin(i+1))*4294967296)|0;
+    for(i=0;i<x.length;i+=16){var oa=a,ob=b,oc=c,od=d,j,f,g,t;
+      for(j=0;j<64;j++){
+        if(j<16){f=(b&c)|((~b)&d);g=j;}else if(j<32){f=(b&d)|(c&(~d));g=(5*j+1)%16;}else if(j<48){f=b^c^d;g=(3*j+5)%16;}else{f=c^(b|(~d));g=(7*j)%16;}
+        t=d;d=c;c=b;b=ad(b,rl(ad(ad(a,f),ad(K[j],x[i+g])),S[(j>>4)*4+(j%4)]));a=t;}
+      a=ad(a,oa);b=ad(b,ob);c=ad(c,oc);d=ad(d,od);}
+    return rh(a)+rh(b)+rh(c)+rh(d);
+  }
+  function b64bytes(b64){ var bin=root.atob(b64), a=new Uint8Array(bin.length); for (var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a; }
+  function saveDir() {
+    var u = String(location.href).split('#')[0].split('?')[0];
+    return '/idbfs/' + md5(u.substring(0, u.lastIndexOf('/')));
+  }
+  function createFirstSave() {
+    if (!SEED || !root.indexedDB) return Promise.resolve('skip');
+    return new Promise(function (resolve) {
+      var r = indexedDB.open('/idbfs', 21);
+      r.onupgradeneeded = function (e) {
+        var db = e.target.result, st = db.objectStoreNames.contains('FILE_DATA') ? e.target.transaction.objectStore('FILE_DATA') : db.createObjectStore('FILE_DATA');
+        if (!st.indexNames.contains('timestamp')) st.createIndex('timestamp', 'timestamp', { unique: false });
+      };
+      r.onerror = function () { resolve('fail'); };
+      r.onsuccess = function (e) {
+        var db = e.target.result, dir = saveDir();
+        try {
+          var tx = db.transaction('FILE_DATA', 'readwrite'), st = tx.objectStore('FILE_DATA');
+          var chk = st.get(dir + '/Save/cloud');
+          chk.onsuccess = function () {
+            if (chk.result) return;                     // deja une sauvegarde : patchAll s'en occupe
+            var now = new Date();
+            var cloud = buildSave(SEED, 99999999, 999999);
+            var lb = b64bytes(SEED_LOCAL_B64);
+            st.put({ timestamp: now, mode: 16877 }, dir);
+            st.put({ timestamp: now, mode: 16895 }, dir + '/Save');
+            st.put({ timestamp: now, mode: 33206, contents: cloud }, dir + '/Save/cloud');
+            st.put({ timestamp: now, mode: 33206, contents: lb }, dir + '/Save/local');
+            console.log('SSPatch: sauvegarde creee pour le 1er lancement (' + dir + ')');
+          };
+          tx.oncomplete = function () { db.close(); resolve('ok'); };
+          tx.onerror = tx.onabort = function () { db.close(); resolve('fail'); };
+        } catch (err) { db.close(); resolve('fail'); }
+      };
+    });
+  }
+
+  function patchAll() {
+    if (!root.indexedDB) return Promise.resolve('no idb');
+    var exists = (root.indexedDB.databases)
+      ? root.indexedDB.databases().then(function (list) {
+          return list.some(function (d) { return d.name === '/idbfs'; });
+        })
+      : Promise.resolve(true);
+    return exists.then(function (ok) {
+      if (!ok) return 'no save yet';
+      return idbOpen().then(function (db) {
+        return new Promise(function (resolve, reject) {
+          var tx = db.transaction('FILE_DATA', 'readwrite');
+          var store = tx.objectStore('FILE_DATA');
+          var keysReq = store.getAllKeys();
+          var valsReq = store.getAll();
+          var done = false;
+          tx.oncomplete = function () { if (!done) { done = true; db.close(); resolve('done'); } };
+          tx.onerror = function () { if (!done) { done = true; db.close(); reject(tx.error); } };
+          tx.onabort = function () { if (!done) { done = true; db.close(); reject(tx.error || 'abort'); } };
+          keysReq.onsuccess = function () {
+            valsReq.onsuccess = function () {
+              var keys = keysReq.result, vals = valsReq.result, n = 0;
+              // index des enregistrements cloud / local
+              var cloudIdx = -1, localIdx = -1;
+              for (var ci2 = 0; ci2 < keys.length; ci2++) {
+                var kk = String(keys[ci2]);
+                if (/\/Save\/cloud$/.test(kk)) cloudIdx = ci2;
+                if (/\/Save\/local$/.test(kk)) localIdx = ci2;
+              }
+
+              // 1) restaure la sauvegarde d'origine si le jeu est reparti de zero
+              if (SEED && cloudIdx >= 0 && vals[cloudIdx] && vals[cloudIdx].contents) {
+                try {
+                  var cur = parseTree(new Uint8Array(vals[cloudIdx].contents), 32, vals[cloudIdx].contents.length).nodes;
+                  var hs = find(cur, 'highScore');
+                  var curScore = hs ? hs.v : 0;
+                  if (!hs || curScore === 0 || (SEED_SCORE > 0 && curScore < SEED_SCORE)) {
+                    vals[cloudIdx].contents = new Uint8Array(SEED);
+                    console.log('SSPatch: sauvegarde d\'origine restauree');
+                  }
+                } catch (e2) {}
+              }
+
+              // 2) patch local (popups / tutoriel)
+              if (localIdx >= 0 && vals[localIdx] && vals[localIdx].contents) {
+                try {
+                  var lb = new Uint8Array(vals[localIdx].contents);
+                  var lt = parseTree(lb, 32, lb.length).nodes;
+                  var a = find(lt, 'numberOfRunsSinceLastGuideline'); if (a) a.v = 100;
+                  var b2 = find(lt, 'introductionPopupShownCount'); if (b2) b2.v = 50;
+                  var c2 = find(lt, 'hasCloudSaveCelebrationBeenShown'); if (c2) c2.v = 1;
+                  vals[localIdx].contents = localSave(lt, lb);
+                  vals[localIdx].timestamp = new Date();
+                  store.put(vals[localIdx], keys[localIdx]);
+                } catch (e3) { console.warn('SSPatch local: ' + e3.message); }
+              }
+
+              for (var i = 0; i < keys.length; i++) {
+                var key = String(keys[i]);
+                if (!/\/Save\/cloud$/.test(key)) continue;
+                if (!vals[i] || !vals[i].contents) continue;
+                try {
+                  var patched = buildSave(vals[i].contents, 99999999, 999999);
+                  vals[i].contents = patched;
+                  vals[i].timestamp = new Date();
+                  store.put(vals[i], keys[i]);
+                  n++;
+                } catch (err) { console.warn('SSPatch: ' + key + ' -> ' + err.message); }
+              }
+              console.log('SSPatch: patched ' + n + ' save(s)');
+            };
+          };
+        });
+      });
+    }).then(function (m) { return m; }, function (e) { console.warn('SSPatch failed: ' + e); return 'fail'; });
+  }
+
+  var api = { parseTree: parseTree, serNodes: serNodes, buildSave: buildSave, patchAll: patchAll };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  root.SS = root.SS || api;
+
+  /* ---------- auto boot : patche la sauvegarde puis lance Unity ---------- */
+  if (typeof document !== 'undefined') {
+    var booted = false, loadFired = false, onloadCalled = false;
+    if (document.readyState === 'complete') loadFired = true;
+    else window.addEventListener('load', function () { loadFired = true; });
+
+    function callDeferredOnload() {
+      if (onloadCalled || !loadFired) return;
+      if (typeof window.onload !== 'function') return;
+      onloadCalled = true;
+      var fn = window.onload;
+      try { fn.call(window, new Event('load')); } catch (e) { console.warn('SSPatch onload: ' + e); }
+    }
+
+    function boot() {
+      if (booted) return;
+      booted = true;
+      var s = document.createElement('script');
+      s.src = 'master-loader.js';
+      document.body.appendChild(s);
+      var n = 0;
+      var iv = setInterval(function () {
+        n++;
+        callDeferredOnload();
+        if (onloadCalled || n > 200) clearInterval(iv);
+      }, 100);
+    }
+    function run() {
+      try { createFirstSave().then(patchAll, patchAll).then(boot, boot); } catch (e) { boot(); }
+      setTimeout(boot, 5000);
+    }
+    if (document.body) run();
+    else document.addEventListener('DOMContentLoaded', run);
+  }
+})(typeof window !== 'undefined' ? window : globalThis);
+
 </script>
-<div class="fyfl-bottom-controls">
-<a class="fyfl-discord-button" href="https://discord.gg/fyfl" target="_blank" rel="noopener noreferrer" aria-label="Rejoindre le Discord FYFL" title="Discord FYFL">
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M19.54 5.19A16.9 16.9 0 0 0 15.5 4l-.49 1.02a15.3 15.3 0 0 0-4.02 0L10.5 4a16.9 16.9 0 0 0-4.04 1.19C3.9 8.75 3.2 12.2 3.55 15.6a16.4 16.4 0 0 0 4.97 2.51l1.2-1.63c-.66-.24-1.3-.54-1.9-.9l.46-.35c3.67 1.72 7.65 1.72 11.28 0l.47.35c-.6.36-1.24.66-1.9.9l1.2 1.63a16.4 16.4 0 0 0 4.97-2.51c.41-3.94-.7-7.36-4.76-10.41ZM8.76 14.1c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2c1.13 0 2.01.99 2 2.2 0 1.21-.88 2.2-2 2.2Zm6.48 0c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2c1.13 0 2.01.99 2 2.2s-.88 2.2-2 2.2Z"/>
-  </svg>
-</a>
-<button id="musicToggle" class="fyfl-sound-button" type="button" onclick="toggleMusic();event.stopPropagation();" aria-label="Couper la musique" title="Couper la musique">♫</button>
-</div>
-
-</body></html>
+  </body>
+</html>
